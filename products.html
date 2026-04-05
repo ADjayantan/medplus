@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- ── Navbar ── -->
 <nav class="navbar" id="main-navbar">
   <div class="navbar-top">
     <div class="container">
@@ -33,7 +32,6 @@
         <div class="nav-logo-icon">M+</div>
         <span class="nav-logo-text">Med<span>Plus</span></span>
       </div>
-
       <div class="nav-search">
         <div class="nav-search-inner">
           <input type="text" id="search-bar" placeholder="Search medicines, brands..." autocomplete="off">
@@ -41,7 +39,6 @@
         </div>
         <div id="autocomplete-list" class="autocomplete-dropdown"></div>
       </div>
-
       <div class="nav-actions">
         <a href="index.html" class="nav-btn nav-btn-ghost">
           <i class="fas fa-home"></i> <span>Home</span>
@@ -65,24 +62,17 @@
   </div>
 </nav>
 
-<!-- ── Category Bar ── -->
 <div class="category-section">
-  <div class="category-scroll" id="category-tabs">
-    <!-- rendered by JS -->
-  </div>
+  <div class="category-scroll" id="category-tabs"></div>
 </div>
 
-<!-- ── Category Cards Hero ── -->
 <div class="cat-cards-section">
   <div class="container" style="max-width:1280px;margin:0 auto;padding:0 1.25rem">
     <h2 class="cat-cards-title">Shop by Category</h2>
-    <div class="cat-cards-grid" id="category-cards">
-      <!-- rendered by JS -->
-    </div>
+    <div class="cat-cards-grid" id="category-cards"></div>
   </div>
 </div>
 
-<!-- ── Toolbar ── -->
 <div class="products-toolbar" id="products-section">
   <div class="toolbar-left">
     <span class="results-count" id="results-count">Loading...</span>
@@ -117,7 +107,6 @@
   </div>
 </div>
 
-<!-- ── Products Grid ── -->
 <div class="products-section">
   <div class="container" style="max-width:1280px; margin:0 auto; padding:0 1.25rem">
     <div class="products-grid" id="products-grid">
@@ -129,11 +118,8 @@
   </div>
 </div>
 
-
-<!-- Product Modal Container -->
 <div id="product-modal"></div>
 
-<!-- Auth Modal -->
 <div class="auth-modal-overlay" id="auth-modal-overlay">
   <div class="auth-modal">
     <button class="auth-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
@@ -141,7 +127,6 @@
   </div>
 </div>
 
-<!-- Footer -->
 <footer class="footer" style="margin-top:3rem">
   <p>&copy; 2024 MedPlus Pharmacy. All rights reserved. |
      <a href="index.html">Home</a> &nbsp;|&nbsp;
@@ -150,28 +135,24 @@
   </p>
 </footer>
 
-<!-- Scripts -->
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/search.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script>
-// Pre-select category from URL param
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
-  const cat    = params.get('category');
+  const cat = params.get('category');
   if (cat) {
-    // Wait for categories to load then activate
     const interval = setInterval(() => {
       const btn = document.querySelector(`.cat-tab[data-cat="${cat}"]`);
-      if (btn) { clearInterval(interval); setCategory(cat, btn); }
+      if (btn) {
+        setCategory(cat, btn);
+        clearInterval(interval);
+      }
     }, 100);
-  }
-  const q = params.get('q');
-  if (q) {
-    const sb = document.getElementById('search-bar');
-    if (sb) { sb.value = q; }
+    setTimeout(() => clearInterval(interval), 5000);
   }
 });
 </script>
