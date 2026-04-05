@@ -30,6 +30,17 @@ app.use('/api/orders',        require('./routes/orders'));
 app.use('/api/prescriptions', require('./routes/prescriptions'));
 app.use('/api/admin',         require('./routes/admin'));
 
+/* ── Seed Route ── */
+app.get('/api/seed', async (_req, res) => {
+  try {
+    const { execSync } = require('child_process');
+    execSync('node ' + __dirname + '/seed.js');
+    res.json({ success: true, message: 'Database seeded with all products!' });
+  } catch(e) {
+    res.json({ error: e.message });
+  }
+});
+
 /* ── Health Check ── */
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date() }));
 
