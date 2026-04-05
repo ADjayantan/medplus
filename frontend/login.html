@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — MedPlus Pharmacy</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/auth.css">
+<style>
+body { background: linear-gradient(135deg, #0d2b2e 0%, #1a5454 50%, #2ea89a 100%); min-height: 100vh; display: flex; flex-direction: column; }
+.auth-page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+.auth-card { animation: slideUp .4s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.brand-back { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+.brand-link { display: flex; align-items: center; gap: .5rem; text-decoration: none; color: #fff; font-weight: 800; font-size: 1.1rem; }
+.brand-icon { width: 36px; height: 36px; background: rgba(255,255,255,.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<div class="auth-page">
+  <div style="width:100%;max-width:440px">
+
+    <div class="brand-back">
+      <a href="index.html" class="brand-link">
+        <div class="brand-icon">M+</div>
+        <span style="color:#fff">MedPlus</span>
+      </a>
+    </div>
+
+    <div class="auth-card">
+
+      <div class="auth-logo">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,var(--teal-400),var(--teal-600));border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem">
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </div>
+
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Sign in to your MedPlus account</p>
+
+      <div class="auth-error" id="login-error"></div>
+
+      <form class="auth-form" onsubmit="doLogin(event)">
+        <div class="form-group">
+          <label class="form-group label" style="font-size:.82rem;font-weight:600;color:var(--text-secondary)">Email Address</label>
+          <div style="position:relative;margin-top:.35rem">
+            <i class="fas fa-envelope" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-secondary);font-size:.875rem"></i>
+            <input type="email" id="login-email" class="input" style="padding-left:2.75rem" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label style="font-size:.82rem;font-weight:600;color:var(--text-secondary)">Password</label>
+          <div class="input-eye-wrap" style="margin-top:.35rem">
+            <i class="fas fa-lock" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-secondary);font-size:.875rem;z-index:1"></i>
+            <input type="password" id="login-password" class="input" style="padding-left:2.75rem" placeholder="Your password" autocomplete="current-password" required>
+            <button type="button" class="eye-btn" onclick="togglePwd('login-password', this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="text-align:right;margin-top:-.5rem">
+          <a href="#" style="font-size:.82rem;color:var(--teal-600);font-weight:600;text-decoration:none">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="login-btn" style="margin-top:.5rem">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+
+      <div class="auth-switch" style="margin-top:1.25rem">
+        Don't have an account?
+        <a href="register.html" style="color:var(--teal-600);font-weight:700;text-decoration:none">Create one</a>
+      </div>
+
+      <div style="text-align:center;margin-top:.75rem">
+        <a href="index.html" style="font-size:.82rem;color:var(--text-secondary);text-decoration:none">
+          <i class="fas fa-arrow-left"></i> Back to store
+        </a>
+      </div>
+
+      <!-- Admin hint -->
+      <div style="margin-top:1.5rem;padding:1rem;background:var(--bg-muted);border-radius:10px;border:1.5px dashed var(--border-color);font-size:.78rem;color:var(--text-secondary)">
+        <strong style="color:var(--teal-600)"><i class="fas fa-shield-alt"></i> Admin Access:</strong><br>
+        Email: admin@medplus.com &nbsp;|&nbsp; Password: Admin@123
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+// Redirect if already logged in
+if (isLoggedIn()) {
+  const redirect = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+  window.location.href = redirect;
+}
+
+function togglePwd(id, btn) {
+  const inp = document.getElementById(id);
+  if (!inp) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+  } else {
+    inp.type = 'password';
+    btn.innerHTML = '<i class="fas fa-eye"></i>';
+  }
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const email    = document.getElementById('login-email')?.value.trim();
+  const password = document.getElementById('login-password')?.value;
+  const errEl    = document.getElementById('login-error');
+  const btn      = document.getElementById('login-btn');
+
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-dots">Signing in…</span>';
+
+  try {
+    const data = await AuthAPI.login({ email, password });
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user',  JSON.stringify(data.user));
+
+    const redirect = new URLSearchParams(window.location.search).get('redirect');
+    window.location.href = redirect || (data.user.isAdmin ? 'admin-dashboard.html' : 'index.html');
+  } catch (err) {
+    errEl.textContent = err.message || 'Login failed. Please check your credentials.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+  }
+}
+</script>
+</body>
+</html>

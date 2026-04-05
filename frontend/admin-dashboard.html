@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — MedPlus</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-wrapper">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon"><i class="fas fa-pills"></i></span>
+      <div>
+        <div class="brand-name">MedPlus</div>
+        <div class="brand-sub">Admin Panel</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin-dashboard.html" class="nav-item active">
+        <span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span>Dashboard</span>
+      </a>
+      <div class="nav-section">Catalogue</div>
+      <a href="admin-products.html" class="nav-item">
+        <span class="nav-icon"><i class="fas fa-pills"></i></span><span>Products</span>
+      </a>
+      <div class="nav-section">Operations</div>
+      <a href="admin-orders.html" class="nav-item">
+        <span class="nav-icon"><i class="fas fa-box"></i></span><span>Orders</span>
+      </a>
+      <a href="admin-prescriptions.html" class="nav-item" id="rx-nav-link">
+        <span class="nav-icon"><i class="fas fa-file-prescription"></i></span><span>Prescriptions</span>
+        <span class="nav-badge" id="pending-rx-badge" style="display:none">0</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html"><i class="fas fa-home"></i> <span>Back to Store</span></a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="topbar-title">Dashboard <span>Overview</span></div>
+      <div class="topbar-actions">
+        <span id="admin-name" style="font-size:14px;color:#64748b"></span>
+        <div class="admin-avatar" id="admin-avatar">A</div>
+        <button class="btn btn-ghost btn-sm" onclick="adminLogout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <div id="alert-area"></div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-pills"></i></div>
+          <div><div class="stat-label">Total Products</div><div class="stat-value" id="s-products">—</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-box"></i></div>
+          <div><div class="stat-label">Total Orders</div><div class="stat-value" id="s-orders">—</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+          <div><div class="stat-label">Customers</div><div class="stat-value" id="s-users">—</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="fas fa-file-prescription"></i></div>
+          <div><div class="stat-label">Pending Rx</div><div class="stat-value" id="s-rx">—</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-rupee-sign"></i></div>
+          <div><div class="stat-label">Total Revenue</div><div class="stat-value" id="s-revenue">—</div></div>
+        </div>
+      </div>
+
+      <!-- Two column layout -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+        <!-- Recent Orders -->
+        <div class="admin-card">
+          <div class="card-header">
+            <span class="card-title">Recent Orders</span>
+            <a href="admin-orders.html" class="btn btn-outline btn-sm">View All</a>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="recent-orders-body">
+                <tr><td colspan="4" class="loading-center"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Orders by Status -->
+        <div class="admin-card">
+          <div class="card-header">
+            <span class="card-title">Orders by Status</span>
+          </div>
+          <div class="card-body">
+            <div id="status-chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="admin-card">
+        <div class="card-header"><span class="card-title">Quick Actions</span></div>
+        <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="admin-products.html" class="btn btn-primary"><i class="fas fa-plus"></i> Add Product</a>
+          <a href="admin-prescriptions.html" class="btn btn-warning"><i class="fas fa-file-prescription"></i> Review Prescriptions</a>
+          <a href="admin-orders.html" class="btn btn-outline"><i class="fas fa-box"></i> Manage Orders</a>
+          <a href="index.html" target="_blank" class="btn btn-ghost"><i class="fas fa-store"></i> View Store</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+/* Admin guard */
+function adminGuard() {
+  const u = currentUser();
+  if (!u || !u.isAdmin) { window.location.href = 'admin-login.html'; return false; }
+  return true;
+}
+function adminLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = 'admin-login.html';
+}
+
+function showAlert(msg, type) {
+  document.getElementById('alert-area').innerHTML =
+    `<div class="alert alert-${type || 'danger'}"><i class="fas fa-exclamation-triangle"></i> ${msg}</div>`;
+}
+
+function badgeHtml(status) {
+  const map = { pending:'badge-pending', confirmed:'badge-confirmed', shipped:'badge-shipped', delivered:'badge-delivered', cancelled:'badge-cancelled' };
+  return `<span class="badge ${map[status] || ''}">${status}</span>`;
+}
+
+async function loadStats() {
+  try {
+    const data = await AdminAPI.stats();
+    document.getElementById('s-products').textContent = data.totalProducts;
+    document.getElementById('s-orders').textContent   = data.totalOrders;
+    document.getElementById('s-users').textContent    = data.totalUsers;
+    document.getElementById('s-rx').textContent       = data.pendingPrescriptions;
+    document.getElementById('s-revenue').textContent  = '\u20b9' + data.totalRevenue.toLocaleString('en-IN');
+
+    if (data.pendingPrescriptions > 0) {
+      const badge = document.getElementById('pending-rx-badge');
+      badge.textContent  = data.pendingPrescriptions;
+      badge.style.display = '';
+    }
+
+    // Recent orders
+    const tbody = document.getElementById('recent-orders-body');
+    if (!data.recentOrders?.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;padding:24px">No orders yet</td></tr>';
+    } else {
+      tbody.innerHTML = data.recentOrders.map(o => `
+        <tr>
+          <td style="font-size:12px;font-family:monospace;color:#64748b">#${o._id.slice(-6).toUpperCase()}</td>
+          <td>${o.userId?.name || 'N/A'}</td>
+          <td>\u20b9${o.total.toLocaleString('en-IN')}</td>
+          <td>${badgeHtml(o.status)}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Status chart
+    const statusColors = { pending:'#f59e0b', confirmed:'#3b82f6', shipped:'#8b5cf6', delivered:'#22c55e', cancelled:'#ef4444' };
+    const maxCount = Math.max(...(data.ordersByStatus.map(s => s.count)), 1);
+    document.getElementById('status-chart').innerHTML = data.ordersByStatus.length
+      ? data.ordersByStatus.map(s => `
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span style="text-transform:capitalize;font-weight:600">${s._id}</span>
+              <span style="color:#64748b">${s.count}</span>
+            </div>
+            <div style="height:10px;background:#f1f5f9;border-radius:6px;overflow:hidden">
+              <div style="height:100%;width:${Math.round(s.count / maxCount * 100)}%;background:${statusColors[s._id] || '#94a3b8'};border-radius:6px"></div>
+            </div>
+          </div>`).join('')
+      : '<p style="color:#94a3b8;font-size:14px;text-align:center;padding:20px">No orders yet</p>';
+
+  } catch (err) {
+    if (err.message.includes('401') || err.message.includes('403')) {
+      window.location.href = 'admin-login.html';
+    } else {
+      showAlert(err.message);
+    }
+  }
+}
+
+function init() {
+  if (!adminGuard()) return;
+  const u = currentUser();
+  document.getElementById('admin-name').textContent   = u.name || 'Admin';
+  document.getElementById('admin-avatar').textContent = (u.name || 'A')[0].toUpperCase();
+  loadStats();
+}
+
+init();
+</script>
+</body>
+</html>

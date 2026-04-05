@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — MedPlus Pharmacy</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/navbar.css">
+<link rel="stylesheet" href="css/cart.css">
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar" id="main-navbar">
+  <div class="navbar-main">
+    <div class="container">
+      <div class="nav-logo" onclick="window.location.href='index.html'">
+        <div class="nav-logo-icon">M+</div>
+        <span class="nav-logo-text">Med<span>Plus</span></span>
+      </div>
+      <div style="flex:1;text-align:center">
+        <span style="font-size:.875rem;color:var(--text-secondary);font-weight:600">
+          <i class="fas fa-lock" style="color:var(--teal-500)"></i> Secure Checkout
+        </span>
+      </div>
+      <a href="cart.html" class="nav-btn nav-btn-ghost" style="font-size:.875rem">
+        <i class="fas fa-arrow-left"></i> Back to Cart
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Success Screen (hidden by default) ── -->
+<div id="success-screen" style="display:none" class="page-shell">
+  <div class="page-container" style="max-width:580px">
+    <div class="card order-success">
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+      <h2>Order Placed Successfully!</h2>
+      <p>Your order has been confirmed. We'll deliver your medicines within 24–48 hours.</p>
+      <div class="order-id-badge">
+        Order ID: <strong id="success-order-id">—</strong>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="profile.html" class="btn-primary" style="width:auto;padding:.8rem 1.75rem">
+          <i class="fas fa-box"></i> Track Order
+        </a>
+        <a href="products.html" class="btn-secondary" style="width:auto;padding:.8rem 1.75rem">
+          <i class="fas fa-shopping-bag"></i> Continue Shopping
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Checkout ── -->
+<div id="checkout-main" class="page-shell">
+  <div class="page-container">
+
+    <!-- Stepper -->
+    <div class="checkout-steps">
+      <div class="step done">
+        <div class="step-num"><i class="fas fa-check" style="font-size:.65rem"></i></div>
+        <span>Cart</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step active">
+        <div class="step-num">2</div>
+        <span>Details</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <span>Payment</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <span>Confirm</span>
+      </div>
+    </div>
+
+    <!-- Error banner -->
+    <div id="checkout-error" class="err-banner info-banner" style="display:none;max-width:900px;margin:0 auto 1.25rem">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="checkout-error-msg"></span>
+    </div>
+
+    <div class="checkout-layout">
+
+      <!-- Left Column -->
+      <div>
+
+        <!-- Delivery Address -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-map-marker-alt"></i> Delivery Address</div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Full Name <span class="required">*</span></label>
+              <input type="text" id="del-name" class="form-input" placeholder="Your full name" autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number <span class="required">*</span></label>
+              <input type="tel" id="del-phone" class="form-input" placeholder="10-digit mobile number" autocomplete="tel">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Full Address <span class="required">*</span></label>
+            <textarea id="del-address" class="form-input" placeholder="House/Flat No., Street, Area, Locality" rows="3"></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">City <span class="required">*</span></label>
+              <input type="text" id="del-city" class="form-input" placeholder="City">
+            </div>
+            <div class="form-group">
+              <label class="form-label">PIN Code <span class="required">*</span></label>
+              <input type="text" id="del-pin" class="form-input" placeholder="6-digit PIN" maxlength="6">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <select id="del-state" class="form-input">
+              <option value="">Select State</option>
+              <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+              <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+              <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+              <option>Himachal Pradesh</option><option>Jharkhand</option>
+              <option>Karnataka</option><option>Kerala</option>
+              <option>Madhya Pradesh</option><option>Maharashtra</option>
+              <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+              <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+              <option>Rajasthan</option><option>Sikkim</option>
+              <option selected>Tamil Nadu</option>
+              <option>Telangana</option><option>Tripura</option>
+              <option>Uttar Pradesh</option><option>Uttarakhand</option>
+              <option>West Bengal</option><option>Delhi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-credit-card"></i> Payment Method</div>
+
+          <div class="payment-options">
+            <div class="payment-option selected" data-method="COD" onclick="selectPayment('COD', this)">
+              <div class="payment-option-icon"><i class="fas fa-money-bill-wave"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">Cash on Delivery</div>
+                <div style="font-size:.75rem;opacity:.7">Pay on arrival</div>
+              </div>
+            </div>
+            <div class="payment-option" data-method="UPI" onclick="selectPayment('UPI', this)">
+              <div class="payment-option-icon"><i class="fas fa-mobile-alt"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">UPI</div>
+                <div style="font-size:.75rem;opacity:.7">GPay, PhonePe, Paytm</div>
+              </div>
+            </div>
+            <div class="payment-option" data-method="Card" onclick="selectPayment('Card', this)">
+              <div class="payment-option-icon"><i class="fas fa-credit-card"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">Card</div>
+                <div style="font-size:.75rem;opacity:.7">Debit or Credit</div>
+              </div>
+            </div>
+            <div class="payment-option" data-method="NetBanking" onclick="selectPayment('NetBanking', this)">
+              <div class="payment-option-icon"><i class="fas fa-university"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">Net Banking</div>
+                <div style="font-size:.75rem;opacity:.7">All major banks</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- UPI field (shown when UPI selected) -->
+          <div id="upi-field" style="display:none;margin-top:1rem">
+            <div class="form-group">
+              <label class="form-label">UPI ID</label>
+              <input type="text" id="upi-id" class="form-input" placeholder="yourname@upi">
+            </div>
+          </div>
+        </div>
+
+        <div class="info-banner">
+          <i class="fas fa-shield-alt"></i>
+          <span>All transactions are safe and secured with end-to-end encryption.</span>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Summary -->
+      <div>
+        <div class="card" style="position:sticky;top:80px">
+          <div class="card-title"><i class="fas fa-receipt"></i> Order Summary</div>
+
+          <!-- Items list -->
+          <div id="checkout-items-list" style="margin-bottom:1rem;max-height:260px;overflow-y:auto">
+            <!-- rendered by JS -->
+          </div>
+
+          <div class="summary-row">
+            <span>Subtotal (<span id="co-item-count">0</span> items)</span>
+            <span id="co-subtotal">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Discount</span>
+            <span id="co-discount" style="color:#22c55e">-₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Delivery</span>
+            <span id="co-delivery">₹40</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total Payable</span>
+            <span id="co-total">₹0</span>
+          </div>
+
+          <button class="btn-primary" id="place-order-btn" onclick="placeOrder()">
+            <i class="fas fa-check-circle"></i> Place Order
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>&copy; 2024 MedPlus Pharmacy. All rights reserved.</p>
+</footer>
+
+<div id="toast-container" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px"></div>
+
+<script src="js/api.js"></script>
+<script src="js/cart.js"></script>
+<script>
+let selectedPayment = 'COD';
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!isLoggedIn()) {
+    window.location.href = 'login.html?redirect=checkout.html';
+    return;
+  }
+  const cart = getCart();
+  if (!cart.length) { window.location.href = 'cart.html'; return; }
+
+  // Pre-fill from user profile
+  const user = currentUser();
+  if (user) {
+    const nameEl = document.getElementById('del-name');
+    const phoneEl= document.getElementById('del-phone');
+    if (nameEl && user.name)  nameEl.value  = user.name;
+    if (phoneEl && user.phone) phoneEl.value = user.phone;
+  }
+
+  renderCheckoutItems(cart);
+  renderCheckoutSummary(cart);
+});
+
+function renderCheckoutItems(cart) {
+  const list = document.getElementById('checkout-items-list');
+  if (!list) return;
+  list.innerHTML = cart.map(item => `
+    <div class="checkout-item">
+      <div class="checkout-item-name">${item.name}</div>
+      <div class="checkout-item-qty" style="color:var(--text-secondary);font-size:.8rem">×${item.qty||1}</div>
+      <div class="checkout-item-price">₹${(item.price*(item.qty||1)).toLocaleString('en-IN')}</div>
+    </div>
+  `).join('');
+}
+
+function renderCheckoutSummary(cart) {
+  const subtotal = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
+  const mrpTotal = cart.reduce((s,i) => s + (i.mrp||i.price)*(i.qty||1), 0);
+  const discount = mrpTotal - subtotal;
+  const delivery = subtotal >= 499 ? 0 : 40;
+  const total    = subtotal + delivery;
+
+  setText('co-item-count', cart.reduce((s,i)=>s+(i.qty||1),0));
+  setText('co-subtotal', '₹' + subtotal.toLocaleString('en-IN'));
+  setText('co-discount', '-₹' + discount.toLocaleString('en-IN'));
+  setHTML('co-delivery',  delivery===0 ? '<span style="color:#22c55e;font-weight:700">FREE</span>' : '₹' + delivery);
+  setText('co-total', '₹' + total.toLocaleString('en-IN'));
+}
+
+function setText(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+function setHTML(id, v) { const el=document.getElementById(id); if(el) el.innerHTML=v; }
+
+function selectPayment(method, el) {
+  selectedPayment = method;
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const upiField = document.getElementById('upi-field');
+  if (upiField) upiField.style.display = method === 'UPI' ? 'block' : 'none';
+}
+
+async function placeOrder() {
+  const btn = document.getElementById('place-order-btn');
+  const errEl = document.getElementById('checkout-error');
+  const errMsg = document.getElementById('checkout-error-msg');
+
+  const name    = document.getElementById('del-name')?.value.trim();
+  const phone   = document.getElementById('del-phone')?.value.trim();
+  const addr    = document.getElementById('del-address')?.value.trim();
+  const city    = document.getElementById('del-city')?.value.trim();
+  const pin     = document.getElementById('del-pin')?.value.trim();
+  const state   = document.getElementById('del-state')?.value;
+
+  if (!name || !phone || !addr || !city || !pin) {
+    errMsg.textContent = 'Please fill in all required delivery details.';
+    errEl.style.display = 'flex';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (!/^\d{10}$/.test(phone)) {
+    errMsg.textContent = 'Please enter a valid 10-digit mobile number.';
+    errEl.style.display = 'flex';
+    return;
+  }
+  if (!/^\d{6}$/.test(pin)) {
+    errMsg.textContent = 'Please enter a valid 6-digit PIN code.';
+    errEl.style.display = 'flex';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const cart     = getCart();
+  const subtotal = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
+  const delivery = subtotal >= 499 ? 0 : 40;
+  const total    = subtotal + delivery;
+
+  const fullAddress = `${addr}, ${city}, ${state} - ${pin}`;
+
+  const payload = {
+    items: cart.map(i => ({
+      productId: i._id,
+      name: i.name,
+      price: i.price,
+      qty: i.qty || 1,
+      image: i.image || ''
+    })),
+    total,
+    address: fullAddress,
+    phone,
+    paymentMethod: selectedPayment
+  };
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Placing Order...';
+
+  try {
+    const order = await OrderAPI.create(payload);
+    saveCart([]);
+    document.getElementById('checkout-main').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+    const oid = document.getElementById('success-order-id');
+    if (oid) oid.textContent = order._id || order.id || 'MP' + Date.now();
+    window.scrollTo(0, 0);
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+    errMsg.textContent = err.message || 'Failed to place order. Please try again.';
+    errEl.style.display = 'flex';
+  }
+}
+</script>
+</body>
+</html>

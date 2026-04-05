@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products — MedPlus Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon"><i class="fas fa-pills"></i></span>
+      <div><div class="brand-name">MedPlus</div><div class="brand-sub">Admin Panel</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin-dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span>Dashboard</span></a>
+      <div class="nav-section">Catalogue</div>
+      <a href="admin-products.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-pills"></i></span><span>Products</span></a>
+      <div class="nav-section">Operations</div>
+      <a href="admin-orders.html" class="nav-item"><span class="nav-icon"><i class="fas fa-box"></i></span><span>Orders</span></a>
+      <a href="admin-prescriptions.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-prescription"></i></span><span>Prescriptions</span></a>
+    </nav>
+    <div class="sidebar-footer"><a href="index.html"><i class="fas fa-home"></i> <span>Back to Store</span></a></div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="topbar-title">Products <span>Manage catalogue</span></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Add Product</button>
+        <button class="btn btn-ghost btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <div id="alert-area"></div>
+
+      <div class="filter-bar">
+        <input type="text" id="search-input" placeholder="Search products..." oninput="filterProducts()">
+        <select id="cat-filter" onchange="filterProducts()">
+          <option value="">All Categories</option>
+        </select>
+        <select id="rx-filter" onchange="filterProducts()">
+          <option value="">All Types</option>
+          <option value="true">Prescription Only</option>
+          <option value="false">OTC</option>
+        </select>
+        <select id="stock-filter" onchange="filterProducts()">
+          <option value="">All Stock</option>
+          <option value="true">In Stock</option>
+          <option value="false">Out of Stock</option>
+        </select>
+        <span id="product-count" style="color:#64748b;font-size:13px;white-space:nowrap"></span>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price / MRP</th>
+                <th>Rating</th>
+                <th>Stock</th>
+                <th>Type</th>
+                <th style="text-align:right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody">
+              <tr><td colspan="7" class="loading-center"><div class="spinner"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Add Product</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-alert"></div>
+      <input type="hidden" id="edit-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input class="form-control" id="f-name" placeholder="e.g. Paracetamol 500mg">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <input class="form-control" id="f-category" placeholder="e.g. Pain Relief" list="cat-list">
+          <datalist id="cat-list"></datalist>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Price (Rs.) *</label>
+          <input class="form-control" id="f-price" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">MRP (Rs.) *</label>
+          <input class="form-control" id="f-mrp" type="number" min="0" placeholder="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" id="f-desc" rows="2" placeholder="Short description..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Manufacturer</label>
+          <input class="form-control" id="f-mfr" placeholder="e.g. Sun Pharma">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Image URL</label>
+          <input class="form-control" id="f-image" placeholder="https://...">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Rating (0-5)</label>
+          <input class="form-control" id="f-rating" type="number" min="0" max="5" step="0.1" placeholder="4.5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reviews Count</label>
+          <input class="form-control" id="f-reviews" type="number" min="0" placeholder="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input class="form-control" id="f-tags" placeholder="pain, fever, relief">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">In Stock</label>
+          <select class="form-control" id="f-stock">
+            <option value="true">Yes — In Stock</option>
+            <option value="false">No — Out of Stock</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Requires Prescription</label>
+          <select class="form-control" id="f-rx">
+            <option value="false">No — OTC</option>
+            <option value="true">Yes — Rx Required</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveProduct()">
+        <i class="fas fa-save"></i> Save Product
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h3>Delete Product</h3>
+      <button class="modal-close" onclick="closeDeleteModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:#475569">Are you sure you want to delete <strong id="delete-name"></strong>? This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="del-btn" onclick="confirmDelete()">
+        <i class="fas fa-trash"></i> Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+let allProducts = [];
+let deleteId    = null;
+
+function adminLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = 'admin-login.html';
+}
+
+function showAlert(msg, type) {
+  document.getElementById('alert-area').innerHTML =
+    `<div class="alert alert-${type || 'danger'}"><i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${msg}</div>`;
+  if (type === 'success') setTimeout(() => document.getElementById('alert-area').innerHTML = '', 3000);
+}
+
+function showModalAlert(msg) {
+  document.getElementById('modal-alert').innerHTML =
+    `<div class="alert alert-danger" style="margin-bottom:12px"><i class="fas fa-exclamation-circle"></i> ${msg}</div>`;
+}
+
+async function loadProducts() {
+  try {
+    const data  = await ProductAPI.list();
+    allProducts = data.products || [];
+    populateCategoryFilter();
+    renderProducts(allProducts);
+  } catch (err) {
+    document.getElementById('products-tbody').innerHTML =
+      `<tr><td colspan="7" style="text-align:center;color:red;padding:24px">${err.message}</td></tr>`;
+  }
+}
+
+function populateCategoryFilter() {
+  const cats = [...new Set(allProducts.map(p => p.category))].sort();
+  const sel  = document.getElementById('cat-filter');
+  const dl   = document.getElementById('cat-list');
+  sel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  dl.innerHTML  = cats.map(c => `<option value="${c}">`).join('');
+}
+
+function filterProducts() {
+  const q     = document.getElementById('search-input').value.toLowerCase();
+  const cat   = document.getElementById('cat-filter').value;
+  const rx    = document.getElementById('rx-filter').value;
+  const stock = document.getElementById('stock-filter').value;
+  const filtered = allProducts.filter(p => {
+    if (q && !p.name.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q)) return false;
+    if (cat   && p.category !== cat) return false;
+    if (rx    !== '' && String(p.requiresPrescription) !== rx) return false;
+    if (stock !== '' && String(p.stock) !== stock) return false;
+    return true;
+  });
+  renderProducts(filtered);
+}
+
+function renderProducts(products) {
+  document.getElementById('product-count').textContent = products.length + ' products';
+  const tbody    = document.getElementById('products-tbody');
+  const discount = p => Math.round((p.mrp - p.price) / p.mrp * 100);
+  if (!products.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:40px">No products found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = products.map(p => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:12px">
+          ${p.image
+            ? `<img class="img-thumb" src="${p.image}" alt="" onerror="this.style.display='none'">`
+            : `<div class="img-placeholder"><i class="fas fa-pills"></i></div>`}
+          <div>
+            <div style="font-weight:600;font-size:14px">${p.name}</div>
+            <div style="font-size:12px;color:#64748b">${p.manufacturer || ''}</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:13px">${p.category}</span></td>
+      <td>
+        <div style="font-weight:700">\u20b9${p.price}</div>
+        <div style="text-decoration:line-through;color:#94a3b8;font-size:12px">\u20b9${p.mrp}</div>
+        <div style="font-size:11px;color:#22c55e;font-weight:600">${discount(p)}% off</div>
+      </td>
+      <td>
+        <div style="color:#f59e0b;font-size:13px">${'&#9733;'.repeat(Math.floor(p.rating))}${'&#9734;'.repeat(5 - Math.floor(p.rating))}</div>
+        <div style="font-size:11px;color:#64748b">${p.rating} (${p.reviews})</div>
+      </td>
+      <td>${p.stock ? '<span class="badge badge-in-stock">In Stock</span>' : '<span class="badge badge-out">Out</span>'}</td>
+      <td>${p.requiresPrescription ? '<span class="badge badge-rx">Rx</span>' : '<span class="badge" style="background:#f1f5f9;color:#475569">OTC</span>'}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn btn-outline btn-sm" onclick="openEdit('${p._id}')">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="openDelete('${p._id}','${p.name.replace(/'/g, "\\'")}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openModal(reset) {
+  if (reset !== false) {
+    document.getElementById('modal-title').textContent = 'Add Product';
+    document.getElementById('edit-id').value = '';
+    document.getElementById('modal-alert').innerHTML = '';
+    ['f-name','f-category','f-price','f-mrp','f-desc','f-mfr','f-image','f-tags'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    document.getElementById('f-rating').value  = '4.5';
+    document.getElementById('f-reviews').value = '0';
+    document.getElementById('f-stock').value   = 'true';
+    document.getElementById('f-rx').value      = 'false';
+  }
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('product-modal').classList.remove('open'); }
+
+function openEdit(id) {
+  const p = allProducts.find(x => x._id === id);
+  if (!p) return;
+  document.getElementById('modal-title').textContent = 'Edit Product';
+  document.getElementById('edit-id').value           = p._id;
+  document.getElementById('f-name').value            = p.name;
+  document.getElementById('f-category').value        = p.category;
+  document.getElementById('f-price').value           = p.price;
+  document.getElementById('f-mrp').value             = p.mrp;
+  document.getElementById('f-desc').value            = p.description || '';
+  document.getElementById('f-mfr').value             = p.manufacturer || '';
+  document.getElementById('f-image').value           = p.image || '';
+  document.getElementById('f-rating').value          = p.rating;
+  document.getElementById('f-reviews').value         = p.reviews;
+  document.getElementById('f-tags').value            = (p.tags || []).join(', ');
+  document.getElementById('f-stock').value           = String(p.stock);
+  document.getElementById('f-rx').value              = String(p.requiresPrescription);
+  document.getElementById('modal-alert').innerHTML   = '';
+  openModal(false);
+}
+
+async function saveProduct() {
+  const id       = document.getElementById('edit-id').value;
+  const name     = document.getElementById('f-name').value.trim();
+  const category = document.getElementById('f-category').value.trim();
+  const price    = parseFloat(document.getElementById('f-price').value);
+  const mrp      = parseFloat(document.getElementById('f-mrp').value);
+  if (!name || !category || isNaN(price) || isNaN(mrp)) { showModalAlert('Name, category, price and MRP are required'); return; }
+  if (price > mrp) { showModalAlert('Price cannot be greater than MRP'); return; }
+  const body = {
+    name, category, price, mrp,
+    description: document.getElementById('f-desc').value.trim(),
+    manufacturer: document.getElementById('f-mfr').value.trim(),
+    image: document.getElementById('f-image').value.trim(),
+    rating: parseFloat(document.getElementById('f-rating').value) || 4.0,
+    reviews: parseInt(document.getElementById('f-reviews').value) || 0,
+    tags: document.getElementById('f-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    stock: document.getElementById('f-stock').value === 'true',
+    requiresPrescription: document.getElementById('f-rx').value === 'true'
+  };
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  try {
+    if (id) await ProductAPI.update(id, body);
+    else    await ProductAPI.create(body);
+    showAlert((id ? 'Product updated' : 'Product added') + ' successfully', 'success');
+    closeModal();
+    loadProducts();
+  } catch (err) {
+    showModalAlert(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Save Product';
+  }
+}
+
+function openDelete(id, name) {
+  deleteId = id;
+  document.getElementById('delete-name').textContent = name;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function closeDeleteModal() { document.getElementById('delete-modal').classList.remove('open'); deleteId = null; }
+
+async function confirmDelete() {
+  if (!deleteId) return;
+  const btn = document.getElementById('del-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+  try {
+    await ProductAPI.delete(deleteId);
+    closeDeleteModal();
+    showAlert('Product deleted', 'success');
+    loadProducts();
+  } catch (err) {
+    showAlert(err.message);
+    closeDeleteModal();
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+  }
+}
+
+document.getElementById('product-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('delete-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteModal(); });
+
+// Admin guard
+const u = currentUser();
+if (!u || !u.isAdmin) { window.location.href = 'admin-login.html'; } else { loadProducts(); }
+</script>
+</body>
+</html>
