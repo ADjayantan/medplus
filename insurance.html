@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -97,9 +97,7 @@
     </div>
 
     <!-- Plans Grid -->
-    <div class="insurance-grid" id="plans-grid">
-      <!-- rendered by insurance.js -->
-    </div>
+    <div class="insurance-grid" id="plans-grid"></div>
 
     <!-- Compare Table -->
     <div class="card" style="margin-bottom:1.5rem;overflow-x:auto">
@@ -136,9 +134,7 @@
     <!-- FAQ -->
     <div class="card">
       <div class="card-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</div>
-      <div id="faq-list">
-        <!-- rendered by insurance.js -->
-      </div>
+      <div id="faq-list"></div>
     </div>
 
     <!-- CTA Banner -->
@@ -164,7 +160,7 @@
 
 <!-- Footer -->
 <footer class="footer" style="margin-top:2rem">
-  <p>&copy; 2024 MedPlus Pharmacy. Insurance products are offered in partnership with licensed insurers.
+  <p>&copy; 2025 MedPlus Pharmacy. Insurance products are offered in partnership with licensed insurers.
      <a href="#">Terms</a> &nbsp;|&nbsp; <a href="#">Privacy</a>
   </p>
 </footer>
@@ -174,7 +170,7 @@
 <script src="js/insurance.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  renderCart(); // update cart badge
+  renderCart();
   const user    = currentUser();
   const loginEl = document.getElementById('nav-login');
   const profEl  = document.getElementById('nav-profile');
