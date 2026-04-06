@@ -142,7 +142,7 @@ async function loadProducts() {
         <i class="fas fa-exclamation-triangle"></i>
         <h3>Could not connect to server</h3>
         <p>${err.message}</p>
-        <p style="font-size:13px;margin-top:8px;opacity:.7">Make sure the backend is running on port 5000</p>
+        <p style="font-size:13px;margin-top:8px;opacity:.7">Make sure the backend is running on port 3000</p>
         <button onclick="loadProducts()" class="btn-retry">
           <i class="fas fa-redo"></i> Retry
         </button>
