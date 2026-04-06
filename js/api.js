@@ -1,4 +1,4 @@
-/* api.js — centralised fetch helper for MedPlus
+ /* api.js — centralised fetch helper for MedPlus
    API_BASE auto-detects environment:
    - Local dev  → http://localhost:3000/api
    - Production → set VITE_API_URL or update the const below with your deployed backend URL
@@ -6,7 +6,7 @@
 
 // ── CONFIGURE THIS for production deployment ──────────────────────────────
 // If you deploy the backend to Render/Railway/etc., replace the string below:
-const PRODUCTION_API = 'https://medplus-lkr7.onrender.com/api';
+const PRODUCTION_API = 'https://your-backend.onrender.com/api';
 // ─────────────────────────────────────────────────────────────────────────
 
 const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
