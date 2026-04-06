@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,6 +13,7 @@
 </head>
 <body>
 
+<!-- ── Navbar ── -->
 <nav class="navbar" id="main-navbar">
   <div class="navbar-top">
     <div class="container">
@@ -32,6 +33,7 @@
         <div class="nav-logo-icon">M+</div>
         <span class="nav-logo-text">Med<span>Plus</span></span>
       </div>
+
       <div class="nav-search">
         <div class="nav-search-inner">
           <input type="text" id="search-bar" placeholder="Search medicines, brands..." autocomplete="off">
@@ -39,6 +41,7 @@
         </div>
         <div id="autocomplete-list" class="autocomplete-dropdown"></div>
       </div>
+
       <div class="nav-actions">
         <a href="index.html" class="nav-btn nav-btn-ghost">
           <i class="fas fa-home"></i> <span>Home</span>
@@ -62,10 +65,12 @@
   </div>
 </nav>
 
+<!-- ── Category Bar ── -->
 <div class="category-section">
   <div class="category-scroll" id="category-tabs"></div>
 </div>
 
+<!-- ── Category Cards Hero ── -->
 <div class="cat-cards-section">
   <div class="container" style="max-width:1280px;margin:0 auto;padding:0 1.25rem">
     <h2 class="cat-cards-title">Shop by Category</h2>
@@ -73,6 +78,7 @@
   </div>
 </div>
 
+<!-- ── Toolbar ── -->
 <div class="products-toolbar" id="products-section">
   <div class="toolbar-left">
     <span class="results-count" id="results-count">Loading...</span>
@@ -107,6 +113,7 @@
   </div>
 </div>
 
+<!-- ── Products Grid ── -->
 <div class="products-section">
   <div class="container" style="max-width:1280px; margin:0 auto; padding:0 1.25rem">
     <div class="products-grid" id="products-grid">
@@ -118,8 +125,10 @@
   </div>
 </div>
 
+<!-- Product Modal Container -->
 <div id="product-modal"></div>
 
+<!-- Auth Modal -->
 <div class="auth-modal-overlay" id="auth-modal-overlay">
   <div class="auth-modal">
     <button class="auth-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
@@ -127,8 +136,9 @@
   </div>
 </div>
 
+<!-- Footer -->
 <footer class="footer" style="margin-top:3rem">
-  <p>&copy; 2024 MedPlus Pharmacy. All rights reserved. |
+  <p>&copy; 2025 MedPlus Pharmacy. All rights reserved. |
      <a href="index.html">Home</a> &nbsp;|&nbsp;
      <a href="insurance.html">Insurance</a> &nbsp;|&nbsp;
      <a href="upload-prescription.html">Upload Rx</a>
@@ -143,16 +153,17 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
-  const cat = params.get('category');
+  const cat    = params.get('category');
   if (cat) {
     const interval = setInterval(() => {
       const btn = document.querySelector(`.cat-tab[data-cat="${cat}"]`);
-      if (btn) {
-        setCategory(cat, btn);
-        clearInterval(interval);
-      }
+      if (btn) { clearInterval(interval); setCategory(cat, btn); }
     }, 100);
-    setTimeout(() => clearInterval(interval), 5000);
+  }
+  const q = params.get('q');
+  if (q) {
+    const sb = document.getElementById('search-bar');
+    if (sb) { sb.value = q; }
   }
 });
 </script>
