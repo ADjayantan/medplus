@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -97,7 +97,9 @@
     </div>
 
     <!-- Plans Grid -->
-    <div class="insurance-grid" id="plans-grid"></div>
+    <div class="insurance-grid" id="plans-grid">
+      <!-- rendered by insurance.js -->
+    </div>
 
     <!-- Compare Table -->
     <div class="card" style="margin-bottom:1.5rem;overflow-x:auto">
@@ -134,7 +136,9 @@
     <!-- FAQ -->
     <div class="card">
       <div class="card-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</div>
-      <div id="faq-list"></div>
+      <div id="faq-list">
+        <!-- rendered by insurance.js -->
+      </div>
     </div>
 
     <!-- CTA Banner -->
@@ -170,7 +174,7 @@
 <script src="js/insurance.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  renderCart();
+  renderCart(); // update cart badge
   const user    = currentUser();
   const loginEl = document.getElementById('nav-login');
   const profEl  = document.getElementById('nav-profile');
