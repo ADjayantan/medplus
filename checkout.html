@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -178,7 +178,7 @@
             </div>
           </div>
 
-          <!-- UPI field -->
+          <!-- UPI field (shown when UPI selected) -->
           <div id="upi-field" style="display:none;margin-top:1rem">
             <div class="form-group">
               <label class="form-label">UPI ID</label>
@@ -199,6 +199,7 @@
         <div class="card" style="position:sticky;top:80px">
           <div class="card-title"><i class="fas fa-receipt"></i> Order Summary</div>
 
+          <!-- Items list -->
           <div id="checkout-items-list" style="margin-bottom:1rem;max-height:260px;overflow-y:auto">
             <!-- rendered by JS -->
           </div>
@@ -250,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cart = getCart();
   if (!cart.length) { window.location.href = 'cart.html'; return; }
 
+  // Pre-fill from user profile
   const user = currentUser();
   if (user) {
     const nameEl = document.getElementById('del-name');
