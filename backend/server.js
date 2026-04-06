@@ -14,8 +14,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../frontend')));
-app.use('/uploads', express.static(path.join(__dirname, '../frontend/uploads')));
+app.use(express.static(path.join(__dirname, '..')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 /* ── Database ── */
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/medplus';
@@ -37,11 +37,11 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date() 
 app.get('*', (req, res) => {
   const file = req.path;
   if (file.endsWith('.html') || file.endsWith('.css') || file.endsWith('.js')) {
-    return res.sendFile(path.join(__dirname, '../frontend', file), err => {
-      if (err) res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    return res.sendFile(path.join(__dirname, '..', file), err => {
+      if (err) res.sendFile(path.join(__dirname, '../index.html'));
     });
   }
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+  res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 /* ── Global Error Handler ── */
