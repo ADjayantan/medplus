@@ -1,14 +1,23 @@
-const jwt    = require('jsonwebtoken');
-const SECRET = process.env.JWT_SECRET || 'medplus_secret_key_2024';
+ /* =====================================================
+   middleware/auth.js — JWT Authentication
+   FIXED: warns if JWT_SECRET is missing
+===================================================== */
+const jwt = require('jsonwebtoken');
+
+const SECRET = process.env.JWT_SECRET;
+if (!SECRET) {
+  console.warn('[WARN] JWT_SECRET is not set! Using insecure fallback. Set it in your .env file.');
+}
+const EFFECTIVE_SECRET = SECRET || 'medplus_INSECURE_fallback_set_JWT_SECRET_in_env';
 
 function authMiddleware(req, res, next) {
   const auth = req.headers.authorization;
   if (!auth || !auth.startsWith('Bearer '))
     return res.status(401).json({ message: 'Unauthorized — token missing' });
   try {
-    req.user = jwt.verify(auth.split(' ')[1], SECRET);
+    req.user = jwt.verify(auth.split(' ')[1], EFFECTIVE_SECRET);
     next();
-  } catch {
+  } catch (err) {
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
