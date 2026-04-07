@@ -1,10 +1,11 @@
+
 /* ============================================
    PRODUCTS + CATEGORIES + CARDS — Stage 5
    ============================================ */
 
 /* ─── Category Tabs ─────────────────────────── */
 .category-section {
-  background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 70px; z-index: 40; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: top 0.1s;
 }
 .category-scroll { display: flex; gap: 8px; padding: 14px 24px; overflow-x: auto; scrollbar-width: none; }
 .category-scroll::-webkit-scrollbar { display: none; }
