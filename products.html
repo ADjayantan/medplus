@@ -157,6 +157,21 @@
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script>
+// ── Fix sticky category bar top dynamically based on navbar height ──
+function updateCategoryTop() {
+  const navbar = document.getElementById('main-navbar');
+  const categorySection = document.querySelector('.category-section');
+  if (navbar && categorySection) {
+    categorySection.style.top = navbar.offsetHeight + 'px';
+  }
+}
+// Run on load and on every scroll (navbar height changes as top bar hides)
+window.addEventListener('scroll', updateCategoryTop);
+window.addEventListener('resize', updateCategoryTop);
+document.addEventListener('DOMContentLoaded', updateCategoryTop);
+// Also run after a short delay to catch any layout shifts
+setTimeout(updateCategoryTop, 300);
+
 // Pre-select category from URL param
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
