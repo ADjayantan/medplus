@@ -188,6 +188,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const sb = document.getElementById('search-bar');
     if (sb) { sb.value = q; }
   }
+
+  // ── Fix sticky offsets so category bar and toolbar stack below navbar ──
+  function updateStickyOffsets() {
+    const navbar   = document.getElementById('main-navbar');
+    const catBar   = document.querySelector('.category-section');
+    if (!navbar || !catBar) return;
+    const navH = navbar.getBoundingClientRect().height;
+    const catH = catBar.getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--navbar-height', navH + 'px');
+    document.documentElement.style.setProperty('--category-height', catH + 'px');
+  }
+
+  // Run once after initial paint, then on resize
+  setTimeout(updateStickyOffsets, 100);
+  window.addEventListener('resize', updateStickyOffsets);
 });
 </script>
 </body>
