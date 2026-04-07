@@ -13,10 +13,10 @@ body.dark .navbar-top{background:var(--teal-900);}
 
 /* ── Main bar ── */
 .navbar-main{padding:.75rem 0;}
-.navbar-main .container{display:flex;align-items:center;gap:1.25rem;}
+.navbar-main .container{display:flex;align-items:center;gap:1rem;flex-wrap:nowrap;}
 
 /* ── Logo ── */
-.nav-logo{display:flex;align-items:center;gap:.5rem;cursor:pointer;flex-shrink:0;}
+.nav-logo{display:flex;align-items:center;gap:.5rem;cursor:pointer;flex-shrink:0;text-decoration:none;}
 .nav-logo-icon{width:2rem;height:2rem;background:linear-gradient(135deg,var(--teal-400),var(--teal-600));color:#fff;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;}
 .nav-logo-text{font-family:var(--font-display);font-size:1.25rem;font-weight:900;color:var(--text-primary);}
 .nav-logo-text span{color:var(--teal-500);}
@@ -27,12 +27,13 @@ body.dark .navbar-top{background:var(--teal-900);}
 .nav-location-text strong{color:var(--teal-600);}
 
 /* ── Search wrapper ── */
-.nav-search{flex:1;max-width:540px;position:relative;}
+.nav-search{flex:1;min-width:0;max-width:580px;position:relative;}
 
 /* ── NEW: nav-search-inner — styled to match home page ── */
 .nav-search-inner {
   display: flex;
   align-items: center;
+  width: 100%;
   background: #ffffff;
   border: 2px solid var(--teal-400);
   border-radius: 50px;
@@ -83,6 +84,7 @@ body.dark .navbar-top{background:var(--teal-900);}
 .nav-search-box {
   display: flex;
   align-items: center;
+  width: 100%;
   background: #ffffff;
   border: 2px solid var(--teal-400);
   border-radius: 50px;
@@ -163,7 +165,7 @@ body.dark .nav-search-input{background:var(--bg-muted);}
 .ac-cat{font-size:.75rem;color:var(--text-secondary);white-space:nowrap;}
 
 /* ── Nav Actions ── */
-.nav-actions{display:flex;align-items:center;gap:.375rem;margin-left:auto;}
+.nav-actions{display:flex;align-items:center;gap:.375rem;flex-shrink:0;}
 .nav-action-btn{display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.4rem .6rem;border-radius:var(--radius-md);background:transparent;border:none;color:var(--text-secondary);font-size:.65rem;font-weight:600;cursor:pointer;transition:all var(--transition);position:relative;}
 .nav-action-btn:hover{background:var(--bg-muted);color:var(--teal-600);}
 .nav-action-btn .icon{font-size:1.1rem;}
