@@ -33,18 +33,19 @@ router.get('/my', authMiddleware, async (req, res) => {
 router.get('/', adminMiddleware, async (req, res) => {
   try {
     const { status, page = 1, limit = 50 } = req.query;
+    const safeLimit = Math.min(parseInt(limit) || 50, 200); // max 200 per page
     const filter = {};
     if (status) filter.status = status;
-    const skip = (page - 1) * limit;
+    const skip = (page - 1) * safeLimit;
     const [orders, total] = await Promise.all([
       Order.find(filter)
         .populate('userId', 'name email phone')
         .sort({ createdAt: -1 })
         .skip(Number(skip))
-        .limit(Number(limit)),
+        .limit(safeLimit),
       Order.countDocuments(filter)
     ]);
-    res.json({ orders, total, page: Number(page), pages: Math.ceil(total / limit) });
+    res.json({ orders, total, page: Number(page), pages: Math.ceil(total / safeLimit) });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
