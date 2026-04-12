@@ -1,10 +1,17 @@
- /* =====================================================
+/* =====================================================
    MAIN.JS — MedPlus (Stage Final — 100+ Products)
 ===================================================== */
 
 let allProducts   = [];
 let allCategories = [];
 let activeCategory = 'all';
+
+/* ── XSS sanitizer ── */
+function sanitize(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
 
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -13,6 +20,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadCategories();
   await loadProducts();
   renderCart();
+
+  // Create toast container once on page load
+  if (!document.getElementById('toast-container')) {
+    const tc = document.createElement('div');
+    tc.id = 'toast-container';
+    tc.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px';
+    document.body.appendChild(tc);
+  }
 });
 
 /* ── Auth UI ── */
@@ -233,9 +248,9 @@ function productCardHtml(p) {
       </div>
 
       <div class="product-info">
-        <div class="product-category" style="color:${meta.color};background:${meta.bg}">${p.category}</div>
-        <h3 class="product-name" onclick="openProductModal('${id}')">${p.name}</h3>
-        <div class="product-mfr"><i class="fas fa-industry" style="opacity:.5;font-size:11px;margin-right:3px"></i>${p.manufacturer || ''}</div>
+        <div class="product-category" style="color:${meta.color};background:${meta.bg}">${sanitize(p.category)}</div>
+        <h3 class="product-name" onclick="openProductModal('${id}')">${sanitize(p.name)}</h3>
+        <div class="product-mfr"><i class="fas fa-industry" style="opacity:.5;font-size:11px;margin-right:3px"></i>${sanitize(p.manufacturer || '')}</div>
         <div class="product-rating">
           <span class="stars">${stars}</span>
           <span class="rating-num">${p.rating.toFixed(1)}</span>
@@ -315,11 +330,11 @@ function openProductModal(id) {
           </div>
           <div class="pmodal-info">
             <div class="product-category" style="color:${meta.color};background:${meta.bg};display:inline-flex;margin-bottom:8px">
-              <i class="fas ${meta.icon}" style="margin-right:5px"></i>${p.category}
+              <i class="fas ${meta.icon}" style="margin-right:5px"></i>${sanitize(p.category)}
             </div>
-            <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;line-height:1.3">${p.name}</h2>
+            <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;line-height:1.3">${sanitize(p.name)}</h2>
             <div style="font-size:13px;color:#64748b;margin-bottom:12px">
-              <i class="fas fa-industry" style="margin-right:4px;opacity:.5"></i>${p.manufacturer || 'MedPlus'}
+              <i class="fas fa-industry" style="margin-right:4px;opacity:.5"></i>${sanitize(p.manufacturer || 'MedPlus')}
             </div>
             <div class="product-rating" style="margin-bottom:14px">
               <span class="stars">${renderStars(p.rating)}</span>
@@ -334,7 +349,7 @@ function openProductModal(id) {
             ${p.description ? `
             <div class="pmodal-description">
               <h4><i class="fas fa-info-circle"></i> About this medicine</h4>
-              <p>${p.description}</p>
+              <p>${sanitize(p.description)}</p>
             </div>` : ''}
             ${p.requiresPrescription ? `
             <div class="rx-info-banner">
@@ -399,18 +414,13 @@ function addToCart(productId) {
   else cart.push({ _id: p._id, name: p.name, price: p.price, image: p.image || '', qty: 1 });
   saveCart(cart);
   renderCart();
-  showToast(`<i class="fas fa-check-circle"></i> ${p.name} added to cart`);
+  showToast(`<i class="fas fa-check-circle"></i> ${sanitize(p.name)} added to cart`);
 }
 
 /* ── Toast ── */
 function showToast(msg, type) {
-  let container = document.getElementById('toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toast-container';
-    container.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px';
-    document.body.appendChild(container);
-  }
+  const container = document.getElementById('toast-container');
+  if (!container) return;
   const toast = document.createElement('div');
   const bg    = type === 'error' ? '#ef4444' : '#1e6b6b';
   toast.style.cssText = `background:${bg};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;max-width:320px`;
