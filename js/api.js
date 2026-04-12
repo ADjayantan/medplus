@@ -1,4 +1,4 @@
- /* =====================================================
+/* =====================================================
    js/api.js — MedPlus Frontend API Helper
    FIXED: Production URL set, CORS credentials, error handling
 ===================================================== */
@@ -85,5 +85,5 @@ function isAdmin()     { const u = currentUser(); return u && u.isAdmin; }
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = '/login.html';
+  window.location.href = 'login.html';
 }
