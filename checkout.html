@@ -358,6 +358,7 @@ async function placeOrder() {
   try {
     const order = await OrderAPI.create(payload);
     saveCart([]);
+    renderCart();
     document.getElementById('checkout-main').style.display = 'none';
     document.getElementById('success-screen').style.display = 'block';
     const oid = document.getElementById('success-order-id');
