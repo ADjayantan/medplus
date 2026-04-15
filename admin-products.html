@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -455,7 +455,7 @@ async function handleImageFile(file) {
     const formData = new FormData();
     formData.append('image', file);
 
-    const API_BASE = window.API_BASE || 'http://localhost:3000';
+    const API_BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
     const res  = await fetch(`${API_BASE}/api/products/upload-image`, {
       method:  'POST',
       headers: { 'Authorization': `Bearer ${token}` },
