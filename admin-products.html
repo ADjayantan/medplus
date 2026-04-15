@@ -115,15 +115,38 @@
         <label class="form-label">Description</label>
         <textarea class="form-control" id="f-desc" rows="2" placeholder="Short description..."></textarea>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Manufacturer</label>
-          <input class="form-control" id="f-mfr" placeholder="e.g. Sun Pharma">
+      <div class="form-group">
+        <label class="form-label">Manufacturer</label>
+        <input class="form-control" id="f-mfr" placeholder="e.g. Sun Pharma">
+      </div>
+
+      <!-- ── Product Image ── -->
+      <div class="form-group">
+        <label class="form-label">Product Image</label>
+
+        <!-- Drop Zone -->
+        <div class="img-upload-zone" id="img-drop-zone" onclick="document.getElementById('f-image-file').click()">
+          <div class="img-upload-preview" id="img-preview-wrap" style="display:none">
+            <img id="img-preview" src="" alt="Preview">
+            <button type="button" class="img-remove-btn" onclick="removeImage(event)" title="Remove image">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="img-upload-placeholder" id="img-placeholder">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Click or drag &amp; drop an image here</span>
+            <small>JPG, PNG, GIF, WEBP &middot; max 5 MB</small>
+          </div>
+          <input type="file" id="f-image-file" accept="image/*" style="display:none" onchange="handleImageFile(this.files[0])">
         </div>
-        <div class="form-group">
-          <label class="form-label">Image URL</label>
-          <input class="form-control" id="f-image" placeholder="https://...">
+
+        <!-- URL fallback -->
+        <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#94a3b8;white-space:nowrap">or paste URL</span>
+          <input class="form-control" id="f-image" placeholder="https://example.com/image.jpg"
+                 style="font-size:13px" oninput="handleImageUrl(this.value)">
         </div>
+        <div id="img-upload-status" style="font-size:12px;margin-top:4px"></div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -292,6 +315,7 @@ function openModal(reset) {
     document.getElementById('edit-id').value = '';
     document.getElementById('modal-alert').innerHTML = '';
     ['f-name','f-category','f-price','f-mrp','f-desc','f-mfr','f-image','f-tags'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    resetImageWidget();
     document.getElementById('f-rating').value  = '4.5';
     document.getElementById('f-reviews').value = '0';
     document.getElementById('f-stock').value   = 'true';
@@ -314,6 +338,8 @@ function openEdit(id) {
   document.getElementById('f-desc').value            = p.description || '';
   document.getElementById('f-mfr').value             = p.manufacturer || '';
   document.getElementById('f-image').value           = p.image || '';
+  resetImageWidget();
+  if (p.image) setImagePreview(p.image);
   document.getElementById('f-rating').value          = p.rating;
   document.getElementById('f-reviews').value         = p.reviews;
   document.getElementById('f-tags').value            = (p.tags || []).join(', ');
@@ -384,6 +410,81 @@ async function confirmDelete() {
     btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
   }
 }
+
+// ── Image Upload Widget ──────────────────────────────────────────────────────
+function resetImageWidget() {
+  document.getElementById('f-image-file').value = '';
+  document.getElementById('img-preview').src    = '';
+  document.getElementById('img-preview-wrap').style.display   = 'none';
+  document.getElementById('img-placeholder').style.display    = 'flex';
+  document.getElementById('img-upload-status').textContent    = '';
+  document.getElementById('img-upload-status').className      = '';
+}
+
+function setImagePreview(src) {
+  document.getElementById('img-preview').src                 = src;
+  document.getElementById('img-preview-wrap').style.display  = 'flex';
+  document.getElementById('img-placeholder').style.display   = 'none';
+}
+
+function removeImage(e) {
+  e.stopPropagation();
+  resetImageWidget();
+  document.getElementById('f-image').value = '';
+}
+
+function handleImageUrl(url) {
+  if (!url) { resetImageWidget(); return; }
+  setImagePreview(url);
+}
+
+async function handleImageFile(file) {
+  if (!file) return;
+  // Show local preview immediately
+  const reader = new FileReader();
+  reader.onload = e => setImagePreview(e.target.result);
+  reader.readAsDataURL(file);
+
+  // Upload to server
+  const statusEl = document.getElementById('img-upload-status');
+  statusEl.textContent = '⏳ Uploading image...';
+  statusEl.className   = 'upload-status-uploading';
+
+  try {
+    const token    = localStorage.getItem('token');
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const API_BASE = window.API_BASE || 'http://localhost:3000';
+    const res  = await fetch(`${API_BASE}/api/products/upload-image`, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body:    formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Upload failed');
+
+    // Store server URL so it gets saved with the product
+    document.getElementById('f-image').value = data.imageUrl;
+    statusEl.textContent = '✓ Image uploaded successfully';
+    statusEl.className   = 'upload-status-success';
+  } catch (err) {
+    statusEl.textContent = '✗ Upload failed: ' + err.message + ' (URL saved from preview will still work if pasted)';
+    statusEl.className   = 'upload-status-error';
+  }
+}
+
+// Drag-and-drop support
+const dropZone = document.getElementById('img-drop-zone');
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handleImageFile(file);
+});
+// ─────────────────────────────────────────────────────────────────────────────
 
 document.getElementById('product-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 document.getElementById('delete-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteModal(); });
