@@ -125,7 +125,9 @@ async function doLogin(e) {
     localStorage.setItem('user',  JSON.stringify(data.user));
 
     const redirect = new URLSearchParams(window.location.search).get('redirect');
-    window.location.href = redirect || (data.user.isAdmin ? 'admin-dashboard.html' : 'index.html');
+    // Admin users are NOT redirected to the admin dashboard from here.
+    // Admin access requires going through /Admin/ entry point first.
+    window.location.href = redirect || 'index.html';
   } catch (err) {
     errEl.textContent = err.message || 'Login failed. Please check your credentials.';
     errEl.style.display = 'block';
