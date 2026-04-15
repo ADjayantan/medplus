@@ -493,10 +493,10 @@ document.getElementById('delete-modal').addEventListener('click', e => { if (e.t
 // Admin guard
 if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
   document.body.innerHTML = '';
-  window.location.replace('index.html');
+  window.location.replace('Admin/index.html'); // must enter via proper admin entry point
 } else {
   const u = currentUser();
-  if (!u || !u.isAdmin) { window.location.href = 'admin-login.html'; } else { loadProducts(); }
+  if (!u || !u.isAdmin) { document.body.innerHTML = ''; window.location.replace('admin-login.html'); } else { loadProducts(); }
 }
 </script>
 <script src="js/chatbot.js"></script>
