@@ -331,7 +331,17 @@ async function placeOrder() {
   }
   errEl.style.display = 'none';
 
-  const cart     = getCart();
+  const cart = getCart();
+
+  // Block order if any item requires prescription and none is uploaded
+  const hasRxItem = cart.some(i => i.requiresPrescription);
+  const rxUploaded = localStorage.getItem('medplus_prescription_uploaded') === 'true';
+  if (hasRxItem && !rxUploaded) {
+    errMsg.innerHTML = '<i class="fas fa-file-prescription" style="margin-right:6px"></i> One or more items require a prescription. Please <a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> before placing the order.';
+    errEl.style.display = 'flex';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
   const subtotal = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
   const delivery = subtotal >= 499 ? 0 : 40;
   const total    = subtotal + delivery;
