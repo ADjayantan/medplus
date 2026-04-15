@@ -98,7 +98,8 @@ let allOrders = [];
 function adminLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = 'admin-login.html';
+  sessionStorage.removeItem('adminGateway');
+  window.location.href = 'index.html';
 }
 
 function showAlert(msg, type) {
@@ -238,6 +239,10 @@ function closeModal() { document.getElementById('order-modal').classList.remove(
 document.getElementById('order-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
 /* Admin guard */
+if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
+  document.body.innerHTML = '';
+  window.location.replace('index.html');
+}
 const u = currentUser();
 if (!u || !u.isAdmin) {
   window.location.href = 'admin-login.html';
