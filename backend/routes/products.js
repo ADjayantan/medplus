@@ -2,6 +2,57 @@ const express = require('express');
 const Product = require('../models/Product');
 const router  = express.Router();
 const { adminMiddleware } = require('../middleware/auth');
+const multer     = require('multer');
+const cloudinary = require('cloudinary').v2;
+const { Readable } = require('stream');
+
+// ── Cloudinary Config ─────────────────────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// ── Multer (memory storage — file goes to Cloudinary, not disk) ───────────────
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },   // 5 MB max
+  fileFilter: (_req, file, cb) => {
+    const allowed = /jpeg|jpg|png|gif|webp/;
+    if (allowed.test(file.mimetype.split('/')[1])) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files (jpg, png, gif, webp) are allowed'));
+    }
+  }
+});
+
+// ── Helper: upload buffer to Cloudinary ──────────────────────────────────────
+function uploadToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'medplus/products' },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    Readable.from(buffer).pipe(stream);
+  });
+}
+
+// POST /api/products/upload-image — Admin only
+router.post('/upload-image', adminMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    const result   = await uploadToCloudinary(req.file.buffer);
+    const imageUrl = result.secure_url;   // permanent Cloudinary URL
+    res.json({ imageUrl, message: 'Image uploaded successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Cloudinary upload failed: ' + err.message });
+  }
+});
+// ─────────────────────────────────────────────────────────────────────────────
 
 // GET /api/products
 router.get('/', async (req, res) => {
@@ -75,7 +126,7 @@ router.put('/:id', adminMiddleware, async (req, res) => {
 router.delete('/:id', adminMiddleware, async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product) return res.status(404).json({ message: 'Product deleted' });
     res.json({ message: 'Product deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
