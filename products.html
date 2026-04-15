@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Products — MedPlus Pharmacy</title>
+<title>My Profile — MedPlus Pharmacy</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/navbar.css">
-<link rel="stylesheet" href="css/products.css">
 <link rel="stylesheet" href="css/cart.css">
 <link rel="stylesheet" href="css/auth.css">
 </head>
@@ -15,195 +14,205 @@
 
 <!-- ── Navbar ── -->
 <nav class="navbar" id="main-navbar">
-  <div class="navbar-top">
-    <div class="container">
-      <div class="top-links">
-        <a href="tel:1800-123-456"><i class="fas fa-phone-alt"></i> 1800-123-456</a>
-        <a href="mailto:support@medplus.com"><i class="fas fa-envelope"></i> support@medplus.com</a>
-      </div>
-      <div class="top-links">
-        <a onclick="window.location.href='upload-prescription.html'"><i class="fas fa-file-prescription"></i> Upload Rx</a>
-        <a onclick="window.location.href='insurance.html'"><i class="fas fa-shield-alt"></i> Insurance</a>
-      </div>
-    </div>
-  </div>
   <div class="navbar-main">
     <div class="container">
       <div class="nav-logo" onclick="window.location.href='index.html'">
         <div class="nav-logo-icon">M+</div>
         <span class="nav-logo-text">Med<span>Plus</span></span>
       </div>
-
-      <div class="nav-search">
-        <div class="nav-search-inner">
-          <input type="text" id="search-bar" placeholder="Search medicines, brands..." autocomplete="off">
-          <button onclick="filterAndRender()"><i class="fas fa-search"></i></button>
-        </div>
-        <div id="autocomplete-list" class="autocomplete-dropdown"></div>
-      </div>
-
+      <div style="flex:1"></div>
       <div class="nav-actions">
-        <a href="index.html" class="nav-btn nav-btn-ghost">
-          <i class="fas fa-home"></i> <span>Home</span>
+        <a href="products.html" class="nav-btn nav-btn-ghost">
+          <i class="fas fa-pills"></i> Shop
         </a>
-        <a href="login.html" class="nav-btn nav-btn-ghost" id="nav-login" style="display:none;text-decoration:none">
-          <i class="fas fa-sign-in-alt"></i> Login
-        </a>
-        <button class="nav-btn nav-btn-ghost" id="nav-profile" onclick="window.location.href='profile.html'" style="display:none">
-          <i class="fas fa-user"></i>
-        </button>
-        <button class="nav-btn nav-btn-ghost" id="nav-admin" onclick="window.location.href='admin-dashboard.html'" style="display:none">
-          <i class="fas fa-user-shield"></i>
-        </button>
-        <a href="cart.html" class="nav-btn nav-btn-cart" id="nav-cart">
+        <a href="cart.html" class="nav-btn nav-btn-cart">
           <i class="fas fa-shopping-cart"></i>
           <span class="cart-badge" id="cart-count" style="display:none">0</span>
-          <span id="cart-total-nav"></span>
         </a>
+        <button class="nav-btn" style="background:#ef4444;color:#fff" onclick="doLogout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
       </div>
     </div>
   </div>
 </nav>
 
-<!-- ── Category Bar ── -->
-<div class="category-section">
-  <div class="category-scroll" id="category-tabs">
-    <!-- rendered by JS -->
-  </div>
-</div>
+<!-- ── Page ── -->
+<div class="page-shell">
+  <div class="page-container">
+    <div class="profile-page">
 
-<!-- ── Category Cards Hero ── -->
-<div class="cat-cards-section">
-  <div class="container" style="max-width:1280px;margin:0 auto;padding:0 1.25rem">
-    <h2 class="cat-cards-title">Shop by Category</h2>
-    <div class="cat-cards-grid" id="category-cards">
-      <!-- rendered by JS -->
-    </div>
-  </div>
-</div>
-
-<!-- ── Toolbar ── -->
-<div class="products-toolbar" id="products-section">
-  <div class="toolbar-left">
-    <span class="results-count" id="results-count">Loading...</span>
-    <div class="toolbar-filters">
-      <select id="sort-select" onchange="filterAndRender()">
-        <option value="name">Sort: A–Z</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="rating">Top Rated</option>
-        <option value="discount">Biggest Discount</option>
-      </select>
-      <select id="rx-filter" onchange="filterAndRender()">
-        <option value="">All Products</option>
-        <option value="otc">OTC Only</option>
-        <option value="rx">Prescription Only</option>
-      </select>
-      <div class="price-filter-wrap">
-        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:2px">Max price: <span id="price-label">Any price</span></label>
-        <input type="range" id="price-filter" min="10" max="1200" value="1200" step="10"
-               oninput="updatePriceLabel();filterAndRender()" style="width:120px">
+      <!-- Profile Hero -->
+      <div class="profile-hero">
+        <div class="profile-avatar" id="profile-avatar">U</div>
+        <div class="profile-info">
+          <h2 id="profile-name">Loading…</h2>
+          <p id="profile-email">—</p>
+          <p id="profile-phone" style="margin-top:.15rem;opacity:.7;font-size:.82rem"><i class="fas fa-phone"></i> —</p>
+        </div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;gap:.5rem;align-items:flex-end">
+          <a id="admin-panel-link" href="admin-dashboard.html" style="display:none;background:rgba(255,255,255,.15);color:#fff;padding:.5rem 1rem;border-radius:8px;font-size:.82rem;font-weight:700;text-decoration:none;border:1.5px solid rgba(255,255,255,.3)">
+            <i class="fas fa-user-shield"></i> Admin Panel
+          </a>
+          <span style="background:rgba(255,255,255,.15);color:#fff;padding:.35rem .85rem;border-radius:20px;font-size:.75rem;font-weight:600">
+            <i class="fas fa-check-circle" style="color:#4dc9ba"></i> Verified Account
+          </span>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="toolbar-right">
-    <label class="toggle-label">
-      <input type="checkbox" id="in-stock-toggle" onchange="filterAndRender()">
-      <span class="toggle-text"><i class="fas fa-check-circle" style="color:#22c55e"></i> In Stock Only</span>
-    </label>
-    <button class="btn-clear-filter" onclick="clearFilters()">
-      <i class="fas fa-times"></i> Clear
-    </button>
-  </div>
-</div>
 
-<!-- ── Products Grid ── -->
-<div class="products-section">
-  <div class="container" style="max-width:1280px; margin:0 auto; padding:0 1.25rem">
-    <div class="products-grid" id="products-grid">
-      <div class="loading-spinner">
-        <div class="spinner-ring"></div>
-        <p>Loading medicines...</p>
+      <!-- Tabs -->
+      <div class="profile-tabs">
+        <button class="profile-tab active" onclick="switchTab('orders', this)">
+          <i class="fas fa-box"></i> My Orders
+        </button>
+        <button class="profile-tab" onclick="switchTab('prescriptions', this)">
+          <i class="fas fa-file-prescription"></i> Prescriptions
+        </button>
+        <button class="profile-tab" onclick="switchTab('account', this)">
+          <i class="fas fa-user-edit"></i> Account
+        </button>
       </div>
+
+      <!-- Orders Panel -->
+      <div class="profile-panel active" id="panel-orders">
+        <div class="section-header">
+          <i class="fas fa-box"></i> Order History
+          <span id="orders-count" style="font-weight:400;font-size:.85rem;color:var(--text-secondary)"></span>
+        </div>
+        <div id="order-history">
+          <div style="text-align:center;padding:3rem;color:var(--text-secondary)">
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--teal-400)"></i>
+            Loading orders…
+          </div>
+        </div>
+      </div>
+
+      <!-- Prescriptions Panel -->
+      <div class="profile-panel" id="panel-prescriptions">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+          <div class="section-header" style="margin:0">
+            <i class="fas fa-file-prescription"></i> My Prescriptions
+          </div>
+          <a href="upload-prescription.html" class="btn-primary" style="width:auto;padding:.6rem 1.25rem;font-size:.875rem">
+            <i class="fas fa-upload"></i> Upload New
+          </a>
+        </div>
+        <div id="rx-history">
+          <div style="text-align:center;padding:3rem;color:var(--text-secondary)">
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--teal-400)"></i>
+            Loading prescriptions…
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Panel -->
+      <div class="profile-panel" id="panel-account">
+        <div class="card" style="max-width:520px">
+          <div class="card-title"><i class="fas fa-user-edit"></i> Account Details</div>
+          <div id="account-msg" style="display:none;margin-bottom:1rem;padding:.75rem 1rem;border-radius:10px;font-size:.875rem"></div>
+
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="acc-name" class="form-input" placeholder="Your full name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="acc-email" class="form-input" placeholder="Email" disabled style="opacity:.6;cursor:not-allowed">
+            <div style="font-size:.75rem;color:var(--text-secondary);margin-top:.25rem"><i class="fas fa-info-circle"></i> Email cannot be changed.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" id="acc-phone" class="form-input" placeholder="10-digit phone" maxlength="10">
+          </div>
+
+          <div style="border-top:1.5px solid var(--border-color);padding-top:1.25rem;margin-top:.25rem">
+            <div class="card-title" style="margin-bottom:1rem"><i class="fas fa-lock"></i> Change Password</div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" id="acc-pwd" class="form-input" placeholder="Leave blank to keep current">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" id="acc-pwd-confirm" class="form-input" placeholder="Repeat new password">
+            </div>
+          </div>
+
+          <button onclick="saveAccount()" class="btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
+
+        <div class="card" style="max-width:520px;margin-top:1.25rem;border-color:#fca5a5">
+          <div class="card-title" style="color:#ef4444"><i class="fas fa-exclamation-triangle"></i> Danger Zone</div>
+          <p style="font-size:.875rem;color:var(--text-secondary);margin-bottom:1rem">Once you logout, you'll need to sign in again to access your account.</p>
+          <button onclick="doLogout()" style="padding:.7rem 1.5rem;background:#ef4444;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:.875rem">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </div>
+
     </div>
-  </div>
-</div>
-
-
-<!-- Product Modal Container -->
-<div id="product-modal"></div>
-
-<!-- Auth Modal -->
-<div class="auth-modal-overlay" id="auth-modal-overlay">
-  <div class="auth-modal">
-    <button class="auth-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
-    <div id="auth-modal-body"></div>
   </div>
 </div>
 
 <!-- Footer -->
-<footer class="footer" style="margin-top:3rem">
-  <p>&copy; 2025 MedPlus Pharmacy. All rights reserved. |
-     <a href="index.html">Home</a> &nbsp;|&nbsp;
-     <a href="insurance.html">Insurance</a> &nbsp;|&nbsp;
-     <a href="upload-prescription.html">Upload Rx</a>
-  </p>
+<footer class="footer">
+  <p>&copy; 2025 MedPlus Pharmacy. All rights reserved.</p>
 </footer>
 
-<!-- Scripts -->
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
-<script src="js/search.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/main.js"></script>
+<script src="js/profile.js"></script>
 <script>
-// ── Fix sticky category bar top dynamically based on navbar height ──
-function updateCategoryTop() {
-  const navbar = document.getElementById('main-navbar');
-  const categorySection = document.querySelector('.category-section');
-  if (navbar && categorySection) {
-    categorySection.style.top = navbar.offsetHeight + 'px';
-  }
-}
-// Run on load and on every scroll (navbar height changes as top bar hides)
-window.addEventListener('scroll', updateCategoryTop);
-window.addEventListener('resize', updateCategoryTop);
-document.addEventListener('DOMContentLoaded', updateCategoryTop);
-// Also run after a short delay to catch any layout shifts
-setTimeout(updateCategoryTop, 300);
-
-// Pre-select category from URL param
 document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  const cat    = params.get('category');
-  if (cat) {
-    // Wait for categories to load then activate
-    const interval = setInterval(() => {
-      const btn = document.querySelector(`.cat-tab[data-cat="${cat}"]`);
-      if (btn) { clearInterval(interval); setCategory(cat, btn); }
-    }, 100);
-  }
-  const q = params.get('q');
-  if (q) {
-    const sb = document.getElementById('search-bar');
-    if (sb) { sb.value = q; }
-  }
-
-  // ── Fix sticky offsets so category bar and toolbar stack below navbar ──
-  function updateStickyOffsets() {
-    const navbar   = document.getElementById('main-navbar');
-    const catBar   = document.querySelector('.category-section');
-    if (!navbar || !catBar) return;
-    const navH = navbar.getBoundingClientRect().height;
-    const catH = catBar.getBoundingClientRect().height;
-    document.documentElement.style.setProperty('--navbar-height', navH + 'px');
-    document.documentElement.style.setProperty('--category-height', catH + 'px');
-  }
-
-  // Run once after initial paint, then on resize
-  setTimeout(updateStickyOffsets, 100);
-  window.addEventListener('resize', updateStickyOffsets);
+  if (!isLoggedIn()) { window.location.href = 'login.html?redirect=profile.html'; return; }
+  const cart = getCart();
+  const cc = document.getElementById('cart-count');
+  const qty = cart.reduce((s,i)=>s+(i.qty||1),0);
+  if (cc) { cc.textContent = qty; cc.style.display = qty>0?'':'none'; }
+  initProfile();
 });
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab)?.classList.add('active');
+}
+
+function saveAccount() {
+  const name = document.getElementById('acc-name')?.value.trim();
+  const phone = document.getElementById('acc-phone')?.value.trim();
+  const pwd   = document.getElementById('acc-pwd')?.value;
+  const confirm = document.getElementById('acc-pwd-confirm')?.value;
+  const msg   = document.getElementById('account-msg');
+
+  if (pwd && pwd !== confirm) {
+    msg.style.display = 'block';
+    msg.style.background = '#fef2f2';
+    msg.style.color = '#dc2626';
+    msg.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match.';
+    return;
+  }
+
+  // Update local user object
+  const user = currentUser();
+  if (user && name) user.name = name;
+  if (user && phone) user.phone = phone;
+  if (user) localStorage.setItem('user', JSON.stringify(user));
+
+  msg.style.display = 'block';
+  msg.style.background = '#f0fdf7';
+  msg.style.color = '#15803d';
+  msg.innerHTML = '<i class="fas fa-check-circle"></i> Profile updated successfully!';
+  setTimeout(() => { msg.style.display = 'none'; }, 3000);
+}
+
+function doLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = 'index.html';
+}
 </script>
 <script src="js/chatbot.js"></script>
 </body>
