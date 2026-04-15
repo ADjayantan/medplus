@@ -242,14 +242,15 @@ document.getElementById('order-modal').addEventListener('click', e => { if (e.ta
 if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
   document.body.innerHTML = '';
   window.location.replace('index.html');
-}
-const u = currentUser();
-if (!u || !u.isAdmin) {
-  window.location.href = 'admin-login.html';
 } else {
-  document.getElementById('admin-name').textContent   = u.name || 'Admin';
-  document.getElementById('admin-avatar').textContent = (u.name || 'A')[0].toUpperCase();
-  loadOrders();
+  const u = currentUser();
+  if (!u || !u.isAdmin) {
+    window.location.href = 'admin-login.html';
+  } else {
+    document.getElementById('admin-name').textContent   = u.name || 'Admin';
+    document.getElementById('admin-avatar').textContent = (u.name || 'A')[0].toUpperCase();
+    loadOrders();
+  }
 }
 </script>
 </body>
