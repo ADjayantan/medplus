@@ -543,14 +543,20 @@
 <script src="js/api.js"></script>
 <script>
 function adminGuard() {
-  // Gateway check — must have entered via /Admin URL
+  // Gateway check — must have entered via /Admin/ entry point URL.
+  // Users who log in through the normal login.html never get this flag,
+  // so they cannot reach admin pages even if their account is isAdmin.
   if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
     document.body.innerHTML = '';
-    window.location.replace('index.html');
+    window.location.replace('Admin/index.html'); // send to proper admin entry
     return false;
   }
   const u = currentUser();
-  if (!u || !u.isAdmin) { window.location.href = 'admin-login.html'; return false; }
+  if (!u || !u.isAdmin) {
+    document.body.innerHTML = '';
+    window.location.replace('admin-login.html');
+    return false;
+  }
   return true;
 }
 function adminLogout() {
