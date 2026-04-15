@@ -17,7 +17,7 @@ textarea.input { resize:vertical; }
 .input-eye-wrap .input { padding-right:2.75rem; }
 .eye-btn { position:absolute; right:.75rem; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:.9rem; }
 .auth-switch { text-align:center; font-size:.85rem; color:var(--text-secondary); margin-top:.25rem; }
-.auth-error { background:#fef2f2; border:1.5px solid #fca5a5; border-radius:var(--radius-md); padding:.75rem 1rem; font-size:.85rem; color:#dc2626; }
+.auth-error { background:#fef2f2; border:1.5px solid #fca5a5; border-radius:var(--radius-md); padding:.75rem 1rem; font-size:.85rem; color:#dc2626; display:none; }
 body.dark .auth-error { background:rgba(220,38,38,.1); border-color:rgba(220,38,38,.3); color:#f87171; }
 
 /* Checkout page */
