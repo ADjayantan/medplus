@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -543,6 +543,12 @@
 <script src="js/api.js"></script>
 <script>
 function adminGuard() {
+  // Gateway check — must have entered via /Admin URL
+  if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
+    document.body.innerHTML = '';
+    window.location.replace('index.html');
+    return false;
+  }
   const u = currentUser();
   if (!u || !u.isAdmin) { window.location.href = 'admin-login.html'; return false; }
   return true;
@@ -550,7 +556,8 @@ function adminGuard() {
 function adminLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = 'admin-login.html';
+  sessionStorage.removeItem('adminGateway'); // clear the gateway flag on logout
+  window.location.href = 'index.html';
 }
 function showAlert(msg) {
   document.getElementById('alert-area').innerHTML =
