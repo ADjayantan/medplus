@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -215,7 +215,8 @@ let deleteId    = null;
 function adminLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = 'admin-login.html';
+  sessionStorage.removeItem('adminGateway');
+  window.location.href = 'index.html';
 }
 
 function showAlert(msg, type) {
@@ -490,8 +491,13 @@ document.getElementById('product-modal').addEventListener('click', e => { if (e.
 document.getElementById('delete-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteModal(); });
 
 // Admin guard
-const u = currentUser();
-if (!u || !u.isAdmin) { window.location.href = 'admin-login.html'; } else { loadProducts(); }
+if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
+  document.body.innerHTML = '';
+  window.location.replace('index.html');
+} else {
+  const u = currentUser();
+  if (!u || !u.isAdmin) { window.location.href = 'admin-login.html'; } else { loadProducts(); }
+}
 </script>
 </body>
 </html>
