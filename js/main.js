@@ -408,13 +408,36 @@ function closeProductModal() {
 function addToCart(productId) {
   const p = allProducts.find(x => x._id === productId);
   if (!p) return;
+
+  if (p.requiresPrescription && !currentUser()) {
+    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+    return;
+  }
+
   const cart     = getCart();
   const existing = cart.find(i => i._id === productId);
-  if (existing) existing.qty = (existing.qty || 1) + 1;
-  else cart.push({ _id: p._id, name: p.name, price: p.price, image: p.image || '', qty: 1 });
+  if (existing) {
+    existing.qty = (existing.qty || 1) + 1;
+  } else {
+    cart.push({
+      _id: p._id,
+      name: p.name,
+      price: p.price,
+      mrp: p.mrp,
+      image: p.image || '',
+      manufacturer: p.manufacturer || '',
+      requiresPrescription: p.requiresPrescription || false,
+      qty: 1
+    });
+  }
   saveCart(cart);
   renderCart();
-  showToast(`<i class="fas fa-check-circle"></i> ${sanitize(p.name)} added to cart`);
+
+  if (p.requiresPrescription) {
+    showToast(`<i class="fas fa-file-prescription"></i> ${sanitize(p.name)} added — prescription required at checkout`, 'warn');
+  } else {
+    showToast(`<i class="fas fa-check-circle"></i> ${sanitize(p.name)} added to cart`);
+  }
 }
 
 /* ── Toast ── */
@@ -422,7 +445,7 @@ function showToast(msg, type) {
   const container = document.getElementById('toast-container');
   if (!container) return;
   const toast = document.createElement('div');
-  const bg    = type === 'error' ? '#ef4444' : '#1e6b6b';
+  const bg    = type === 'error' ? '#ef4444' : type === 'warn' ? '#d97706' : '#1e6b6b';
   toast.style.cssText = `background:${bg};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;max-width:320px`;
   toast.innerHTML = msg;
   container.appendChild(toast);
