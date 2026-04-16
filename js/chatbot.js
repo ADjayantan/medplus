@@ -4,8 +4,8 @@
   /* ── CONFIG ── */
   const OPENROUTER_API_KEY = 'sk-or-v1-85f.....a31'; // starts with sk-or-v1-...
   const FDA_API_BASE = 'https://api.fda.gov/drug/event.json';
-  const FDA_API_KEY  = ''; // Optional: get a free key at open.fda.gov/apis/authentication
-                            // Leave empty for 40 req/min, add key for 500 req/min
+  const FDA_API_KEY  = 'YOUR_FDA_KEY_HERE'; // ← Paste the key from your email (adjayantan2007@gmail.com)
+                                             // With key: 240 req/min, 120,000 req/day
 
   const SYSTEM_PROMPT = `You are MedPlus AI, a friendly and knowledgeable pharmacy assistant for MedPlus — an online pharmacy platform.
 You help customers with:
