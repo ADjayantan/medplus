@@ -1,8 +1,8 @@
-/* MedPlus AI Chatbot — Powered by Google Gemini (Free) */
+/* MedPlus AI Chatbot — Powered by OpenRouter (Free) */
 (function () {
 
-  /* ── CONFIG — Replace with your Gemini API key ── */
- const GEMINI_API_KEY = 'AQ.Ab8RN6JGU7sNkyxK_rDzwwZeVp-DcHxwi-DK6_zBdvOnzjhiDA';
+  /* ── CONFIG — Replace with your OpenRouter API key ── */
+  const OPENROUTER_API_KEY = 'YOUR_OPENROUTER_API_KEY_HERE'; // starts with sk-or-v1-...
 
   const SYSTEM_PROMPT = `You are MedPlus AI, a friendly and knowledgeable pharmacy assistant for MedPlus — an online pharmacy platform.
 You help customers with:
@@ -257,28 +257,36 @@ Keep responses concise, warm, and helpful. If a question needs a doctor's consul
     inputEl.style.height = 'auto';
     appendMsg('user', text);
 
-    history.push({ role: 'user', parts: [{ text }] });
+    history.push({ role: 'user', content: text });
 
     isLoading = true;
     sendBtn.disabled = true;
     showTyping();
 
     try {
-      // Gemini needs system prompt injected as first user/model pair
-      const contents = [
-        { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
-        { role: 'model', parts: [{ text: 'Understood! I am MedPlus AI, ready to help.' }] },
-        ...history
+      // Validate API key before calling
+      if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_API_KEY_HERE' || !OPENROUTER_API_KEY.startsWith('sk-or-')) {
+        throw new Error('INVALID_KEY');
+      }
+
+      const messages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...history.map(m => ({ role: m.role, content: m.content }))
       ];
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents })
-        }
-      );
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'HTTP-Referer': 'https://adjayantan.github.io/medplus',
+          'X-Title': 'MedPlus AI Chatbot'
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-3.3-8b-instruct:free',
+          messages
+        })
+      });
 
       const data = await res.json();
 
@@ -286,20 +294,25 @@ Keep responses concise, warm, and helpful. If a question needs a doctor's consul
         throw new Error(data?.error?.message || `API error ${res.status}`);
       }
 
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+      const reply = data.choices?.[0]?.message?.content
         || "I'm sorry, I couldn't get a response. Please try again.";
 
       hideTyping();
       appendMsg('bot', reply);
-      history.push({ role: 'model', parts: [{ text: reply }] });
+      history.push({ role: 'assistant', content: reply });
 
       if (history.length > 20) history = history.slice(-20);
 
     } catch (err) {
       hideTyping();
-      const msg = err.message?.includes('API_KEY_INVALID') || err.message?.includes('400')
-        ? '⚠️ Gemini API key is invalid. Please check GEMINI_API_KEY in chatbot.js.'
-        : "Sorry, I'm having trouble connecting right now. Please try again in a moment. 🙏";
+      let msg;
+      if (err.message === 'INVALID_KEY') {
+        msg = '⚠️ Chatbot not configured. Please add your OpenRouter API key (sk-or-v1-...) in chatbot.js line 5.';
+      } else if (err.message?.includes('401')) {
+        msg = '⚠️ OpenRouter API key is invalid. Please check your key at openrouter.ai/keys.';
+      } else {
+        msg = "Sorry, I'm having trouble connecting right now. Please try again in a moment. 🙏";
+      }
       appendMsg('bot', msg);
     } finally {
       isLoading = false;
