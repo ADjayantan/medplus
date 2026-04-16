@@ -1,5 +1,20 @@
-/* MedPlus AI Chatbot — Powered by Claude */
+/* MedPlus AI Chatbot — Powered by Google Gemini (Free) */
 (function () {
+
+  /* ── CONFIG — Replace with your Gemini API key ── */
+ const GEMINI_API_KEY = 'AQ.Ab8RN6JGU7sNkyxK_rDzwwZeVp-DcHxwi-DK6_zBdvOnzjhiDA';
+
+  const SYSTEM_PROMPT = `You are MedPlus AI, a friendly and knowledgeable pharmacy assistant for MedPlus — an online pharmacy platform.
+You help customers with:
+- Medicine information (uses, dosage, side effects, interactions)
+- Order tracking and delivery queries
+- Prescription upload guidance
+- Payment and refund questions
+- General health and wellness advice
+- Product availability questions
+
+Keep responses concise, warm, and helpful. If a question needs a doctor's consultation, always recommend that. Never suggest specific dosages for prescription medicines without a prescription. Format with line breaks for readability. Respond in the same language as the user.`;
+
   /* ── Inject CSS ── */
   const style = document.createElement('style');
   style.textContent = `
@@ -70,10 +85,7 @@
       max-width: 78%; padding: 10px 14px; border-radius: 18px;
       font-size: 13.5px; line-height: 1.5; word-break: break-word;
     }
-    .mp-msg.bot .mp-msg-bubble {
-      background: #f1f5f9; color: #1e293b;
-      border-bottom-left-radius: 4px;
-    }
+    .mp-msg.bot .mp-msg-bubble { background: #f1f5f9; color: #1e293b; border-bottom-left-radius: 4px; }
     .mp-msg.user .mp-msg-bubble {
       background: linear-gradient(135deg, #0d9488, #0f766e);
       color: #fff; border-bottom-right-radius: 4px;
@@ -116,9 +128,7 @@
     .mp-chat-send:disabled { opacity: .5; cursor: not-allowed; transform: none; }
     .mp-chat-send svg { width: 16px; height: 16px; fill: #fff; }
 
-    .mp-quick-btns {
-      display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px;
-    }
+    .mp-quick-btns { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px; }
     .mp-quick-btn {
       font-size: 11.5px; padding: 5px 11px; border-radius: 20px;
       border: 1.5px solid #0d9488; color: #0d9488; background: #fff;
@@ -178,10 +188,10 @@
 
   /* ── State ── */
   const messagesEl = document.getElementById('mp-messages');
-  const inputEl = document.getElementById('mp-input');
-  const sendBtn = document.getElementById('mp-send-btn');
-  let history = [];
-  let isOpen = false;
+  const inputEl    = document.getElementById('mp-input');
+  const sendBtn    = document.getElementById('mp-send-btn');
+  let history   = [];
+  let isOpen    = false;
   let isLoading = false;
 
   /* ── Toggle ── */
@@ -203,7 +213,7 @@
 
   /* ── Greet ── */
   function greet() {
-    appendMsg('bot', '👋 Hi! I\'m your MedPlus AI assistant. I can help you with medicine information, orders, prescriptions, delivery, and general health questions. How can I help you today?');
+    appendMsg('bot', "👋 Hi! I'm your MedPlus AI assistant. I can help you with medicine information, orders, prescriptions, delivery, and general health questions. How can I help you today?");
   }
 
   /* ── Append message ── */
@@ -219,7 +229,6 @@
     }
     messagesEl.appendChild(wrap);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-    return wrap;
   }
 
   /* ── Typing indicator ── */
@@ -247,45 +256,51 @@
     inputEl.value = '';
     inputEl.style.height = 'auto';
     appendMsg('user', text);
-    history.push({ role: 'user', content: text });
+
+    history.push({ role: 'user', parts: [{ text }] });
 
     isLoading = true;
     sendBtn.disabled = true;
     showTyping();
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `You are MedPlus AI, a friendly and knowledgeable pharmacy assistant for MedPlus — an online pharmacy platform. 
-You help customers with:
-- Medicine information (uses, dosage, side effects, interactions)
-- Order tracking and delivery queries
-- Prescription upload guidance
-- Payment and refund questions
-- General health and wellness advice
-- Product availability questions
+      // Gemini needs system prompt injected as first user/model pair
+      const contents = [
+        { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
+        { role: 'model', parts: [{ text: 'Understood! I am MedPlus AI, ready to help.' }] },
+        ...history
+      ];
 
-Keep responses concise, warm, and helpful. If a question needs a doctor's consultation, always recommend that. Never suggest specific dosages for prescription medicines without a prescription. Format with line breaks for readability. Respond in the same language as the user.`,
-          messages: history
-        })
-      });
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents })
+        }
+      );
 
       const data = await res.json();
-      const reply = data.content?.[0]?.text || "I'm sorry, I couldn't get a response. Please try again.";
+
+      if (!res.ok) {
+        throw new Error(data?.error?.message || `API error ${res.status}`);
+      }
+
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+        || "I'm sorry, I couldn't get a response. Please try again.";
 
       hideTyping();
       appendMsg('bot', reply);
-      history.push({ role: 'assistant', content: reply });
+      history.push({ role: 'model', parts: [{ text: reply }] });
 
-      // Keep history manageable
       if (history.length > 20) history = history.slice(-20);
+
     } catch (err) {
       hideTyping();
-      appendMsg('bot', "Sorry, I'm having trouble connecting right now. Please try again in a moment. 🙏");
+      const msg = err.message?.includes('API_KEY_INVALID') || err.message?.includes('400')
+        ? '⚠️ Gemini API key is invalid. Please check GEMINI_API_KEY in chatbot.js.'
+        : "Sorry, I'm having trouble connecting right now. Please try again in a moment. 🙏";
+      appendMsg('bot', msg);
     } finally {
       isLoading = false;
       sendBtn.disabled = false;
