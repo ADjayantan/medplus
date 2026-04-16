@@ -1,8 +1,11 @@
-/* MedPlus AI Chatbot — Powered by OpenRouter (Free) */
+/* MedPlus AI Chatbot — Powered by OpenRouter + FDA Drug Event API */
 (function () {
 
-  /* ── CONFIG — Replace with your OpenRouter API key ── */
-const OPENROUTER_API_KEY = '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';
+  /* ── CONFIG ── */
+  const OPENROUTER_API_KEY = 'sk-or-v1-85f.....a31'; // starts with sk-or-v1-...
+  const FDA_API_BASE = 'https://api.fda.gov/drug/event.json';
+  const FDA_API_KEY  = ''; // Optional: get a free key at open.fda.gov/apis/authentication
+                            // Leave empty for 40 req/min, add key for 500 req/min
 
   const SYSTEM_PROMPT = `You are MedPlus AI, a friendly and knowledgeable pharmacy assistant for MedPlus — an online pharmacy platform.
 You help customers with:
@@ -136,6 +139,12 @@ Keep responses concise, warm, and helpful. If a question needs a doctor's consul
     }
     .mp-quick-btn:hover { background: #0d9488; color: #fff; }
 
+    .mp-fda-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7;
+      border-radius: 10px; padding: 2px 7px; margin-bottom: 5px;
+    }
+
     @media (max-width: 420px) {
       #mp-chat-window { width: calc(100vw - 24px); right: 12px; bottom: 88px; }
       #mp-chat-fab { right: 16px; bottom: 16px; }
@@ -217,13 +226,14 @@ Keep responses concise, warm, and helpful. If a question needs a doctor's consul
   }
 
   /* ── Append message ── */
-  function appendMsg(role, text) {
+  function appendMsg(role, text, usedFDA) {
     const wrap = document.createElement('div');
     wrap.className = `mp-msg ${role}`;
     if (role === 'bot') {
+      const badge = usedFDA ? '<div class="mp-fda-badge">📊 FDA Data</div>' : '';
       wrap.innerHTML = `
         <div class="mp-msg-avatar">🤖</div>
-        <div class="mp-msg-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+        <div class="mp-msg-bubble">${badge}${text.replace(/\n/g, '<br>')}</div>`;
     } else {
       wrap.innerHTML = `<div class="mp-msg-bubble">${text.replace(/\n/g, '<br>')}</div>`;
     }
@@ -249,6 +259,57 @@ Keep responses concise, warm, and helpful. If a question needs a doctor's consul
     if (t) t.remove();
   }
 
+  /* ── FDA Drug Event API ── */
+  function extractDrugName(text) {
+    const patterns = [
+      /(?:side[\s-]?effects?|adverse[\s-]?effects?|reactions?|events?)\s+(?:of|for|from|to)\s+([a-zA-Z][a-zA-Z0-9\s\-]{1,30})/i,
+      /(?:tell\s+me\s+about|info(?:rmation)?\s+(?:on|about)|what\s+(?:is|are)|about)\s+([a-zA-Z][a-zA-Z0-9\s\-]{1,30})(?:\s+(?:drug|medicine|medication|tablet|capsule|pill))?/i,
+      /([a-zA-Z][a-zA-Z0-9\s\-]{1,30})\s+(?:side[\s-]?effects?|adverse|reactions?|interactions?|warnings?|uses?|dosage)/i,
+      /is\s+([a-zA-Z][a-zA-Z0-9\-]{2,20})\s+(?:safe|dangerous|okay|good|bad|effective)/i,
+      /(?:drug|medicine|medication|tablet|capsule|pill)\s+([a-zA-Z][a-zA-Z0-9\-]{2,20})/i,
+    ];
+    for (const re of patterns) {
+      const m = text.match(re);
+      if (m && m[1]) return m[1].trim().split(/\s+/).slice(0, 2).join(' ');
+    }
+    return null;
+  }
+
+  async function fetchFDAData(drugName) {
+    try {
+      const keyParam = FDA_API_KEY ? `&api_key=${FDA_API_KEY}` : '';
+      const url = `${FDA_API_BASE}?search=patient.drug.medicinalproduct:"${encodeURIComponent(drugName)}"&limit=5${keyParam}`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!data.results || data.results.length === 0) return null;
+
+      // Tally adverse reactions across all returned reports
+      const reactionCounts = {};
+      data.results.forEach(report => {
+        (report.patient?.reaction || []).forEach(r => {
+          const term = r.reactionmeddrapt;
+          if (term) reactionCounts[term] = (reactionCounts[term] || 0) + 1;
+        });
+      });
+
+      const topReactions = Object.entries(reactionCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([term]) => term);
+
+      if (topReactions.length === 0) return null;
+
+      return {
+        drug: drugName,
+        reportCount: data.meta?.results?.total || data.results.length,
+        reactions: topReactions,
+      };
+    } catch {
+      return null;
+    }
+  }
+
   /* ── Send ── */
   async function sendMessage(text) {
     text = (text || inputEl.value).trim();
@@ -263,14 +324,32 @@ Keep responses concise, warm, and helpful. If a question needs a doctor's consul
     sendBtn.disabled = true;
     showTyping();
 
+    let fdaContext = null;
+    let usedFDA = false;
+
     try {
-      // Validate API key before calling
+      // ── Try to enrich with FDA data ──
+      const drugName = extractDrugName(text);
+      if (drugName) {
+        const fdaData = await fetchFDAData(drugName);
+        if (fdaData) {
+          fdaContext = `[FDA FAERS Data for "${fdaData.drug}": Based on ${fdaData.reportCount.toLocaleString()} adverse event reports, the most frequently reported reactions are: ${fdaData.reactions.join(', ')}. Use this data to inform your answer but always recommend consulting a doctor.]`;
+          usedFDA = true;
+        }
+      }
+
+      // ── Validate OpenRouter key ──
       if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_API_KEY_HERE' || !OPENROUTER_API_KEY.startsWith('sk-or-')) {
         throw new Error('INVALID_KEY');
       }
 
+      // ── Build message list, injecting FDA context if available ──
+      const systemContent = fdaContext
+        ? `${SYSTEM_PROMPT}\n\n${fdaContext}`
+        : SYSTEM_PROMPT;
+
       const messages = [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: systemContent },
         ...history.map(m => ({ role: m.role, content: m.content }))
       ];
 
@@ -298,7 +377,7 @@ Keep responses concise, warm, and helpful. If a question needs a doctor's consul
         || "I'm sorry, I couldn't get a response. Please try again.";
 
       hideTyping();
-      appendMsg('bot', reply);
+      appendMsg('bot', reply, usedFDA);
       history.push({ role: 'assistant', content: reply });
 
       if (history.length > 20) history = history.slice(-20);
