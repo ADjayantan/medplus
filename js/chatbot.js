@@ -2,7 +2,7 @@
 (function () {
 
   /* ── CONFIG — Replace with your OpenRouter API key ── */
- const OPENROUTER_API_KEY = 'sk-or-v1-85f.....a31'; // starts with sk-or-v1-...
+ const OPENROUTER_API_KEY = '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';
 
   const SYSTEM_PROMPT = `You are MedPlus AI, a friendly and knowledgeable pharmacy assistant for MedPlus — an online pharmacy platform.
 You help customers with:
