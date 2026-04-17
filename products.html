@@ -10,6 +10,52 @@
 <link rel="stylesheet" href="css/products.css">
 <link rel="stylesheet" href="css/cart.css">
 <link rel="stylesheet" href="css/auth.css">
+<style>
+/* ── Toolbar responsive wrapping ── */
+.products-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+}
+.toolbar-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.toolbar-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .toolbar-left,
+  .toolbar-right {
+    width: 100%;
+  }
+  .toolbar-filters {
+    width: 100%;
+  }
+  .toolbar-filters select,
+  .toolbar-filters .price-filter-wrap {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -37,7 +83,11 @@
       <div class="nav-search">
         <div class="nav-search-inner">
           <input type="text" id="search-bar" placeholder="Search medicines, brands..." autocomplete="off">
-          <button onclick="filterAndRender()"><i class="fas fa-search"></i></button>
+          <!-- Fix 2: mobile search button uses .btn-label for label text -->
+          <button onclick="filterAndRender()">
+            <i class="fas fa-search"></i>
+            <span class="btn-label">Search</span>
+          </button>
         </div>
         <div id="autocomplete-list" class="autocomplete-dropdown"></div>
       </div>
@@ -46,7 +96,8 @@
         <a href="index.html" class="nav-btn nav-btn-ghost">
           <i class="fas fa-home"></i> <span>Home</span>
         </a>
-        <a href="login.html" class="nav-btn nav-btn-ghost" id="nav-login" style="display:none;text-decoration:none">
+        <!-- Fix 1: removed hardcoded display:none so auth.js controls visibility -->
+        <a href="login.html" class="nav-btn nav-btn-ghost" id="nav-login" style="text-decoration:none">
           <i class="fas fa-sign-in-alt"></i> Login
         </a>
         <button class="nav-btn nav-btn-ghost" id="nav-profile" onclick="window.location.href='profile.html'" style="display:none">
@@ -83,6 +134,7 @@
 </div>
 
 <!-- ── Toolbar ── -->
+<!-- Fix 3: toolbar wraps gracefully on small screens via CSS above -->
 <div class="products-toolbar" id="products-section">
   <div class="toolbar-left">
     <span class="results-count" id="results-count">Loading...</span>
