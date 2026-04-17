@@ -70,36 +70,84 @@ function renderHomeCartBadge() {
   if (badge) { badge.textContent = total; badge.style.display = total > 0 ? '' : 'none'; }
 }
 
-/* ── Load 8 Featured Products ── */
+/* ── Load 8 Featured Products (with Render cold-start retry) ── */
 async function loadFeaturedProducts() {
   const grid = document.getElementById('featured-products-grid');
   if (!grid) return;
 
-  try {
-    /* Fetch top-rated products, limit 8 */
-    const data = await ProductAPI.list({ sort: 'rating', limit: 8 });
-    homeFeaturedProducts = (data.products || []).slice(0, 8);
+  /* Show shimmer while loading — keep the 8 placeholders already in HTML */
+  /* (they are rendered inline in index.html, so nothing to do here) */
 
-    if (!homeFeaturedProducts.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-secondary)"><i class="fas fa-pills" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--neutral-300)"></i><p>Products loading…</p><a href="products.html" style="color:var(--teal-500);font-weight:700">Browse all medicines</a></div>';
-      return;
+  const TIMEOUT_MS  = 35000;  /* 35s — covers Render free-tier cold start */
+  const MAX_RETRIES = 2;
+  let lastError;
+
+  /* Show a gentle "waking up" hint after 5s */
+  const hintTimer = setTimeout(() => {
+    const hint = document.createElement('p');
+    hint.id = 'fp-hint';
+    hint.style.cssText = 'grid-column:1/-1;text-align:center;font-size:.82rem;color:var(--text-secondary);padding:.5rem 0 0;margin:0';
+    hint.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="margin-right:.4rem;color:var(--teal-400)"></i>Server is waking up — products will appear shortly…';
+    /* Insert AFTER the shimmer cards */
+    grid.appendChild(hint);
+  }, 5000);
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      /* Race the API call against our timeout */
+      const data = await Promise.race([
+        ProductAPI.list({ sort: 'rating', limit: 8 }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), TIMEOUT_MS)
+        ),
+      ]);
+
+      clearTimeout(hintTimer);
+      homeFeaturedProducts = (data.products || []).slice(0, 8);
+
+      if (!homeFeaturedProducts.length) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:2.5rem 1rem;color:var(--text-secondary)">
+            <i class="fas fa-pills" style="font-size:2.25rem;margin-bottom:.875rem;display:block;color:var(--neutral-300)"></i>
+            <p style="margin-bottom:1rem;font-weight:600">No products found</p>
+            <a href="products.html" style="color:var(--teal-500);font-weight:700;text-decoration:none">Browse all medicines →</a>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = homeFeaturedProducts.map(p => featuredCardHtml(p)).join('');
+      return; /* success — exit */
+
+    } catch (err) {
+      lastError = err;
+      /* If not the last attempt, wait briefly then retry */
+      if (attempt < MAX_RETRIES) {
+        await new Promise(res => setTimeout(res, 4000));
+      }
     }
+  }
 
-    grid.innerHTML = homeFeaturedProducts.map(p => featuredCardHtml(p)).join('');
-  } catch (err) {
-    /* Graceful fallback — don't break the page */
-    if (grid) {
-      grid.innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-secondary)">
-          <i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--neutral-300)"></i>
-          <p style="margin-bottom:1rem">Could not load products right now.</p>
+  /* All attempts exhausted */
+  clearTimeout(hintTimer);
+  if (grid) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:2.5rem 1rem;color:var(--text-secondary)">
+        <i class="fas fa-exclamation-circle" style="font-size:2.25rem;margin-bottom:.875rem;display:block;color:#fca5a5"></i>
+        <p style="margin-bottom:.5rem;font-weight:600">Couldn't load products right now</p>
+        <p style="font-size:.82rem;margin-bottom:1.25rem">The server may be starting up. Please try again in a moment.</p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+          <button onclick="loadFeaturedProducts()"
+            style="display:inline-flex;align-items:center;gap:.4rem;background:var(--teal-400);color:#fff;border:none;padding:.65rem 1.25rem;border-radius:8px;font-weight:700;font-size:.875rem;cursor:pointer">
+            <i class="fas fa-redo"></i> Try Again
+          </button>
           <a href="products.html" class="featured-cta-btn" style="display:inline-flex">
             <i class="fas fa-pills"></i> Browse All Medicines
           </a>
-        </div>`;
-    }
-    console.warn('home.js: featured products load error —', err.message);
+        </div>
+      </div>`;
+    /* Restore shimmer-style min-height so CLS is minimal */
   }
+  console.warn('home.js: featured products failed after retries —', lastError?.message);
 }
 
 /* ── Featured Card HTML ── */
