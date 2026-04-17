@@ -63,6 +63,8 @@
 
 /* Mobile-only search bar in hero */
 .hero-mobile-search {
+  flex-direction: row;
+  width: 100%;
   display: none;
   background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2);
   border-radius: var(--radius-lg); overflow: hidden;
@@ -534,59 +536,136 @@
 /* =================================================================
    RESPONSIVE
 ================================================================= */
+/* =================================================================
+   RESPONSIVE
+================================================================= */
+
+/* ── Tablet landscape ── */
 @media (max-width: 1100px) {
   .categories-grid { grid-template-columns: repeat(3,1fr); }
-  .featured-grid { grid-template-columns: repeat(3,1fr); }
-  .why-grid { grid-template-columns: repeat(3,1fr); }
-  .footer-inner { grid-template-columns: 1fr 1fr; }
-  .footer-brand { grid-column: 1 / -1; }
+  .featured-grid   { grid-template-columns: repeat(3,1fr); }
+  .why-grid        { grid-template-columns: repeat(3,1fr); }
+  .footer-inner    { grid-template-columns: 1fr 1fr; }
+  .footer-brand    { grid-column: 1 / -1; }
 }
 
+/* ── Tablet portrait — hero collapses to single column ── */
 @media (max-width: 960px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-panel { display: none; }
-  .hero-section { padding: 3rem 0 2.5rem; }
-  .hero-mobile-search { display: flex; }
-  .stats-bar-inner { grid-template-columns: repeat(2,1fr); }
+  .hero-inner          { grid-template-columns: 1fr; }
+  .hero-panel          { display: none !important; }
+  .hero-section        { padding: 3rem 0 2.5rem; }
+  .hero-mobile-search  { display: flex !important; }
+  .hero-sub            { max-width: 100%; }
+
+  .stats-bar-inner     { grid-template-columns: repeat(2,1fr); }
   .stat-cell:nth-child(2) { border-right: none; }
-  .offers-grid { grid-template-columns: 1fr; gap: .875rem; }
-  .rx-band-inner { grid-template-columns: 1fr; gap: 2rem; }
-  .trust-strip-grid { grid-template-columns: repeat(2,1fr); }
+
+  .offers-grid         { grid-template-columns: 1fr; gap: .875rem; }
+  .rx-band-inner       { grid-template-columns: 1fr; gap: 2rem; }
+  .trust-strip-grid    { grid-template-columns: repeat(2,1fr); }
   .trust-stat-card:nth-child(2) { border-right: none; }
-  .why-grid { grid-template-columns: repeat(2,1fr); }
+  .why-grid            { grid-template-columns: repeat(2,1fr); }
 }
 
+/* ── Mobile ── */
 @media (max-width: 767px) {
-  .hp-section { padding: 2.75rem 0; }
-  .categories-grid { grid-template-columns: repeat(3,1fr); gap: .75rem; }
-  .cat-icon { width: 2.5rem; height: 2.5rem; font-size: 1.1rem; }
-  .cat-name { font-size: .75rem; }
-  .featured-grid { grid-template-columns: repeat(2,1fr); gap: 1rem; }
-  .fp-img { height: 130px; }
-  .offer-card { padding: 1.5rem; min-height: unset; }
-  .why-grid { grid-template-columns: repeat(2,1fr); gap: .875rem; }
-  .why-card { padding: 1.25rem 1rem; }
-  .trust-strip { padding: 2.5rem 0; }
-  .trust-stat-val { font-size: 1.7rem; }
-  .footer-inner { grid-template-columns: 1fr; gap: 1.75rem; }
-  .footer-trust { flex-direction: column; align-items: flex-start; gap: .75rem; }
-  .section-header-row { flex-direction: column; align-items: flex-start; }
-  .final-cta { padding: 3rem 0; }
+  /* Sections */
+  .hp-section          { padding: 2.25rem 0; }
+  .section-header-row  { flex-direction: column; align-items: flex-start; }
+
+  /* Hero */
+  .hero-section        { padding: 2rem 0 1.75rem; }
+  .hero-h1             { font-size: clamp(1.6rem, 5vw, 2.2rem); }
+  .hero-sub            { font-size: .95rem; margin-bottom: 1.5rem; }
+  .hero-cta-row        { gap: .6rem; }
+  .hero-trust-row      { gap: .4rem; }
+  .hero-trust-pill     { font-size: .7rem; padding: .25rem .65rem; }
+
+  /* Stats bar */
+  .stats-bar-inner     { grid-template-columns: repeat(2,1fr); }
+  .stat-cell           { padding: 1rem .75rem; }
+  .stat-num            { font-size: 1.25rem; }
+  .stat-lbl            { font-size: .7rem; }
+  .stat-cell:nth-child(2) { border-right: none; }
+
+  /* Categories — 3 per row on mobile */
+  .categories-grid {
+    grid-template-columns: repeat(3,1fr);
+    gap: .65rem;
+  }
+  .cat-card            { padding: 1.1rem .5rem 1rem; }
+  .cat-icon            { width: 2.4rem; height: 2.4rem; font-size: 1rem; margin-bottom: .6rem; }
+  .cat-name            { font-size: .72rem; }
+
+  /* Featured products — 2 per row */
+  .featured-grid       { grid-template-columns: repeat(2,1fr); gap: .75rem; }
+  .fp-img              { height: 120px; }
+  .fp-body             { padding: .75rem; }
+  .fp-name             { font-size: .82rem; }
+  .fp-mfr              { display: none; }
+  .fp-add-btn          { padding: .4rem .65rem; font-size: .72rem; }
+
+  /* Offers */
+  .offers-grid         { grid-template-columns: 1fr; gap: .75rem; }
+  .offer-card          { padding: 1.4rem 1.25rem; min-height: unset; }
+  .offer-title         { font-size: 1.2rem; }
+
+  /* Why section */
+  .why-grid            { grid-template-columns: repeat(2,1fr); gap: .75rem; }
+  .why-card            { padding: 1.25rem .875rem; }
+  .why-icon-wrap       { width: 2.75rem; height: 2.75rem; font-size: 1.2rem; }
+  .why-title           { font-size: .85rem; }
+  .why-desc            { font-size: .75rem; }
+
+  /* Trust strip */
+  .trust-strip         { padding: 2rem 0; }
+  .trust-strip-grid    { grid-template-columns: repeat(2,1fr); }
+  .trust-stat-card:nth-child(2) { border-right: none; }
+  .trust-stat-val      { font-size: 1.6rem; }
+  .trust-stat-lbl      { font-size: .72rem; }
+
+  /* Prescription band */
+  .rx-band             { padding: 2rem 0; }
+  .rx-band-inner       { grid-template-columns: 1fr; gap: 1.5rem; }
+  .rx-upload-box       { min-width: unset; padding: 1.75rem 1.25rem; }
+
+  /* Final CTA */
+  .final-cta           { padding: 2.5rem 0; }
+  .final-cta-btns      { flex-direction: column; align-items: center; }
+  .final-cta-primary,
+  .final-cta-secondary { width: 100%; max-width: 300px; justify-content: center; }
+
+  /* Footer */
+  .footer-inner        { grid-template-columns: 1fr; gap: 1.5rem; }
+  .footer-brand        { grid-column: auto; }
+  .footer-trust        { flex-direction: column; align-items: flex-start; gap: .6rem; }
+  .footer-bottom       { flex-direction: column; gap: .4rem; text-align: center; align-items: center; }
 }
 
-@media (max-width: 520px) {
-  .hero-section { padding: 2.25rem 0 2rem; }
-  .hero-cta-row { flex-direction: column; }
-  .hero-btn-primary, .hero-btn-secondary { justify-content: center; }
-  .hero-h1 { font-size: 1.75rem; }
-  .categories-grid { grid-template-columns: repeat(2,1fr); gap: .65rem; }
-  .featured-grid { grid-template-columns: repeat(2,1fr); gap: .75rem; }
-  .fp-body { padding: .75rem; }
-  .fp-name { font-size: .82rem; }
-  .fp-add-btn { padding: .4rem .65rem; font-size: .72rem; }
-  .stats-bar-inner { grid-template-columns: repeat(2,1fr); }
-  .why-grid { grid-template-columns: 1fr 1fr; }
-  .final-cta-btns { flex-direction: column; align-items: center; }
-  .rx-upload-box { min-width: unset; }
-  .offers-grid { grid-template-columns: 1fr; }
+/* ── Small mobile (≤ 420px) ── */
+@media (max-width: 420px) {
+  /* Categories — 2 per row on very small screens */
+  .categories-grid     { grid-template-columns: repeat(2,1fr); gap: .5rem; }
+  .cat-card            { padding: .9rem .4rem .875rem; }
+  .cat-icon            { width: 2.1rem; height: 2.1rem; font-size: .9rem; }
+  .cat-name            { font-size: .68rem; }
+
+  /* Hero */
+  .hero-h1             { font-size: 1.6rem; }
+  .hero-cta-row        { flex-direction: column; }
+  .hero-btn-primary,
+  .hero-btn-secondary  { justify-content: center; width: 100%; }
+
+  /* Featured products */
+  .featured-grid       { grid-template-columns: repeat(2,1fr); gap: .5rem; }
+  .fp-img              { height: 100px; }
+
+  /* Stats bar — 2×2 */
+  .stats-bar-inner     { grid-template-columns: repeat(2,1fr); }
+
+  /* Why — single column on tiny screens */
+  .why-grid            { grid-template-columns: 1fr 1fr; }
+
+  /* Offer strip smaller */
+  .offer-strip-item    { font-size: .7rem; padding: 0 1.5rem; }
 }
