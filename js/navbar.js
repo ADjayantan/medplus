@@ -138,42 +138,45 @@ const MedNavbar = (() => {
   <div class="nav-mobile-drawer" id="nav-mobile-drawer"
     role="dialog" aria-label="Mobile navigation" aria-modal="false">
 
-    <div class="mob-search" role="search">
-      <input type="text" id="mob-search-bar"
-        placeholder="Search medicines…"
-        aria-label="Search medicines (mobile)"
-        onkeydown="if(event.key==='Enter'){window.location.href='${r}products.html?q='+encodeURIComponent(this.value.trim())}">
-      <button aria-label="Search"
-        onclick="window.location.href='${r}products.html?q='+encodeURIComponent(document.getElementById('mob-search-bar').value.trim())">
-        <i class="fas fa-search" aria-hidden="true"></i>
+    <div class="mob-drawer-inner">
+      <div class="mob-search" role="search">
+        <input type="text" id="mob-search-bar"
+          placeholder="Search medicines…"
+          aria-label="Search medicines (mobile)"
+          onkeydown="if(event.key==='Enter'){window.location.href='${r}products.html?q='+encodeURIComponent(this.value.trim())}">
+        <button aria-label="Search"
+          onclick="window.location.href='${r}products.html?q='+encodeURIComponent(document.getElementById('mob-search-bar').value.trim())">
+          <i class="fas fa-search" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <a href="${r}index.html"><i class="fas fa-home" aria-hidden="true"></i> Home</a>
+      <a href="${r}products.html"><i class="fas fa-pills" aria-hidden="true"></i> Products</a>
+      <a href="${r}insurance.html"><i class="fas fa-shield-alt" aria-hidden="true"></i> Insurance</a>
+      <a href="${r}upload-prescription.html"><i class="fas fa-file-prescription" aria-hidden="true"></i> Upload Prescription</a>
+
+      <a href="${r}login.html" class="mob-login" id="mob-nav-login">
+        <i class="fas fa-sign-in-alt" aria-hidden="true"></i> Login
+      </a>
+      <a href="${r}profile.html" id="mob-nav-profile" style="display:none">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span id="mob-profile-name">Profile</span>
+      </a>
+      <a href="${r}admin-dashboard.html" id="mob-nav-admin"
+         style="display:none" class="mob-admin">
+        <i class="fas fa-cog" aria-hidden="true"></i> Admin
+      </a>
+      <button class="mob-link mob-logout" id="mob-nav-logout"
+        style="display:none" onclick="logout()">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
       </button>
+
+      <a href="${r}cart.html" class="mob-cart" id="mob-nav-cart" aria-label="Cart">
+        <i class="fas fa-shopping-cart" aria-hidden="true"></i> Cart
+        <span class="cart-badge" id="mob-cart-count"
+          style="display:none;margin-left:4px" aria-hidden="true">0</span>
+      </a>
     </div>
-
-    <a href="${r}products.html"><i class="fas fa-pills" aria-hidden="true"></i> Products</a>
-    <a href="${r}insurance.html"><i class="fas fa-shield-alt" aria-hidden="true"></i> Insurance</a>
-    <a href="${r}upload-prescription.html"><i class="fas fa-file-prescription" aria-hidden="true"></i> Upload Rx</a>
-
-    <a href="${r}login.html" class="mob-login" id="mob-nav-login">
-      <i class="fas fa-sign-in-alt" aria-hidden="true"></i> Login
-    </a>
-    <a href="${r}profile.html" id="mob-nav-profile" style="display:none">
-      <i class="fas fa-user" aria-hidden="true"></i>
-      <span id="mob-profile-name">Profile</span>
-    </a>
-    <a href="${r}admin-dashboard.html" id="mob-nav-admin"
-       style="display:none" class="mob-admin">
-      <i class="fas fa-cog" aria-hidden="true"></i> Admin
-    </a>
-    <button class="mob-link mob-logout" id="mob-nav-logout"
-      style="display:none" onclick="logout()">
-      <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
-    </button>
-
-    <a href="${r}cart.html" class="mob-cart" id="mob-nav-cart" aria-label="Cart">
-      <i class="fas fa-shopping-cart" aria-hidden="true"></i> Cart
-      <span class="cart-badge" id="mob-cart-count"
-        style="display:none;margin-left:4px" aria-hidden="true">0</span>
-    </a>
   </div>
 </nav>
 
