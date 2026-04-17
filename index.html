@@ -39,7 +39,7 @@
 .hero-search button:hover { background: var(--teal-500); }
 #autocomplete-list { border-radius: 12px; top: calc(100% + 8px); }
 
-/* Navbar Search Bar — UPDATED DESIGN */
+/* Navbar Search Bar */
 .nav-search-box {
   display: flex;
   align-items: center;
@@ -71,9 +71,7 @@
   color: #1e293b;
   font-weight: 500;
 }
-.nav-search-box input::placeholder {
-  color: #94a3b8;
-}
+.nav-search-box input::placeholder { color: #94a3b8; }
 .nav-search-box .search-btn {
   padding: 0.6rem 1.4rem;
   background: var(--teal-400);
@@ -124,9 +122,85 @@
   padding: 24px; font-size: 13px; margin-top: 48px;
 }
 .footer a { color: var(--teal-300); text-decoration: none; }
+
+/* ── Hamburger button ── */
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  color: #fff;
+  font-size: 1.4rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.nav-hamburger:hover { background: rgba(255,255,255,0.1); }
+
+/* ── Mobile nav drawer ── */
+.nav-mobile-drawer {
+  display: none;
+  flex-direction: column;
+  background: var(--teal-900, #134e4a);
+  padding: 0.75rem 1rem 1rem;
+  gap: 0.4rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.nav-mobile-drawer.open { display: flex; }
+
+.nav-mobile-drawer .mob-search {
+  display: flex;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.nav-mobile-drawer .mob-search input {
+  flex: 1; padding: 10px 14px; border: none; outline: none; font-size: 14px; color: #1e293b;
+}
+.nav-mobile-drawer .mob-search button {
+  padding: 10px 14px; background: var(--teal-400); color: #fff; border: none; cursor: pointer; font-size: 14px;
+}
+
+.nav-mobile-drawer a,
+.nav-mobile-drawer button.mob-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px;
+  font-size: 14px; font-weight: 600;
+  color: rgba(255,255,255,0.88); text-decoration: none;
+  background: none; border: none; cursor: pointer; width: 100%; text-align: left;
+  transition: background 0.15s;
+}
+.nav-mobile-drawer a:hover,
+.nav-mobile-drawer button.mob-link:hover { background: rgba(255,255,255,0.1); }
+.nav-mobile-drawer a.mob-cart {
+  background: rgba(245,158,11,0.15);
+  color: #f59e0b;
+}
+.nav-mobile-drawer a.mob-login { color: var(--teal-200, #99f6e4); }
+.nav-mobile-drawer button.mob-logout { color: #fca5a5; }
+
+@media (max-width: 768px) {
+  .nav-hamburger { display: flex; align-items: center; }
+  /* Hide desktop actions on mobile */
+  .nav-actions { display: none !important; }
+  /* Hide desktop search on mobile */
+  .nav-search { display: none !important; }
+  /* Ensure logo and hamburger sit side by side */
+  .navbar-main .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
 </style>
 </head>
 <body>
+
+<!-- Toast container for notifications -->
+<div id="toast-container" style="position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none"></div>
 
 <nav class="navbar" id="main-navbar">
   <!-- Top bar -->
@@ -151,7 +225,7 @@
         <span class="nav-logo-text">Med<span>Plus</span></span>
       </a>
 
-      <!-- ✅ UPDATED Search Bar -->
+      <!-- Desktop Search Bar -->
       <div class="nav-search" style="position:relative;flex:1;min-width:0;max-width:580px">
         <div class="nav-search-box">
           <span class="search-icon"><i class="fas fa-search"></i></span>
@@ -161,13 +235,13 @@
             onkeydown="if(event.key==='Enter'){ window.location.href='products.html?q='+encodeURIComponent(this.value.trim()); }">
           <button class="search-btn"
             onclick="window.location.href='products.html?q='+encodeURIComponent(document.getElementById('search-bar').value.trim())">
-            <i class="fas fa-search"></i> Search
+            <i class="fas fa-search"></i> <span class="btn-label">Search</span>
           </button>
         </div>
         <div id="autocomplete-list" class="autocomplete-dropdown" style="position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--bg-surface);border:1.5px solid var(--border-color);border-radius:12px;box-shadow:var(--shadow-lg);z-index:500;display:none"></div>
       </div>
 
-      <!-- Nav Actions -->
+      <!-- Desktop Nav Actions -->
       <div class="nav-actions">
         <a href="products.html" class="nav-btn nav-btn-ghost" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:600;color:#fff;background:rgba(46,168,154,0.15);text-decoration:none">
           <i class="fas fa-pills"></i><span class="hide-mobile">Products</span>
@@ -197,7 +271,39 @@
           <span class="cart-badge" id="cart-count" style="display:none">0</span>
         </a>
       </div>
+
+      <!-- Hamburger button (mobile only) -->
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" onclick="toggleMobileNav()">
+        <i class="fas fa-bars" id="hamburger-icon"></i>
+      </button>
     </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="nav-mobile-drawer" id="nav-mobile-drawer">
+    <!-- Mobile search -->
+    <div class="mob-search">
+      <input type="text" id="mob-search-bar" placeholder="Search medicines..."
+        onkeydown="if(event.key==='Enter'){ window.location.href='products.html?q='+encodeURIComponent(this.value.trim()); }">
+      <button onclick="window.location.href='products.html?q='+encodeURIComponent(document.getElementById('mob-search-bar').value.trim())">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+
+    <a href="products.html"><i class="fas fa-pills"></i> Products</a>
+    <a href="insurance.html"><i class="fas fa-shield-alt"></i> Insurance</a>
+    <a href="upload-prescription.html"><i class="fas fa-file-prescription"></i> Upload Rx</a>
+
+    <!-- Auth-dependent links — shown/hidden by updateNavAuth() -->
+    <a href="login.html" class="mob-login" id="mob-nav-login"><i class="fas fa-sign-in-alt"></i> Login</a>
+    <a href="profile.html" id="mob-nav-profile" style="display:none"><i class="fas fa-user"></i> <span id="mob-profile-name">Profile</span></a>
+    <button class="mob-link mob-logout" id="mob-nav-logout" style="display:none" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <a href="admin-dashboard.html" id="mob-nav-admin" style="display:none;background:rgba(124,58,237,0.15);color:#a78bfa"><i class="fas fa-cog"></i> Admin</a>
+
+    <a href="cart.html" class="mob-cart" id="mob-nav-cart">
+      <i class="fas fa-shopping-cart"></i> Cart
+      <span class="cart-badge" id="mob-cart-count" style="display:none;margin-left:4px">0</span>
+    </a>
   </div>
 </nav>
 
@@ -326,6 +432,38 @@
 <script src="js/main.js"></script>
 
 <script>
+/* ── Mobile hamburger toggle ── */
+function toggleMobileNav() {
+  const drawer = document.getElementById('nav-mobile-drawer');
+  const icon   = document.getElementById('hamburger-icon');
+  const isOpen = drawer.classList.toggle('open');
+  icon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
+}
+
+/* Close drawer when clicking outside */
+document.addEventListener('click', function(e) {
+  const navbar = document.getElementById('main-navbar');
+  if (navbar && !navbar.contains(e.target)) {
+    const drawer = document.getElementById('nav-mobile-drawer');
+    const icon   = document.getElementById('hamburger-icon');
+    if (drawer && drawer.classList.contains('open')) {
+      drawer.classList.remove('open');
+      if (icon) icon.className = 'fas fa-bars';
+    }
+  }
+});
+
+/* Close drawer on resize to desktop */
+window.addEventListener('resize', function() {
+  if (window.innerWidth > 768) {
+    const drawer = document.getElementById('nav-mobile-drawer');
+    const icon   = document.getElementById('hamburger-icon');
+    if (drawer) drawer.classList.remove('open');
+    if (icon) icon.className = 'fas fa-bars';
+  }
+});
+
+/* ── Auth state ── */
 function updateNavAuth() {
   const user        = currentUser();
   const loginEl     = document.getElementById('nav-login');
@@ -334,22 +472,64 @@ function updateNavAuth() {
   const adminEl     = document.getElementById('nav-admin');
   const logoutEl    = document.getElementById('nav-logout');
 
+  // Mobile mirrors
+  const mobLogin   = document.getElementById('mob-nav-login');
+  const mobProfile = document.getElementById('mob-nav-profile');
+  const mobPName   = document.getElementById('mob-profile-name');
+  const mobAdmin   = document.getElementById('mob-nav-admin');
+  const mobLogout  = document.getElementById('mob-nav-logout');
+
   if (user) {
-    if (loginEl)     { loginEl.style.display    = 'none'; }
-    if (profileEl)   { profileEl.style.display  = 'flex'; }
-    if (profileName) { profileName.textContent  = user.name.split(' ')[0]; }
-    if (adminEl)     { adminEl.style.display    = user.isAdmin ? 'flex' : 'none'; }
-    if (logoutEl)    { logoutEl.style.display   = 'flex'; }
+    if (loginEl)     loginEl.style.display    = 'none';
+    if (profileEl)   profileEl.style.display  = 'flex';
+    if (profileName) profileName.textContent  = user.name.split(' ')[0];
+    if (adminEl)     adminEl.style.display    = user.isAdmin ? 'flex' : 'none';
+    if (logoutEl)    logoutEl.style.display   = 'flex';
+
+    if (mobLogin)   mobLogin.style.display   = 'none';
+    if (mobProfile) mobProfile.style.display = 'flex';
+    if (mobPName)   mobPName.textContent     = user.name.split(' ')[0];
+    if (mobAdmin)   mobAdmin.style.display   = user.isAdmin ? 'flex' : 'none';
+    if (mobLogout)  mobLogout.style.display  = 'flex';
   } else {
-    if (loginEl)     { loginEl.style.display    = 'flex'; }
-    if (profileEl)   { profileEl.style.display  = 'none'; }
-    if (adminEl)     { adminEl.style.display    = 'none'; }
-    if (logoutEl)    { logoutEl.style.display   = 'none'; }
+    if (loginEl)     loginEl.style.display    = 'flex';
+    if (profileEl)   profileEl.style.display  = 'none';
+    if (adminEl)     adminEl.style.display    = 'none';
+    if (logoutEl)    logoutEl.style.display   = 'none';
+
+    if (mobLogin)   mobLogin.style.display   = 'flex';
+    if (mobProfile) mobProfile.style.display = 'none';
+    if (mobAdmin)   mobAdmin.style.display   = 'none';
+    if (mobLogout)  mobLogout.style.display  = 'none';
   }
 }
 
+/* ── Sync mobile cart badge ── */
+function syncMobileCartBadge() {
+  const desktopBadge = document.getElementById('cart-count');
+  const mobileBadge  = document.getElementById('mob-cart-count');
+  if (!desktopBadge || !mobileBadge) return;
+  mobileBadge.textContent = desktopBadge.textContent;
+  mobileBadge.style.display = desktopBadge.style.display;
+}
+/* Observe desktop badge changes and mirror to mobile */
+const _cartBadgeObs = new MutationObserver(syncMobileCartBadge);
+document.addEventListener('DOMContentLoaded', () => {
+  const badge = document.getElementById('cart-count');
+  if (badge) _cartBadgeObs.observe(badge, { childList: true, attributes: true, attributeFilter: ['style'] });
+  syncMobileCartBadge();
+});
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeProductModal();
+  if (e.key === 'Escape') {
+    closeProductModal && closeProductModal();
+    const drawer = document.getElementById('nav-mobile-drawer');
+    const icon   = document.getElementById('hamburger-icon');
+    if (drawer && drawer.classList.contains('open')) {
+      drawer.classList.remove('open');
+      if (icon) icon.className = 'fas fa-bars';
+    }
+  }
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
     const s = document.getElementById('hero-search-bar') || document.getElementById('search-bar');
