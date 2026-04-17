@@ -8,6 +8,255 @@
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/navbar.css">
 <link rel="stylesheet" href="css/cart.css">
+
+<style>
+/* ── Mobile spacing overrides ── */
+@media (max-width: 640px) {
+  .page-shell {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+  .page-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+    margin-bottom: 1.25rem;
+  }
+  .page-title {
+    font-size: 1.4rem;
+  }
+  .cart-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  .cart-item {
+    flex-direction: row;
+    gap: .75rem;
+    padding: .9rem;
+  }
+  .cart-item-img {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+  .cart-item-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+  }
+  .qty-control {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  .btn-primary,
+  .btn-secondary {
+    padding: .85rem 1rem;
+    font-size: .9rem;
+  }
+  .info-banner {
+    font-size: .82rem;
+    padding: .65rem .9rem;
+  }
+  /* coupon row stacks on very small screens */
+  #coupon-input {
+    font-size: .9rem;
+  }
+}
+
+/* ── Professional Footer ── */
+.site-footer {
+  background: linear-gradient(160deg, #0f172a 0%, #134e4a 100%);
+  color: #cbd5e1;
+  padding: 3rem 0 0;
+  margin-top: 3rem;
+  font-size: .875rem;
+  line-height: 1.7;
+}
+.site-footer .footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 2.5rem;
+}
+@media (max-width: 900px) {
+  .site-footer .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+@media (max-width: 540px) {
+  .site-footer .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}
+.site-footer .footer-brand .logo {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: .9rem;
+  text-decoration: none;
+}
+.site-footer .footer-brand .logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1rem;
+  color: #fff;
+  letter-spacing: -.5px;
+  flex-shrink: 0;
+}
+.site-footer .footer-brand .logo-text {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: -.3px;
+}
+.site-footer .footer-brand .logo-text span {
+  color: #2dd4bf;
+}
+.site-footer .footer-brand p {
+  color: #94a3b8;
+  font-size: .83rem;
+  max-width: 260px;
+  margin-bottom: 1.1rem;
+}
+.site-footer .footer-brand .contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+.site-footer .footer-brand .contact-items a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: .82rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  transition: color .18s;
+}
+.site-footer .footer-brand .contact-items a:hover {
+  color: #2dd4bf;
+}
+.site-footer .footer-col h4 {
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #f1f5f9;
+  margin-bottom: .9rem;
+}
+.site-footer .footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+.site-footer .footer-col ul li a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: .83rem;
+  transition: color .18s;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.site-footer .footer-col ul li a:hover {
+  color: #2dd4bf;
+}
+.site-footer .footer-col ul li a i {
+  font-size: .7rem;
+  opacity: .6;
+}
+.site-footer .footer-trust {
+  border-top: 1px solid rgba(255,255,255,.08);
+  margin-top: 2.5rem;
+  padding: 1.25rem 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-footer .footer-trust .trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem 1.25rem;
+}
+.site-footer .footer-trust .trust-badge {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .76rem;
+  color: #64748b;
+}
+.site-footer .footer-trust .trust-badge i {
+  color: #2dd4bf;
+  font-size: .85rem;
+}
+.site-footer .footer-bottom {
+  background: rgba(0,0,0,.25);
+  padding: 1rem 1.5rem;
+  margin-top: 1.25rem;
+}
+.site-footer .footer-bottom-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-footer .footer-bottom-inner p {
+  font-size: .76rem;
+  color: #475569;
+  margin: 0;
+}
+.site-footer .footer-social {
+  display: flex;
+  gap: .6rem;
+}
+.site-footer .footer-social a {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: .8rem;
+  text-decoration: none;
+  transition: background .18s, color .18s;
+}
+.site-footer .footer-social a:hover {
+  background: rgba(45,212,191,.15);
+  color: #2dd4bf;
+  border-color: rgba(45,212,191,.3);
+}
+</style>
 </head>
 <body>
 
@@ -31,7 +280,8 @@
       </div>
       <div style="flex:1"></div>
       <div class="nav-actions">
-        <button class="nav-btn nav-btn-ghost" id="nav-login" onclick="window.location.href='login.html'" style="display:none">
+        <!-- FIX: removed inline display:none — updateNavAuth() controls visibility at runtime -->
+        <button class="nav-btn nav-btn-ghost" id="nav-login" onclick="window.location.href='login.html'">
           <i class="fas fa-sign-in-alt"></i> Login
         </button>
         <button class="nav-btn nav-btn-ghost" id="nav-profile" onclick="window.location.href='profile.html'" style="display:none">
@@ -184,9 +434,85 @@
   </div>
 </div>
 
-<!-- Footer -->
-<footer class="footer">
-  <p>&copy; 2025 MedPlus Pharmacy. All rights reserved.</p>
+<!-- ── Professional Footer ── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+
+    <!-- Brand column -->
+    <div class="footer-brand">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">M+</div>
+        <span class="logo-text">Med<span>Plus</span></span>
+      </a>
+      <p>Your trusted online pharmacy for genuine medicines, health products, and expert wellness advice — delivered fast to your door.</p>
+      <div class="contact-items">
+        <a href="tel:1800-123-456"><i class="fas fa-phone-alt"></i> 1800-123-456 (Toll Free)</a>
+        <a href="mailto:care@medplus.in"><i class="fas fa-envelope"></i> care@medplus.in</a>
+        <a href="#"><i class="fas fa-clock"></i> Mon – Sat, 9 AM – 8 PM</a>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+        <li><a href="products.html"><i class="fas fa-chevron-right"></i> Medicines</a></li>
+        <li><a href="upload-prescription.html"><i class="fas fa-chevron-right"></i> Upload Rx</a></li>
+        <li><a href="cart.html"><i class="fas fa-chevron-right"></i> My Cart</a></li>
+        <li><a href="profile.html"><i class="fas fa-chevron-right"></i> My Account</a></li>
+      </ul>
+    </div>
+
+    <!-- Help -->
+    <div class="footer-col">
+      <h4>Help &amp; Support</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Track Order</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Return Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Grievance</a></li>
+      </ul>
+    </div>
+
+    <!-- Policies -->
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Terms of Use</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Shipping Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Rx Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Authenticity</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Trust Badges -->
+  <div class="footer-trust">
+    <div class="trust-badges">
+      <span class="trust-badge"><i class="fas fa-shield-alt"></i> 100% Genuine Medicines</span>
+      <span class="trust-badge"><i class="fas fa-truck"></i> Fast Delivery</span>
+      <span class="trust-badge"><i class="fas fa-lock"></i> Secure Payments</span>
+      <span class="trust-badge"><i class="fas fa-undo-alt"></i> Easy Returns</span>
+      <span class="trust-badge"><i class="fas fa-certificate"></i> Licensed Pharmacy</span>
+    </div>
+    <div class="footer-social">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-inner">
+      <p>&copy; 2025 MedPlus Pharmacy Pvt. Ltd. All rights reserved.</p>
+      <p>Licensed by the Central Drugs Standard Control Organisation (CDSCO).</p>
+    </div>
+  </div>
 </footer>
 
 <div id="toast-container" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px"></div>
@@ -205,8 +531,16 @@ function updateNavAuth() {
   const user = currentUser();
   const li = document.getElementById('nav-login');
   const pr = document.getElementById('nav-profile');
-  if (user) { if (li) li.style.display='none'; if (pr) { pr.style.display=''; pr.innerHTML='<i class="fas fa-user"></i> '+user.name.split(' ')[0]; } }
-  else { if (li) li.style.display=''; if (pr) pr.style.display='none'; }
+  if (user) {
+    if (li) li.style.display = 'none';
+    if (pr) {
+      pr.style.display = '';
+      pr.innerHTML = '<i class="fas fa-user"></i> ' + user.name.split(' ')[0];
+    }
+  } else {
+    if (li) li.style.display = '';
+    if (pr) pr.style.display = 'none';
+  }
 }
 
 function renderCartPage() {
@@ -235,7 +569,6 @@ function renderCartPage() {
   renderItems(cart);
   renderSummary(cart);
 
-  // Rx notice
   const hasRx = cart.some(i => i.requiresPrescription);
   const rxNotice = document.getElementById('rx-notice');
   if (rxNotice) rxNotice.style.display = hasRx ? 'flex' : 'none';
@@ -296,21 +629,20 @@ function renderSummary(cart) {
     if (savingsBadge) savingsBadge.style.display = 'none';
   }
 
-  // Delivery banner
-  const diff = FREE_DELIVERY_THRESHOLD - subtotal;
+  const diff     = FREE_DELIVERY_THRESHOLD - subtotal;
   const delivMsg = document.getElementById('delivery-msg');
   const diffEl   = document.getElementById('delivery-diff');
   const banner   = document.getElementById('free-delivery-banner');
   if (banner) {
     if (delivery === 0) {
       banner.innerHTML = '<i class="fas fa-truck"></i><span><strong>🎉 You have FREE delivery!</strong></span>';
-      banner.style.background = 'var(--green-50)';
+      banner.style.background  = 'var(--green-50)';
       banner.style.borderColor = 'var(--green-200)';
-      banner.style.color = 'var(--green-700)';
+      banner.style.color       = 'var(--green-700)';
     } else {
-      banner.style.background = '';
+      banner.style.background  = '';
       banner.style.borderColor = '';
-      banner.style.color = '';
+      banner.style.color       = '';
       if (delivMsg && diffEl) {
         diffEl.textContent = '₹' + diff;
         delivMsg.innerHTML = 'Add items worth <strong>₹' + diff + '</strong> more for <strong>FREE delivery</strong>!';
