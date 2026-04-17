@@ -669,3 +669,193 @@
   /* Offer strip smaller */
   .offer-strip-item    { font-size: .7rem; padding: 0 1.5rem; }
 }
+
+/* =================================================================
+   MOBILE FIXES — appended patch (overrides above where needed)
+================================================================= */
+
+/* ── Ensure hero right panel is truly hidden on mobile/tablet ── */
+@media (max-width: 960px) {
+  .hero-panel { display: none !important; }
+  .hero-inner { grid-template-columns: 1fr !important; }
+  .hero-mobile-search { display: flex !important; }
+}
+
+/* ── Mobile core layout fixes ── */
+@media (max-width: 767px) {
+  /* Container horizontal padding */
+  .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+  /* Sections */
+  .hp-section { padding: 2rem 0; }
+
+  /* ── HERO ── */
+  .hero-section { padding: 1.75rem 0 1.5rem; }
+  .hero-inner { display: flex !important; flex-direction: column; gap: 0; }
+  .hero-panel { display: none !important; }
+  .hero-mobile-search { display: flex !important; }
+  .hero-h1 { font-size: clamp(1.55rem, 5.5vw, 2rem); margin-bottom: .85rem; }
+  .hero-sub { font-size: .9rem; margin-bottom: 1.25rem; line-height: 1.6; }
+  .hero-eyebrow { font-size: .68rem; margin-bottom: 1rem; }
+  .hero-cta-row { gap: .55rem; margin-bottom: 1.5rem; }
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    padding: .75rem 1.25rem;
+    font-size: .88rem;
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+  }
+  .hero-trust-row { gap: .4rem; }
+  .hero-trust-pill { font-size: .68rem; padding: .25rem .6rem; }
+
+  /* Mobile search in hero */
+  .hero-mobile-search {
+    display: flex !important;
+    margin-bottom: 1.25rem;
+    border-radius: 10px;
+  }
+  .hero-mobile-search input { font-size: .9rem; padding: .8rem .9rem; }
+  .hero-mobile-search button { padding: .8rem 1rem; font-size: .85rem; }
+
+  /* ── STATS BAR ── */
+  .stats-bar-inner {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .stat-cell { padding: .875rem .5rem; border-right: 1.5px solid var(--border-color); border-bottom: 1.5px solid var(--border-color); }
+  .stat-cell:nth-child(2),
+  .stat-cell:nth-child(4) { border-right: none; }
+  .stat-cell:nth-child(3),
+  .stat-cell:nth-child(4) { border-bottom: none; }
+  .stat-num { font-size: 1.2rem; }
+  .stat-lbl { font-size: .68rem; }
+
+  /* ── CATEGORIES GRID — 3 columns ── */
+  .categories-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: .6rem !important;
+  }
+  .cat-card { padding: 1rem .5rem .9rem; border-radius: 12px; }
+  .cat-icon { width: 2.5rem; height: 2.5rem; font-size: 1.05rem; margin-bottom: .6rem; border-radius: 8px; }
+  .cat-name { font-size: .72rem; line-height: 1.25; }
+
+  /* ── FEATURED PRODUCTS — 2 columns ── */
+  .featured-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: .65rem !important;
+  }
+  .fp-shimmer { border-radius: 12px; }
+  .fp-card { border-radius: 12px; }
+  .fp-img { height: 120px; }
+  .fp-body { padding: .75rem .75rem .875rem; }
+  .fp-cat { font-size: .65rem; margin-bottom: .25rem; }
+  .fp-name { font-size: .82rem; line-height: 1.3; }
+  .fp-mfr { display: none; }
+  .fp-rating { font-size: .7rem; margin-bottom: .55rem; }
+  .fp-footer { gap: .3rem; }
+  .fp-price { font-size: .9rem; }
+  .fp-add-btn { padding: .38rem .6rem; font-size: .72rem; gap: .25rem; }
+  .fp-add-btn i { display: none; }
+
+  /* ── OFFERS ── */
+  .offers-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: .75rem !important;
+  }
+  .offer-card { padding: 1.35rem 1.1rem; min-height: unset; border-radius: 14px; }
+  .offer-title { font-size: 1.15rem; }
+  .offer-desc { font-size: .8rem; }
+
+  /* ── WHY SECTION ── */
+  .why-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: .65rem !important;
+  }
+  .why-card { padding: 1.1rem .75rem; border-radius: 12px; }
+  .why-icon-wrap { width: 2.5rem; height: 2.5rem; font-size: 1.1rem; margin-bottom: .75rem; }
+  .why-title { font-size: .82rem; }
+  .why-desc { font-size: .72rem; }
+
+  /* ── TRUST STRIP ── */
+  .trust-strip { padding: 1.75rem 0; }
+  .trust-strip-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .trust-stat-card { padding: 1rem .5rem; border-right: 1px solid rgba(255,255,255,.12); border-bottom: 1px solid rgba(255,255,255,.12); }
+  .trust-stat-card:nth-child(2),
+  .trust-stat-card:nth-child(4) { border-right: none; }
+  .trust-stat-card:nth-child(3),
+  .trust-stat-card:nth-child(4) { border-bottom: none; }
+  .trust-stat-val { font-size: 1.5rem; }
+  .trust-stat-icon { font-size: 1.2rem; margin-bottom: .5rem; }
+
+  /* ── PRESCRIPTION BAND ── */
+  .rx-band { padding: 1.75rem 0; }
+  .rx-band-inner {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+  }
+  .rx-upload-box { min-width: unset; padding: 1.5rem 1.25rem; border-radius: 14px; }
+  .rx-upload-icon { font-size: 2rem; margin-bottom: .75rem; }
+  .rx-upload-box h3 { font-size: 1rem; }
+  .rx-upload-box p { font-size: .8rem; margin-bottom: 1.25rem; }
+  .rx-steps { gap: .75rem; }
+  .rx-step-body h4 { font-size: .82rem; }
+  .rx-step-body p { font-size: .74rem; }
+
+  /* ── FINAL CTA ── */
+  .final-cta { padding: 2.25rem 0; }
+  .final-cta h2 { font-size: clamp(1.5rem, 5vw, 2rem); }
+  .final-cta p { font-size: .9rem; }
+  .final-cta-btns {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: .6rem;
+  }
+  .final-cta-primary,
+  .final-cta-secondary {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center;
+    padding: .85rem 1.5rem;
+  }
+
+  /* ── FOOTER ── */
+  .footer-inner {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  .footer-brand { grid-column: auto !important; }
+  .footer-trust { flex-direction: column; align-items: flex-start; gap: .5rem; }
+  .footer-bottom { flex-direction: column; text-align: center; align-items: center; gap: .35rem; }
+
+  /* ── Section header ── */
+  .section-header-row { flex-direction: column; align-items: flex-start; gap: .5rem; }
+  .section-h2 { font-size: clamp(1.3rem, 4.5vw, 1.65rem); }
+  .section-sub { font-size: .82rem; }
+
+  /* ── Offer strip ── */
+  .offer-strip-item { font-size: .72rem; padding: 0 1.75rem; }
+}
+
+/* ── Very small phones (≤ 400px) ── */
+@media (max-width: 400px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: .5rem !important;
+  }
+  .hero-cta-row { flex-direction: column; }
+  .hero-btn-primary,
+  .hero-btn-secondary { width: 100%; text-align: center; justify-content: center; }
+  .featured-grid { gap: .5rem !important; }
+  .fp-img { height: 100px; }
+  .stat-num { font-size: 1.1rem; }
+}
