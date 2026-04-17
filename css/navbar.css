@@ -178,19 +178,38 @@ body.dark .navbar-top { background: var(--teal-900); }
 }
 
 /* ═══════════════════════════════════════════════════════
-   MOBILE DRAWER
+   MOBILE DRAWER — smooth slide-down
    ═══════════════════════════════════════════════════════ */
 .nav-mobile-drawer {
-  display: none;
-  flex-direction: column;
-  background: var(--teal-900, #134e4a);
-  padding: .75rem 1rem 1.25rem;
-  gap: .3rem;
-  border-top: 1px solid rgba(255,255,255,.1);
-  position: relative; /* sits above overlay via z-index on .navbar */
+  /* Collapsed: zero height, invisible */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  /* Smooth slide-down transition */
+  transition: max-height .32s cubic-bezier(.4,0,.2,1),
+              opacity .22s ease;
+  background: #0f3d3a;
+  border-top: 1px solid rgba(255,255,255,.08);
+  position: relative;
   z-index: 1001;
+  /* Always display:block so transition works */
+  display: block !important;
 }
-.nav-mobile-drawer.open { display: flex; }
+.nav-mobile-drawer.open {
+  max-height: 580px;
+  opacity: 1;
+}
+
+/* Inner padding — wrap all content for clean transition */
+.nav-mobile-drawer > * {
+  /* give first child padding so height animation looks right */
+}
+.nav-mobile-drawer .mob-drawer-inner {
+  padding: .75rem 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
 
 /* Mobile search bar */
 .nav-mobile-drawer .mob-search {
@@ -204,7 +223,6 @@ body.dark .navbar-top { background: var(--teal-900); }
   border: none; outline: none;
   font-size: 14px; color: #1e293b; background: transparent;
 }
-/* Focus ring inside drawer search */
 .nav-mobile-drawer .mob-search input:focus {
   box-shadow: 0 0 0 2px var(--teal-400) inset;
 }
@@ -213,6 +231,7 @@ body.dark .navbar-top { background: var(--teal-900); }
   background: var(--teal-400, #2ea89a);
   color: #fff; border: none; cursor: pointer;
   font-size: 15px; transition: background .2s;
+  display: flex; align-items: center;
 }
 .nav-mobile-drawer .mob-search button:hover { background: var(--teal-500, #0d9488); }
 
@@ -222,14 +241,13 @@ body.dark .navbar-top { background: var(--teal-900); }
   display: flex; align-items: center; gap: 12px;
   padding: 11px 12px; border-radius: 8px;
   font-size: 14px; font-weight: 600;
-  color: rgba(255,255,255,.88); text-decoration: none;
+  color: rgba(255,255,255,.9); text-decoration: none;
   background: none; border: none; cursor: pointer;
   width: 100%; text-align: left; min-height: 46px;
   transition: background .15s;
 }
 .nav-mobile-drawer a:hover,
-.nav-mobile-drawer button.mob-link:hover { background: rgba(255,255,255,.1); }
-/* Focus ring in drawer */
+.nav-mobile-drawer button.mob-link:hover { background: rgba(255,255,255,.1); color: #fff; }
 .nav-mobile-drawer a:focus-visible,
 .nav-mobile-drawer button.mob-link:focus-visible {
   outline: 2px solid rgba(255,255,255,.6);
@@ -244,12 +262,12 @@ body.dark .navbar-top { background: var(--teal-900); }
 }
 
 /* Special colours */
-.nav-mobile-drawer a.mob-cart      { background: rgba(245,158,11,.12); color: #fbbf24; }
-.nav-mobile-drawer a.mob-cart:hover{ background: rgba(245,158,11,.22); }
-.nav-mobile-drawer a.mob-login     { color: var(--teal-200, #99f6e4); }
+.nav-mobile-drawer a.mob-cart        { background: rgba(245,158,11,.12); color: #fbbf24; }
+.nav-mobile-drawer a.mob-cart:hover  { background: rgba(245,158,11,.22); }
+.nav-mobile-drawer a.mob-login       { color: var(--teal-200, #99f6e4); }
 .nav-mobile-drawer button.mob-logout { color: #fca5a5; }
-.nav-mobile-drawer a.mob-admin     { background: rgba(124,58,237,.12); color: #c084fc; }
-.nav-mobile-drawer a.mob-admin:hover{ background: rgba(124,58,237,.22); }
+.nav-mobile-drawer a.mob-admin       { background: rgba(124,58,237,.12); color: #c084fc; }
+.nav-mobile-drawer a.mob-admin:hover { background: rgba(124,58,237,.22); }
 
 /* ── Legacy .mobile-menu-btn (kept for safety) ── */
 .mobile-menu-btn {
