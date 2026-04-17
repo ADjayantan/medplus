@@ -8,301 +8,36 @@
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/navbar.css">
 <link rel="stylesheet" href="css/cart.css">
-
 <style>
 /* ── Mobile spacing overrides ── */
 @media (max-width: 640px) {
-  .page-shell {
-    padding-top: 1rem;
-    padding-bottom: 2rem;
-  }
-  .page-container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .5rem;
-    margin-bottom: 1.25rem;
-  }
-  .page-title {
-    font-size: 1.4rem;
-  }
-  .cart-layout {
-    grid-template-columns: 1fr !important;
-    gap: 1rem;
-  }
-  .cart-item {
-    flex-direction: row;
-    gap: .75rem;
-    padding: .9rem;
-  }
-  .cart-item-img {
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-  }
-  .cart-item-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .5rem;
-  }
-  .qty-control {
-    width: 100%;
-    justify-content: flex-start;
-  }
-  .card {
-    padding: 1rem;
-    border-radius: 12px;
-  }
-  .btn-primary,
-  .btn-secondary {
-    padding: .85rem 1rem;
-    font-size: .9rem;
-  }
-  .info-banner {
-    font-size: .82rem;
-    padding: .65rem .9rem;
-  }
-  /* coupon row stacks on very small screens */
-  #coupon-input {
-    font-size: .9rem;
-  }
-}
-
-/* ── Professional Footer ── */
-.site-footer {
-  background: linear-gradient(160deg, #0f172a 0%, #134e4a 100%);
-  color: #cbd5e1;
-  padding: 3rem 0 0;
-  margin-top: 3rem;
-  font-size: .875rem;
-  line-height: 1.7;
-}
-.site-footer .footer-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 2.5rem;
-}
-@media (max-width: 900px) {
-  .site-footer .footer-inner {
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-  }
-}
-@media (max-width: 540px) {
-  .site-footer .footer-inner {
-    grid-template-columns: 1fr;
-    gap: 1.75rem;
-  }
-}
-.site-footer .footer-brand .logo {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  margin-bottom: .9rem;
-  text-decoration: none;
-}
-.site-footer .footer-brand .logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #14b8a6, #0f766e);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 1rem;
-  color: #fff;
-  letter-spacing: -.5px;
-  flex-shrink: 0;
-}
-.site-footer .footer-brand .logo-text {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #f1f5f9;
-  letter-spacing: -.3px;
-}
-.site-footer .footer-brand .logo-text span {
-  color: #2dd4bf;
-}
-.site-footer .footer-brand p {
-  color: #94a3b8;
-  font-size: .83rem;
-  max-width: 260px;
-  margin-bottom: 1.1rem;
-}
-.site-footer .footer-brand .contact-items {
-  display: flex;
-  flex-direction: column;
-  gap: .4rem;
-}
-.site-footer .footer-brand .contact-items a {
-  color: #94a3b8;
-  text-decoration: none;
-  font-size: .82rem;
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  transition: color .18s;
-}
-.site-footer .footer-brand .contact-items a:hover {
-  color: #2dd4bf;
-}
-.site-footer .footer-col h4 {
-  font-size: .8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: #f1f5f9;
-  margin-bottom: .9rem;
-}
-.site-footer .footer-col ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: .45rem;
-}
-.site-footer .footer-col ul li a {
-  color: #94a3b8;
-  text-decoration: none;
-  font-size: .83rem;
-  transition: color .18s;
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-}
-.site-footer .footer-col ul li a:hover {
-  color: #2dd4bf;
-}
-.site-footer .footer-col ul li a i {
-  font-size: .7rem;
-  opacity: .6;
-}
-.site-footer .footer-trust {
-  border-top: 1px solid rgba(255,255,255,.08);
-  margin-top: 2.5rem;
-  padding: 1.25rem 1.5rem;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 2rem;
-  align-items: center;
-  justify-content: space-between;
-}
-.site-footer .footer-trust .trust-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .75rem 1.25rem;
-}
-.site-footer .footer-trust .trust-badge {
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-  font-size: .76rem;
-  color: #64748b;
-}
-.site-footer .footer-trust .trust-badge i {
-  color: #2dd4bf;
-  font-size: .85rem;
-}
-.site-footer .footer-bottom {
-  background: rgba(0,0,0,.25);
-  padding: 1rem 1.5rem;
-  margin-top: 1.25rem;
-}
-.site-footer .footer-bottom-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: .75rem;
-  align-items: center;
-  justify-content: space-between;
-}
-.site-footer .footer-bottom-inner p {
-  font-size: .76rem;
-  color: #475569;
-  margin: 0;
-}
-.site-footer .footer-social {
-  display: flex;
-  gap: .6rem;
-}
-.site-footer .footer-social a {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  font-size: .8rem;
-  text-decoration: none;
-  transition: background .18s, color .18s;
-}
-.site-footer .footer-social a:hover {
-  background: rgba(45,212,191,.15);
-  color: #2dd4bf;
-  border-color: rgba(45,212,191,.3);
+  .page-shell { padding-top: 1rem; padding-bottom: 2rem; }
+  .page-container { padding-left: 1rem; padding-right: 1rem; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: .5rem; margin-bottom: 1.25rem; }
+  .page-title { font-size: 1.4rem; }
+  .cart-layout { grid-template-columns: 1fr !important; gap: 1rem; }
+  .cart-item { flex-direction: row; gap: .75rem; padding: .9rem; }
+  .cart-item-img { width: 64px; height: 64px; flex-shrink: 0; }
+  .cart-item-footer { flex-direction: column; align-items: flex-start; gap: .5rem; }
+  .qty-control { width: 100%; justify-content: flex-start; }
+  .card { padding: 1rem; border-radius: 12px; }
+  .btn-primary, .btn-secondary { padding: .85rem 1rem; font-size: .9rem; }
+  .info-banner { font-size: .82rem; padding: .65rem .9rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- ── Navbar ── -->
-<nav class="navbar" id="main-navbar">
-  <div class="navbar-top">
-    <div class="container">
-      <div class="top-links">
-        <a href="tel:1800-123-456"><i class="fas fa-phone-alt"></i> 1800-123-456</a>
-      </div>
-      <div class="top-links">
-        <a onclick="window.location.href='upload-prescription.html'"><i class="fas fa-file-prescription"></i> Upload Rx</a>
-      </div>
-    </div>
-  </div>
-  <div class="navbar-main">
-    <div class="container">
-      <div class="nav-logo" onclick="window.location.href='index.html'">
-        <div class="nav-logo-icon">M+</div>
-        <span class="nav-logo-text">Med<span>Plus</span></span>
-      </div>
-      <div style="flex:1"></div>
-      <div class="nav-actions">
-        <!-- FIX: removed inline display:none — updateNavAuth() controls visibility at runtime -->
-        <button class="nav-btn nav-btn-ghost" id="nav-login" onclick="window.location.href='login.html'">
-          <i class="fas fa-sign-in-alt"></i> Login
-        </button>
-        <button class="nav-btn nav-btn-ghost" id="nav-profile" onclick="window.location.href='profile.html'" style="display:none">
-          <i class="fas fa-user"></i>
-        </button>
-        <a href="cart.html" class="nav-btn nav-btn-cart" id="nav-cart">
-          <i class="fas fa-shopping-cart"></i>
-          <span class="cart-badge" id="cart-count" style="display:none">0</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</nav>
+<!-- Shared navbar injected here -->
+<div id="navbar-placeholder"></div>
 
-<!-- ── Page ── -->
-<div class="page-shell">
+<!-- Page -->
+<main class="page-shell">
   <div class="page-container">
 
     <div class="page-header">
       <a href="products.html" class="page-back-btn">
-        <i class="fas fa-arrow-left"></i> Continue Shopping
+        <i class="fas fa-arrow-left" aria-hidden="true"></i> Continue Shopping
       </a>
       <div>
         <h1 class="page-title">Your Cart</h1>
@@ -311,12 +46,12 @@
     </div>
 
     <!-- Empty State -->
-    <div id="cart-empty" class="cart-empty" style="display:none">
-      <div class="cart-empty-icon"><i class="fas fa-shopping-cart"></i></div>
+    <div id="cart-empty" class="cart-empty" style="display:none" aria-live="polite">
+      <div class="cart-empty-icon"><i class="fas fa-shopping-cart" aria-hidden="true"></i></div>
       <h2>Your cart is empty</h2>
       <p>Add medicines and healthcare products to your cart to get started.</p>
       <a href="products.html" class="btn-primary" style="width:auto;display:inline-flex;padding:.9rem 2rem">
-        <i class="fas fa-pills"></i> Browse Medicines
+        <i class="fas fa-pills" aria-hidden="true"></i> Browse Medicines
       </a>
     </div>
 
@@ -325,120 +60,98 @@
 
       <!-- Left: Items -->
       <div>
-
-        <!-- Delivery Banner -->
         <div class="info-banner" id="free-delivery-banner">
-          <i class="fas fa-truck"></i>
+          <i class="fas fa-truck" aria-hidden="true"></i>
           <span id="delivery-msg">Add items worth <strong id="delivery-diff">₹0</strong> more for <strong>FREE delivery</strong>!</span>
         </div>
 
         <div class="card">
           <div class="card-title">
-            <i class="fas fa-shopping-bag"></i>
+            <i class="fas fa-shopping-bag" aria-hidden="true"></i>
             Cart Items <span style="font-weight:400;color:#9ca3af;font-size:.85rem" id="item-count-label"></span>
           </div>
-          <div id="cart-items-list">
-            <!-- rendered by JS -->
-          </div>
+          <div id="cart-items-list" aria-live="polite"><!-- rendered by JS --></div>
         </div>
 
-        <!-- Prescription Notice -->
-        <div class="warn-banner info-banner" id="rx-notice" style="display:none">
-          <i class="fas fa-file-prescription"></i>
+        <div class="warn-banner info-banner" id="rx-notice" style="display:none" role="alert">
+          <i class="fas fa-file-prescription" aria-hidden="true"></i>
           <span>Some items require a prescription. Please
             <a href="upload-prescription.html" style="color:#92400e;font-weight:700">upload your prescription</a>
             before or after ordering.
           </span>
         </div>
 
-        <!-- Coupon -->
         <div class="card">
-          <div class="card-title"><i class="fas fa-tag"></i> Promo Code</div>
+          <div class="card-title"><i class="fas fa-tag" aria-hidden="true"></i> Promo Code</div>
           <div style="display:flex;gap:.75rem">
-            <input type="text" id="coupon-input" class="form-input" placeholder="Enter promo code" style="flex:1">
+            <input type="text" id="coupon-input" class="form-input" placeholder="Enter promo code"
+                   style="flex:1" aria-label="Promo code">
             <button onclick="applyCoupon()" style="padding:.7rem 1.25rem;background:var(--teal-500);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;white-space:nowrap">
               Apply
             </button>
           </div>
-          <div id="coupon-msg" style="margin-top:.5rem;font-size:.82rem"></div>
+          <div id="coupon-msg" style="margin-top:.5rem;font-size:.82rem" aria-live="polite"></div>
         </div>
-
       </div>
 
       <!-- Right: Summary -->
       <div>
         <div class="card">
-          <div class="card-title"><i class="fas fa-receipt"></i> Order Summary</div>
+          <div class="card-title"><i class="fas fa-receipt" aria-hidden="true"></i> Order Summary</div>
+          <div class="summary-row"><span>Subtotal</span><span id="subtotal-val">₹0</span></div>
+          <div class="summary-row"><span>Discount</span><span id="discount-val" style="color:#22c55e">-₹0</span></div>
+          <div class="summary-row"><span>Delivery Charges</span><span id="delivery-val">₹40</span></div>
+          <div class="summary-row total"><span>Total Amount</span><span id="total-val">₹0</span></div>
 
-          <div class="summary-row">
-            <span>Subtotal</span>
-            <span id="subtotal-val">₹0</span>
-          </div>
-          <div class="summary-row">
-            <span>Discount</span>
-            <span id="discount-val" style="color:#22c55e">-₹0</span>
-          </div>
-          <div class="summary-row">
-            <span>Delivery Charges</span>
-            <span id="delivery-val">₹40</span>
-          </div>
-          <div class="summary-row total">
-            <span>Total Amount</span>
-            <span id="total-val">₹0</span>
-          </div>
-
-          <div class="summary-savings" id="savings-badge" style="display:none">
-            <i class="fas fa-piggy-bank"></i>
+          <div class="summary-savings" id="savings-badge" style="display:none" aria-live="polite">
+            <i class="fas fa-piggy-bank" aria-hidden="true"></i>
             You save <strong id="savings-val">₹0</strong> on this order!
           </div>
 
           <button class="btn-primary" onclick="proceedToCheckout()" id="checkout-btn">
-            <i class="fas fa-lock"></i> Proceed to Checkout
+            <i class="fas fa-lock" aria-hidden="true"></i> Proceed to Checkout
           </button>
           <a href="products.html" class="btn-secondary">
-            <i class="fas fa-arrow-left"></i> Continue Shopping
+            <i class="fas fa-arrow-left" aria-hidden="true"></i> Continue Shopping
           </a>
 
           <div style="display:flex;justify-content:center;gap:1rem;margin-top:1.25rem">
             <span style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:4px">
-              <i class="fas fa-lock"></i> Secure Checkout
+              <i class="fas fa-lock" aria-hidden="true"></i> Secure Checkout
             </span>
             <span style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:4px">
-              <i class="fas fa-undo"></i> Easy Returns
+              <i class="fas fa-undo" aria-hidden="true"></i> Easy Returns
             </span>
             <span style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:4px">
-              <i class="fas fa-shield-alt"></i> Authentic
+              <i class="fas fa-shield-alt" aria-hidden="true"></i> Authentic
             </span>
           </div>
         </div>
 
-        <!-- Rx Upload CTA -->
         <div class="card" style="background:linear-gradient(135deg,var(--teal-950),var(--teal-700));color:#fff;border:none">
           <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
-            <i class="fas fa-file-prescription" style="font-size:1.5rem;opacity:.8"></i>
+            <i class="fas fa-file-prescription" style="font-size:1.5rem;opacity:.8" aria-hidden="true"></i>
             <div>
               <div style="font-weight:700;font-size:.95rem">Have a prescription?</div>
               <div style="font-size:.8rem;opacity:.75">Upload it for faster processing</div>
             </div>
           </div>
-          <a href="upload-prescription.html" style="display:block;text-align:center;padding:.7rem;background:rgba(255,255,255,.15);border-radius:10px;color:#fff;font-weight:700;font-size:.875rem;text-decoration:none;border:1.5px solid rgba(255,255,255,.25);transition:background .18s"
+          <a href="upload-prescription.html"
+             style="display:block;text-align:center;padding:.7rem;background:rgba(255,255,255,.15);border-radius:10px;color:#fff;font-weight:700;font-size:.875rem;text-decoration:none;border:1.5px solid rgba(255,255,255,.25);transition:background .18s"
              onmouseover="this.style.background='rgba(255,255,255,.25)'"
              onmouseout="this.style.background='rgba(255,255,255,.15)'">
-            <i class="fas fa-upload"></i> Upload Prescription
+            <i class="fas fa-upload" aria-hidden="true"></i> Upload Prescription
           </a>
         </div>
       </div>
 
     </div><!-- /cart-content -->
-
   </div>
-</div>
+</main>
 
-<!-- ── Professional Footer ── -->
-<footer class="site-footer">
+<!-- Shared footer -->
+<footer class="site-footer" role="contentinfo">
   <div class="footer-inner">
-
-    <!-- Brand column -->
     <div class="footer-brand">
       <a href="index.html" class="logo">
         <div class="logo-icon">M+</div>
@@ -446,67 +159,53 @@
       </a>
       <p>Your trusted online pharmacy for genuine medicines, health products, and expert wellness advice — delivered fast to your door.</p>
       <div class="contact-items">
-        <a href="tel:1800-123-456"><i class="fas fa-phone-alt"></i> 1800-123-456 (Toll Free)</a>
-        <a href="mailto:care@medplus.in"><i class="fas fa-envelope"></i> care@medplus.in</a>
-        <a href="#"><i class="fas fa-clock"></i> Mon – Sat, 9 AM – 8 PM</a>
+        <a href="tel:1800-123-456"><i class="fas fa-phone-alt" aria-hidden="true"></i> 1800-123-456 (Toll Free)</a>
+        <a href="mailto:care@medplus.in"><i class="fas fa-envelope" aria-hidden="true"></i> care@medplus.in</a>
+        <a href="#"><i class="fas fa-clock" aria-hidden="true"></i> Mon – Sat, 9 AM – 8 PM</a>
       </div>
     </div>
-
-    <!-- Quick Links -->
     <div class="footer-col">
       <h4>Quick Links</h4>
       <ul>
-        <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
-        <li><a href="products.html"><i class="fas fa-chevron-right"></i> Medicines</a></li>
-        <li><a href="upload-prescription.html"><i class="fas fa-chevron-right"></i> Upload Rx</a></li>
-        <li><a href="cart.html"><i class="fas fa-chevron-right"></i> My Cart</a></li>
-        <li><a href="profile.html"><i class="fas fa-chevron-right"></i> My Account</a></li>
+        <li><a href="index.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> Home</a></li>
+        <li><a href="products.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> Medicines</a></li>
+        <li><a href="upload-prescription.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> Upload Rx</a></li>
+        <li><a href="cart.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> My Cart</a></li>
+        <li><a href="profile.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> My Account</a></li>
       </ul>
     </div>
-
-    <!-- Help -->
     <div class="footer-col">
       <h4>Help &amp; Support</h4>
       <ul>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Track Order</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Return Policy</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Grievance</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Track Order</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Return Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> FAQ</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Contact Us</a></li>
       </ul>
     </div>
-
-    <!-- Policies -->
     <div class="footer-col">
       <h4>Policies</h4>
       <ul>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Terms of Use</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Shipping Policy</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Rx Policy</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right"></i> Authenticity</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Privacy Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Terms of Use</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Shipping Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Rx Policy</a></li>
       </ul>
     </div>
-
   </div>
-
-  <!-- Trust Badges -->
   <div class="footer-trust">
     <div class="trust-badges">
-      <span class="trust-badge"><i class="fas fa-shield-alt"></i> 100% Genuine Medicines</span>
-      <span class="trust-badge"><i class="fas fa-truck"></i> Fast Delivery</span>
-      <span class="trust-badge"><i class="fas fa-lock"></i> Secure Payments</span>
-      <span class="trust-badge"><i class="fas fa-undo-alt"></i> Easy Returns</span>
-      <span class="trust-badge"><i class="fas fa-certificate"></i> Licensed Pharmacy</span>
+      <span class="trust-badge"><i class="fas fa-shield-alt" aria-hidden="true"></i> 100% Genuine</span>
+      <span class="trust-badge"><i class="fas fa-truck" aria-hidden="true"></i> Fast Delivery</span>
+      <span class="trust-badge"><i class="fas fa-lock" aria-hidden="true"></i> Secure Payments</span>
+      <span class="trust-badge"><i class="fas fa-undo-alt" aria-hidden="true"></i> Easy Returns</span>
     </div>
     <div class="footer-social">
-      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-      <a href="#" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
-      <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+      <a href="#" aria-label="Twitter / X"><i class="fab fa-x-twitter" aria-hidden="true"></i></a>
     </div>
   </div>
-
   <div class="footer-bottom">
     <div class="footer-bottom-inner">
       <p>&copy; 2025 MedPlus Pharmacy Pvt. Ltd. All rights reserved.</p>
@@ -515,42 +214,27 @@
   </div>
 </footer>
 
-<div id="toast-container" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px"></div>
-
+<!-- Scripts -->
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
+<script src="js/navbar.js"></script>
 <script>
+MedNavbar.init('');
+
 const FREE_DELIVERY_THRESHOLD = 499;
 
 document.addEventListener('DOMContentLoaded', () => {
-  updateNavAuth();
   renderCartPage();
 });
 
-function updateNavAuth() {
-  const user = currentUser();
-  const li = document.getElementById('nav-login');
-  const pr = document.getElementById('nav-profile');
-  if (user) {
-    if (li) li.style.display = 'none';
-    if (pr) {
-      pr.style.display = '';
-      pr.innerHTML = '<i class="fas fa-user"></i> ' + user.name.split(' ')[0];
-    }
-  } else {
-    if (li) li.style.display = '';
-    if (pr) pr.style.display = 'none';
-  }
-}
-
 function renderCartPage() {
-  const cart = getCart();
-  const emptyEl   = document.getElementById('cart-empty');
+  const cart    = getCart();
+  const emptyEl = document.getElementById('cart-empty');
   const contentEl = document.getElementById('cart-content');
-  const countEl   = document.getElementById('cart-count');
+  const countEl = document.getElementById('cart-count');
 
-  const totalQty = cart.reduce((s,i) => s+(i.qty||1), 0);
-  if (countEl) { countEl.textContent = totalQty; countEl.style.display = totalQty>0?'':'none'; }
+  const totalQty = cart.reduce((s,i) => s + (i.qty||1), 0);
+  if (countEl) { countEl.textContent = totalQty; countEl.style.display = totalQty > 0 ? '' : 'none'; }
 
   if (!cart.length) {
     if (emptyEl)   emptyEl.style.display   = 'block';
@@ -561,17 +245,16 @@ function renderCartPage() {
   if (contentEl) contentEl.style.display = 'grid';
 
   const subtitle = document.getElementById('cart-subtitle');
-  if (subtitle) subtitle.textContent = totalQty + ' item' + (totalQty!==1?'s':'');
+  if (subtitle) subtitle.textContent = totalQty + ' item' + (totalQty !== 1 ? 's' : '');
 
   const label = document.getElementById('item-count-label');
-  if (label) label.textContent = '(' + cart.length + ' product' + (cart.length!==1?'s':'') + ')';
+  if (label) label.textContent = '(' + cart.length + ' product' + (cart.length !== 1 ? 's' : '') + ')';
 
   renderItems(cart);
   renderSummary(cart);
 
-  const hasRx = cart.some(i => i.requiresPrescription);
   const rxNotice = document.getElementById('rx-notice');
-  if (rxNotice) rxNotice.style.display = hasRx ? 'flex' : 'none';
+  if (rxNotice) rxNotice.style.display = cart.some(i => i.requiresPrescription) ? 'flex' : 'none';
 }
 
 function renderItems(cart) {
@@ -594,11 +277,11 @@ function renderItems(cart) {
           </div>
           <div style="display:flex;align-items:center;gap:.5rem">
             <div class="qty-control">
-              <button class="qty-btn" onclick="changeQty('${item._id}', -1)"><i class="fas fa-minus"></i></button>
+              <button class="qty-btn" onclick="changeQty('${item._id}',-1)" aria-label="Decrease quantity"><i class="fas fa-minus"></i></button>
               <span class="qty-value">${item.qty||1}</span>
-              <button class="qty-btn" onclick="changeQty('${item._id}', 1)"><i class="fas fa-plus"></i></button>
+              <button class="qty-btn" onclick="changeQty('${item._id}',1)" aria-label="Increase quantity"><i class="fas fa-plus"></i></button>
             </div>
-            <button class="remove-btn" onclick="removeItem('${item._id}')">
+            <button class="remove-btn" onclick="removeItem('${item._id}')" aria-label="Remove ${item.name}">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
@@ -629,24 +312,16 @@ function renderSummary(cart) {
     if (savingsBadge) savingsBadge.style.display = 'none';
   }
 
-  const diff     = FREE_DELIVERY_THRESHOLD - subtotal;
-  const delivMsg = document.getElementById('delivery-msg');
-  const diffEl   = document.getElementById('delivery-diff');
-  const banner   = document.getElementById('free-delivery-banner');
+  const diff   = FREE_DELIVERY_THRESHOLD - subtotal;
+  const banner = document.getElementById('free-delivery-banner');
   if (banner) {
     if (delivery === 0) {
       banner.innerHTML = '<i class="fas fa-truck"></i><span><strong>🎉 You have FREE delivery!</strong></span>';
-      banner.style.background  = 'var(--green-50)';
-      banner.style.borderColor = 'var(--green-200)';
-      banner.style.color       = 'var(--green-700)';
+      banner.style.cssText += ';background:var(--green-50);border-color:var(--green-200);color:var(--green-700)';
     } else {
-      banner.style.background  = '';
-      banner.style.borderColor = '';
-      banner.style.color       = '';
-      if (delivMsg && diffEl) {
-        diffEl.textContent = '₹' + diff;
-        delivMsg.innerHTML = 'Add items worth <strong>₹' + diff + '</strong> more for <strong>FREE delivery</strong>!';
-      }
+      banner.style.background = banner.style.borderColor = banner.style.color = '';
+      const delivMsg = document.getElementById('delivery-msg');
+      if (delivMsg) delivMsg.innerHTML = 'Add items worth <strong>₹' + diff + '</strong> more for <strong>FREE delivery</strong>!';
     }
   }
 }
@@ -667,9 +342,7 @@ function changeQty(id, delta) {
 }
 
 function removeItem(id) {
-  let cart = getCart();
-  cart = cart.filter(i => i._id !== id);
-  saveCart(cart);
+  saveCart(getCart().filter(i => i._id !== id));
   renderCartPage();
   showToast('Item removed from cart');
 }
@@ -678,33 +351,28 @@ function applyCoupon() {
   const code = document.getElementById('coupon-input')?.value?.toUpperCase().trim();
   const msg  = document.getElementById('coupon-msg');
   if (!msg) return;
-  if (code === 'MEDPLUS10') {
-    msg.innerHTML = '<span style="color:#16a34a"><i class="fas fa-check-circle"></i> 10% discount applied!</span>';
-  } else if (code === 'FIRST50') {
-    msg.innerHTML = '<span style="color:#16a34a"><i class="fas fa-check-circle"></i> ₹50 off applied on first order!</span>';
+  const codes = { 'MEDPLUS10': '10% discount applied!', 'FIRST50': '₹50 off applied on first order!' };
+  if (codes[code]) {
+    msg.innerHTML = `<span style="color:#16a34a"><i class="fas fa-check-circle"></i> ${codes[code]}</span>`;
   } else {
     msg.innerHTML = '<span style="color:#dc2626"><i class="fas fa-times-circle"></i> Invalid promo code.</span>';
   }
 }
 
 function proceedToCheckout() {
-  if (!isLoggedIn()) {
-    window.location.href = 'login.html?redirect=checkout.html';
-    return;
-  }
-  const cart = getCart();
-  if (!cart.length) return;
+  if (!isLoggedIn()) { window.location.href = 'login.html?redirect=checkout.html'; return; }
+  if (!getCart().length) return;
   window.location.href = 'checkout.html';
 }
 
 function showToast(msg, type) {
   const container = document.getElementById('toast-container');
+  if (!container) return;
   const toast = document.createElement('div');
-  const bg    = type==='error'?'#ef4444':'#1e293b';
-  toast.style.cssText = `background:${bg};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;max-width:320px`;
+  toast.style.cssText = `background:${type==='error'?'#ef4444':'#1e293b'};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;max-width:320px;pointer-events:auto`;
   toast.innerHTML = `<i class="fas ${type==='error'?'fa-exclamation-circle':'fa-check-circle'}"></i> ${msg}`;
   container.appendChild(toast);
-  setTimeout(()=>{ toast.style.opacity='0'; toast.style.transition='opacity .3s'; setTimeout(()=>toast.remove(),300); },3000);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
 </script>
 <script src="js/chatbot.js"></script>
