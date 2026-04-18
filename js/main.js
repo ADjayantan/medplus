@@ -137,27 +137,30 @@ function setCategory(cat, btn) {
 /* ── Products ── */
 async function loadProducts() {
   const grid = document.getElementById('products-grid');
-  if (grid) grid.innerHTML = `
-    <div class="loading-spinner">
+  const isLive = location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
+
+  if (grid) grid.innerHTML = `<div class="loading-spinner">
       <div class="spinner-ring"></div>
-      <p>Loading medicines...</p>
+      <p>Loading medicines&hellip;</p>
     </div>`;
+
   try {
     const data  = await ProductAPI.list();
     allProducts = data.products || [];
     filterAndRender();
-    // Re-render category cards with counts
     renderCategoryCards(allCategories);
-    // Update stats
     const statEl = document.getElementById('product-stat');
     if (statEl) statEl.textContent = allProducts.length + '+ medicines';
   } catch (err) {
+    const localHint = !isLive
+      ? ''
+      : '<p style="font-size:13px;margin-top:8px;opacity:.7">Make sure the backend is running on port 3000: <code>cd backend &amp;&amp; node server.js</code></p>';
     if (grid) grid.innerHTML = `
       <div class="api-error-state">
         <i class="fas fa-exclamation-triangle"></i>
         <h3>Could not connect to server</h3>
         <p>${err.message}</p>
-        <p style="font-size:13px;margin-top:8px;opacity:.7">Make sure the backend is running on port 3000</p>
+        ${localHint}
         <button onclick="loadProducts()" class="btn-retry">
           <i class="fas fa-redo"></i> Retry
         </button>
