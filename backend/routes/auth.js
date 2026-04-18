@@ -1,9 +1,15 @@
-const express = require('express');
-const jwt     = require('jsonwebtoken');
-const User    = require('../models/User');
-const router  = express.Router();
-const SECRET  = process.env.JWT_SECRET || 'medplus_secret_key_2024';
+const express   = require('express');
+const jwt       = require('jsonwebtoken');
+const User      = require('../models/User');
+const router    = express.Router();
 const rateLimit = require('express-rate-limit');
+
+/* ── JWT secret — hard-fail if missing (no insecure fallback) ── */
+const SECRET = process.env.JWT_SECRET;
+if (!SECRET) {
+  console.error('[FATAL] JWT_SECRET is not set. Set it in your .env file and restart.');
+  process.exit(1);
+}
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -28,7 +34,7 @@ router.post('/register', authLimiter, async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone, isAdmin: user.isAdmin }
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Registration failed' });
   }
 });
 
@@ -47,7 +53,7 @@ router.post('/login', authLimiter, async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone, isAdmin: user.isAdmin }
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Login failed' });
   }
 });
 
