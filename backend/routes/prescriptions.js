@@ -66,7 +66,35 @@ router.post('/upload', authMiddleware, upload.single('prescription'), async (req
   }
 });
 
-// ── GET /api/prescriptions/my ─────────────────────────────────────────────────
+// ── GET /api/prescriptions/file/:filename — authenticated file download ───────
+// Replaces the old express.static('/uploads') — only the owner or an admin
+// can fetch their own prescription file.
+router.get('/file/:filename', authMiddleware, async (req, res) => {
+  try {
+    const { filename } = req.params;
+
+    // Basic path-traversal guard — filename must be a plain file, no slashes or dots sequences
+    if (!/^[\w\-]+\.(jpg|jpeg|png|pdf)$/i.test(filename)) {
+      return res.status(400).json({ message: 'Invalid filename' });
+    }
+
+    // Verify the requester owns this prescription (or is an admin)
+    const prescription = await Prescription.findOne({ url: '/uploads/prescriptions/' + filename });
+    if (!prescription) return res.status(404).json({ message: 'File not found' });
+    if (prescription.userId.toString() !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const filepath = path.join(uploadDir, filename);
+    if (!fs.existsSync(filepath)) return res.status(404).json({ message: 'File not found on disk' });
+
+    res.sendFile(filepath);
+  } catch (err) {
+    res.status(500).json({ message: 'Could not serve file' });
+  }
+});
+
+
 router.get('/my', authMiddleware, async (req, res) => {
   try {
     const prescriptions = await Prescription.find({ userId: req.user.id }).sort({ uploadedAt: -1 });
