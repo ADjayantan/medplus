@@ -52,13 +52,11 @@ node server.js    # http://localhost:3000
 
 ---
 
-## 🔑 Default Credentials
+## 🔑 Default Admin Account
 
-| Role  | Email                | Password  |
-|-------|----------------------|-----------|
-| Admin | admin@medplus.com    | Admin@123 |
+A default admin account is created by `seed.js`. **Change the password immediately after first login.**
 
-> ⚠️ Change these before deploying to production.
+The seed credentials are intentionally not published here. Check your private onboarding notes, or inspect `backend/seed.js` locally — never commit real credentials to a public repo.
 
 ---
 
