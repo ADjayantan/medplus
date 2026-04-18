@@ -1,120 +1,90 @@
 /* =====================================================
-   js/api.js — MedPlus Frontend API Helper
+   API.JS — MedPlus shared API config & helpers
 ===================================================== */
 
-// ── SET YOUR RENDER BACKEND URL HERE ─────────────────────────
-// After deploying backend to Render, paste your URL below:
-const PRODUCTION_API = 'https://medplus-lkr7.onrender.com/api';
-// ─────────────────────────────────────────────────────────────
+/* Backend URL — set window.API_BASE before loading this
+   script if you need to override (e.g. in dev).
+   Falls back to the deployed Render instance.           */
+window.API_BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
 
-const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-const API_BASE = isLocal ? 'http://localhost:3000/api' : PRODUCTION_API;
-
-// ── Wake-up helper: shows a live countdown banner during Render cold-start ────
-// Render free tier spins down after ~15 min of inactivity. The first request
-// after sleep fails immediately. We retry once with a visible 30s countdown
-// so users see progress instead of a confusing error screen.
-function _notifyWakeUp(secondsLeft) {
-  const el = document.getElementById('server-wake-banner');
-  if (!el) return;
-  if (secondsLeft > 0) {
-    el.style.display = 'flex';
-    el.innerHTML = '<i class="fas fa-power-off" style="color:#f59e0b;font-size:16px"></i>'
-      + '<span>Server is starting up &mdash; ready in about <strong>' + secondsLeft + 's</strong>\u2026</span>';
-  } else {
-    el.style.display = 'none';
-    el.innerHTML = '';
-  }
-}
-
-async function apiFetch(path, options = {}, _retried = false) {
-  const token   = localStorage.getItem('token');
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
+/* ── Generic fetch wrapper ── */
+async function apiFetch(path, options = {}) {
+  const url = window.API_BASE + path;
+  const token = localStorage.getItem('medplus_token');
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
-  let res;
-  try {
-    res = await fetch(API_BASE + path, { ...options, headers });
-  } catch (networkErr) {
-    // On first network failure on the live site, show countdown and retry once.
-    if (!_retried && !isLocal) {
-      let t = 30;
-      _notifyWakeUp(t);
-      await new Promise(r => {
-        const iv = setInterval(() => {
-          t--;
-          _notifyWakeUp(t);
-          if (t <= 0) { clearInterval(iv); r(); }
-        }, 1000);
-      });
-      _notifyWakeUp(0);
-      return apiFetch(path, options, true);
-    }
-    throw new Error('Unable to reach the server. Please check your connection and try again.');
+  const res = await fetch(url, { ...options, headers });
+  if (!res.ok) {
+    let msg = 'Request failed';
+    try { const body = await res.json(); msg = body.message || msg; } catch {}
+    throw Object.assign(new Error(msg), { status: res.status });
   }
+  return res.json();
+}
 
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || 'HTTP ' + res.status);
-  return data;
+/* ── Products ── */
+async function fetchProducts(params = {}) {
+  const qs = new URLSearchParams();
+  if (params.category)   qs.set('category',   params.category);
+  if (params.search)     qs.set('search',      params.search);
+  if (params.inStock)    qs.set('inStock',     'true');
+  if (params.limit)      qs.set('limit',       params.limit);
+  if (params.autocomplete) qs.set('autocomplete', 'true');
+  const query = qs.toString() ? '?' + qs.toString() : '';
+  return apiFetch('/api/products' + query);
+}
+
+async function fetchProductById(id) {
+  return apiFetch('/api/products/' + id);
+}
+
+async function fetchCategories() {
+  return apiFetch('/api/products/categories');
 }
 
 /* ── Auth ── */
-const AuthAPI = {
-  login:    body => apiFetch('/login',    { method: 'POST', body: JSON.stringify(body) }),
-  register: body => apiFetch('/register', { method: 'POST', body: JSON.stringify(body) }),
-};
+async function apiLogin(email, password) {
+  return apiFetch('/api/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+}
 
-/* ── Products ── */
-const ProductAPI = {
-  list:         (params = {}) => apiFetch('/products?' + new URLSearchParams(params)),
-  categories:   ()            => apiFetch('/products/categories'),
-  get:          id            => apiFetch('/products/' + id),
-  autocomplete: q             => apiFetch('/products?search=' + encodeURIComponent(q) + '&autocomplete=true&limit=8'),
-  create:       body          => apiFetch('/products',       { method: 'POST',   body: JSON.stringify(body) }),
-  update:       (id, body)    => apiFetch('/products/' + id, { method: 'PUT',    body: JSON.stringify(body) }),
-  delete:       id            => apiFetch('/products/' + id, { method: 'DELETE' }),
-};
+async function apiRegister(data) {
+  return apiFetch('/api/register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
 
 /* ── Orders ── */
-const OrderAPI = {
-  create:       body          => apiFetch('/orders',                   { method: 'POST', body: JSON.stringify(body) }),
-  my:           ()            => apiFetch('/orders/my'),
-  get:          id            => apiFetch('/orders/' + id),
-  all:          (params = {}) => apiFetch('/orders?' + new URLSearchParams(params)),
-  updateStatus: (id, status)  => apiFetch('/orders/' + id + '/status', { method: 'PUT', body: JSON.stringify({ status }) }),
-};
+async function apiPlaceOrder(orderData) {
+  return apiFetch('/api/orders', {
+    method: 'POST',
+    body: JSON.stringify(orderData),
+  });
+}
 
-/* ── Prescriptions ── */
-const PrescriptionAPI = {
-  upload: formData => {
-    const token = localStorage.getItem('token');
-    return fetch(API_BASE + '/prescriptions/upload', {
-      method:  'POST',
-      headers: { 'Authorization': 'Bearer ' + token },
-      body:    formData,
-    }).then(r => r.json());
-  },
-  my:     ()            => apiFetch('/prescriptions/my'),
-  all:    (params = {}) => apiFetch('/prescriptions?' + new URLSearchParams(params)),
-  review: (id, body)    => apiFetch('/prescriptions/' + id + '/review', { method: 'PUT', body: JSON.stringify(body) }),
-  // Authenticated URL for viewing a prescription file (replaces bare /uploads/... path)
-  fileUrl: filename => API_BASE + '/prescriptions/file/' + encodeURIComponent(filename),
-};
+async function apiGetOrders() {
+  return apiFetch('/api/orders');
+}
 
-/* ── Admin ── */
-const AdminAPI = {
-  stats: () => apiFetch('/admin/stats'),
-  users: () => apiFetch('/admin/users'),
-};
-
-/* ── Shared auth helpers — used by every page ── */
-function isLoggedIn()  { return !!localStorage.getItem('token'); }
-function currentUser() { return JSON.parse(localStorage.getItem('user') || 'null'); }
-function isAdmin()     { const u = currentUser(); return u && u.isAdmin; }
-
-/* ── Logout helper ── */
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.href = 'login.html';
+/* ── Toast helper (used across pages) ── */
+function showToast(msg, type = 'info') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + (type === 'error' ? 'error' : type === 'success' ? 'success' : '');
+  toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity .3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
