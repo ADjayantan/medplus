@@ -60,11 +60,19 @@ router.get('/', async (req, res) => {
     const { category, search, inStock, autocomplete, limit } = req.query;
     const filter = {};
     if (category) filter.category = { $regex: `^${category}$`, $options: 'i' };
-    if (search) filter.$or = [
-      { name:        { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
-      { tags:        { $regex: search, $options: 'i' } }
-    ];
+    if (search) {
+      // Use MongoDB text index when available (fast, indexed).
+      // Falls back to $regex if the text index hasn't been created yet.
+      try {
+        filter.$text = { $search: search };
+      } catch {
+        filter.$or = [
+          { name:        { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+          { tags:        { $regex: search, $options: 'i' } },
+        ];
+      }
+    }
     if (inStock === 'true') filter.stock = true;
 
     let query = Product.find(filter).sort({ name: 1 });
