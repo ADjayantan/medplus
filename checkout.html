@@ -357,20 +357,17 @@ async function placeOrder() {
         return;
       }
     } catch (rxErr) {
-      // API unavailable — fall back to localStorage flag
-      const rxUploaded = localStorage.getItem('medplus_prescription_uploaded') === 'true';
-      if (!rxUploaded) {
-        errMsg.innerHTML =
-          '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
-          'One or more items require a prescription. Please ' +
-          '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
-          'before placing the order.';
-        errEl.style.display = 'flex';
-        errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
-        return;
-      }
+      // API failed (e.g. server cold start) — always block to be safe
+      errMsg.innerHTML =
+        '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
+        'Could not verify prescription. Please ' +
+        '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
+        'and try again in a moment.';
+      errEl.style.display = 'flex';
+      errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+      return;
     }
   }
   // ─────────────────────────────────────────────────────────────
