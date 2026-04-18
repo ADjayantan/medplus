@@ -302,7 +302,7 @@ function selectPayment(method, el) {
 }
 
 async function placeOrder() {
-  const btn = document.getElementById('place-order-btn');
+  const btn   = document.getElementById('place-order-btn');
   const errEl = document.getElementById('checkout-error');
   const errMsg = document.getElementById('checkout-error-msg');
 
@@ -333,15 +333,48 @@ async function placeOrder() {
 
   const cart = getCart();
 
-  // Block order if any item requires prescription and none is uploaded
+  // ── PRESCRIPTION CHECK (API-based) ──────────────────────────
   const hasRxItem = cart.some(i => i.requiresPrescription);
-  const rxUploaded = localStorage.getItem('medplus_prescription_uploaded') === 'true';
-  if (hasRxItem && !rxUploaded) {
-    errMsg.innerHTML = '<i class="fas fa-file-prescription" style="margin-right:6px"></i> One or more items require a prescription. Please <a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> before placing the order.';
-    errEl.style.display = 'flex';
-    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
+  if (hasRxItem) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span> Verifying prescription…';
+    try {
+      const rxData = await PrescriptionAPI.my();
+      const prescriptions = rxData.prescriptions || [];
+      const hasValidRx = prescriptions.some(
+        rx => rx.status === 'approved' || rx.status === 'pending'
+      );
+      if (!hasValidRx) {
+        errMsg.innerHTML =
+          '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
+          'One or more items require a prescription. Please ' +
+          '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
+          'before placing the order.';
+        errEl.style.display = 'flex';
+        errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+        return;
+      }
+    } catch (rxErr) {
+      // API unavailable — fall back to localStorage flag
+      const rxUploaded = localStorage.getItem('medplus_prescription_uploaded') === 'true';
+      if (!rxUploaded) {
+        errMsg.innerHTML =
+          '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
+          'One or more items require a prescription. Please ' +
+          '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
+          'before placing the order.';
+        errEl.style.display = 'flex';
+        errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+        return;
+      }
+    }
   }
+  // ─────────────────────────────────────────────────────────────
+
   const subtotal = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
   const delivery = subtotal >= 499 ? 0 : 40;
   const total    = subtotal + delivery;
@@ -369,6 +402,8 @@ async function placeOrder() {
     const order = await OrderAPI.create(payload);
     saveCart([]);
     renderCart();
+    // Clear the prescription flag after successful order
+    localStorage.removeItem('medplus_prescription_uploaded');
     document.getElementById('checkout-main').style.display = 'none';
     document.getElementById('success-screen').style.display = 'block';
     const oid = document.getElementById('success-order-id');
