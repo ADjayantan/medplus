@@ -1,158 +1,686 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Products — MedPlus Pharmacy</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="css/global.css">
-<link rel="stylesheet" href="css/navbar.css">
-<link rel="stylesheet" href="css/products.css">
-<link rel="stylesheet" href="css/cart.css">
-<link rel="stylesheet" href="css/auth.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products — MedPlus Pharmacy</title>
+  <meta name="description" content="Browse genuine medicines, vitamins, and health products at MedPlus Pharmacy. Filter by category, price, and availability.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/products.css">
 </head>
 <body>
 
-<!-- Shared navbar injected here -->
+<!-- Shared navbar -->
 <div id="navbar-placeholder"></div>
 
-<!-- Category Bar -->
-<div class="category-section">
-  <div class="category-scroll" id="category-tabs"><!-- rendered by JS --></div>
-</div>
-
-<!-- Category Cards -->
-<div class="cat-cards-section">
-  <div class="container" style="max-width:1280px;margin:0 auto;padding:0 1.25rem">
-    <h2 class="cat-cards-title">Shop by Category</h2>
-    <div class="cat-cards-grid" id="category-cards"><!-- rendered by JS --></div>
+<!-- ── Category tabs ── -->
+<section class="category-section" id="category-section" aria-label="Product categories">
+  <div class="category-scroll" id="category-scroll" role="tablist" aria-label="Filter by category">
+    <!-- Populated by JS -->
   </div>
-</div>
+</section>
 
-<!-- Toolbar -->
-<div class="products-toolbar" id="products-section">
+<!-- ── Toolbar ── -->
+<div class="products-toolbar" id="products-toolbar">
   <div class="toolbar-left">
     <span class="results-count" id="results-count">Loading…</span>
     <div class="toolbar-filters">
-      <select id="sort-select" onchange="filterAndRender()">
+      <select id="sort-select" aria-label="Sort products">
         <option value="name">Sort: A–Z</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="rating">Top Rated</option>
-        <option value="discount">Biggest Discount</option>
+        <option value="name_desc">Sort: Z–A</option>
+        <option value="price_asc">Price: Low to High</option>
+        <option value="price_desc">Price: High to Low</option>
+        <option value="discount">Best Discount</option>
       </select>
-      <select id="rx-filter" onchange="filterAndRender()">
+      <select id="category-select" aria-label="Filter by category">
         <option value="">All Products</option>
-        <option value="otc">OTC Only</option>
-        <option value="rx">Prescription Only</option>
       </select>
       <div class="price-filter-wrap">
-        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:2px">
+        <label for="price-filter" style="font-size:12px;color:#64748b;margin-bottom:2px;display:block">
           Max price: <span id="price-label">Any price</span>
         </label>
-        <input type="range" id="price-filter" min="10" max="1200" value="1200" step="10"
-               oninput="updatePriceLabel();filterAndRender()" style="width:120px"
-               aria-label="Maximum price filter">
+        <input type="range" id="price-filter" min="0" max="5000" step="50" value="5000" aria-label="Maximum price filter">
       </div>
     </div>
   </div>
   <div class="toolbar-right">
-    <label class="toggle-label">
-      <input type="checkbox" id="in-stock-toggle" onchange="filterAndRender()">
-      <span class="toggle-text">
-        <i class="fas fa-check-circle" style="color:#22c55e" aria-hidden="true"></i> In Stock Only
-      </span>
+    <label class="stock-toggle">
+      <input type="checkbox" id="in-stock-toggle" aria-label="Show in stock only">
+      <i class="fas fa-check-circle" style="color:var(--teal-500)"></i>
+      In Stock Only
     </label>
-    <button class="btn-clear-filter" onclick="clearFilters()">
-      <i class="fas fa-times" aria-hidden="true"></i> Clear
+    <button class="btn btn-sm btn-ghost" id="clear-filters-btn" onclick="clearFilters()" style="display:none">
+      <i class="fas fa-times"></i> Clear
     </button>
   </div>
 </div>
 
-<!-- Server wake-up banner (shown during Render cold-start) -->
-<div id="server-wake-banner" style="display:none;align-items:center;justify-content:center;gap:10px;
-     background:#fffbeb;border-bottom:1px solid #fde68a;padding:10px 20px;
-     font-size:14px;color:#92400e;text-align:center"></div>
+<!-- ── Products grid ── -->
+<main id="products-main">
+  <div class="products-grid" id="products-grid" aria-live="polite" aria-label="Products">
+    <!-- Loading spinner -->
+    <div class="loading-spinner" id="loading-spinner">
+      <div class="spinner-ring"></div>
+      <p>Loading products…</p>
+    </div>
+  </div>
+</main>
 
-<!-- Products Grid -->
-<div class="products-section">
-  <div class="container" style="max-width:1280px;margin:0 auto;padding:0 1.25rem">
-    <div class="products-grid" id="products-grid">
-      <div class="loading-spinner">
-        <div class="spinner-ring"></div>
-        <p>Loading medicines…</p>
+<!-- ── Product detail modal ── -->
+<div id="product-modal" role="dialog" aria-modal="true" aria-labelledby="pmodal-name" style="display:none">
+  <div class="pmodal-overlay" onclick="closeModal(event)">
+    <div class="pmodal-content" onclick="event.stopPropagation()">
+      <button class="pmodal-close" onclick="closeProductModal()" aria-label="Close">&times;</button>
+      <div class="pmodal-body">
+        <div class="pmodal-img" id="pmodal-img-wrap">
+          <span class="pmodal-img-ph"><i class="fas fa-pills"></i></span>
+        </div>
+        <div class="pmodal-info">
+          <span class="product-category" id="pmodal-category"></span>
+          <h2 id="pmodal-name" style="font-size:1.35rem;margin:.4rem 0 .25rem;"></h2>
+          <p class="product-mfr" id="pmodal-mfr"></p>
+
+          <div class="product-rating" id="pmodal-rating" style="margin:.5rem 0"></div>
+
+          <div class="pmodal-price-row">
+            <span class="product-price" id="pmodal-price"></span>
+            <span class="product-mrp"   id="pmodal-mrp"></span>
+            <span class="discount-tag"  id="pmodal-discount" style="display:none"></span>
+          </div>
+
+          <div class="rx-info-banner" id="pmodal-rx" style="display:none">
+            <i class="fas fa-file-prescription"></i>
+            <div>
+              <strong>Prescription Required</strong><br>
+              <span style="font-size:.8rem">Please <a href="upload-prescription.html" style="color:inherit;font-weight:700">upload your prescription</a> before purchasing.</span>
+            </div>
+          </div>
+
+          <div class="pmodal-description" id="pmodal-desc" style="display:none">
+            <h4><i class="fas fa-info-circle"></i> About this product</h4>
+            <p id="pmodal-desc-text"></p>
+          </div>
+
+          <div class="pmodal-tags" id="pmodal-tags"></div>
+
+          <div style="display:flex;gap:8px;margin-top:1rem">
+            <button class="btn-add-cart" id="pmodal-add-btn" style="flex:1;padding:12px">
+              <i class="fas fa-cart-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Product Modal -->
-<div id="product-modal"></div>
-
-<!-- Auth Modal -->
-<div class="auth-modal-overlay" id="auth-modal-overlay" role="dialog" aria-modal="true" aria-label="Authentication">
-  <div class="auth-modal">
-    <button class="auth-close" onclick="closeAuthModal()" aria-label="Close">
-      <i class="fas fa-times" aria-hidden="true"></i>
-    </button>
-    <div id="auth-modal-body"></div>
+<!-- ── Footer ── -->
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">M+</div>
+        <span class="logo-text">Med<span>Plus</span></span>
+      </a>
+      <p>Your trusted online pharmacy for genuine medicines, health products, and expert wellness advice — delivered fast to your door.</p>
+      <div class="contact-items">
+        <a href="tel:1800-123-456"><i class="fas fa-phone-alt"></i> 1800-123-456 (Toll Free)</a>
+        <a href="mailto:care@medplus.in"><i class="fas fa-envelope"></i> care@medplus.in</a>
+        <a href="#"><i class="fas fa-clock"></i> Mon – Sat, 9 AM – 8 PM</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+        <li><a href="products.html"><i class="fas fa-chevron-right"></i> All Medicines</a></li>
+        <li><a href="upload-prescription.html"><i class="fas fa-chevron-right"></i> Upload Rx</a></li>
+        <li><a href="cart.html"><i class="fas fa-chevron-right"></i> My Cart</a></li>
+        <li><a href="profile.html"><i class="fas fa-chevron-right"></i> My Account</a></li>
+        <li><a href="insurance.html"><i class="fas fa-chevron-right"></i> Health Insurance</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help &amp; Support</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Track Order</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Return Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Terms of Use</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Shipping Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Rx Policy</a></li>
+      </ul>
+    </div>
   </div>
-</div>
-
-<!-- Shared footer -->
-<footer class="footer" role="contentinfo">
-  <p>
-    <a href="index.html"><strong>MedPlus</strong></a> &nbsp;|&nbsp;
-    <a href="products.html">Products</a> &nbsp;|&nbsp;
-    <a href="insurance.html">Insurance</a> &nbsp;|&nbsp;
-    <a href="upload-prescription.html">Upload Rx</a> &nbsp;|&nbsp;
-    <a href="cart.html">Cart</a>
-  </p>
-  <p style="margin-top:8px">&copy; 2025 MedPlus Pharmacy. All rights reserved.</p>
+  <div class="footer-trust">
+    <div class="trust-badges">
+      <span class="trust-badge"><i class="fas fa-shield-alt"></i> 100% Genuine Medicines</span>
+      <span class="trust-badge"><i class="fas fa-truck"></i> Fast Delivery</span>
+      <span class="trust-badge"><i class="fas fa-lock"></i> Secure Payments</span>
+      <span class="trust-badge"><i class="fas fa-undo-alt"></i> Easy Returns</span>
+      <span class="trust-badge"><i class="fas fa-certificate"></i> CDSCO Licensed</span>
+    </div>
+    <div class="footer-social" aria-label="Social media">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-bottom-inner">
+      <p>&copy; 2025 MedPlus Pharmacy Pvt. Ltd. All rights reserved.</p>
+      <p>Licensed by the Central Drugs Standard Control Organisation (CDSCO).</p>
+    </div>
+  </div>
 </footer>
+
+<div id="toast-container"></div>
 
 <!-- Scripts -->
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
-<script src="js/search.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/main.js"></script>
 <script src="js/navbar.js"></script>
 <script>
-MedNavbar.init('');
+MedNavbar.init('products');
 
-/* Sticky offsets */
-function updateStickyOffsets() {
-  const navbar = document.getElementById('main-navbar');
-  const catBar = document.querySelector('.category-section');
-  if (!navbar || !catBar) return;
-  const navH = navbar.getBoundingClientRect().height;
-  const catH = catBar.getBoundingClientRect().height;
-  document.documentElement.style.setProperty('--navbar-height', navH + 'px');
-  document.documentElement.style.setProperty('--category-height', catH + 'px');
+/* ── State ── */
+let allProducts    = [];
+let filteredProducts = [];
+let activeCategory = '';
+let searchQuery    = '';
+let maxPrice       = 5000;
+let inStockOnly    = false;
+let sortOrder      = 'name';
+let openProduct    = null;
+
+/* ── Category metadata ── */
+const CAT_META = {
+  'Pain Relief':           { icon: 'fa-hand-holding-medical', color: '#fef3c7', textColor: '#92400e' },
+  'Antibiotics':           { icon: 'fa-capsules',             color: '#dbeafe', textColor: '#1e40af' },
+  'Allergy & Cold':        { icon: 'fa-wind',                 color: '#ede9fe', textColor: '#6d28d9' },
+  'Diabetes':              { icon: 'fa-tint',                 color: '#fce7f3', textColor: '#9d174d' },
+  'Heart & BP':            { icon: 'fa-heartbeat',            color: '#fee2e2', textColor: '#991b1b' },
+  'Vitamins & Supplements':{ icon: 'fa-leaf',                 color: '#d1fae5', textColor: '#065f46' },
+  'Stomach & Digestion':   { icon: 'fa-stomach',              color: '#fef9c3', textColor: '#854d0e' },
+  'Respiratory':           { icon: 'fa-lungs',                color: '#e0f2fe', textColor: '#075985' },
+  'Skin Care':             { icon: 'fa-hand-sparkles',        color: '#fce7f3', textColor: '#9d174d' },
+  'Eye Care':              { icon: 'fa-eye',                  color: '#e0f2fe', textColor: '#1e3a5f' },
+  'Baby Care':             { icon: 'fa-baby',                 color: '#fdf4ff', textColor: '#7e22ce' },
+  'Women\'s Health':       { icon: 'fa-venus',                color: '#fce7f3', textColor: '#9d174d' },
+  'Orthopedic':            { icon: 'fa-bone',                 color: '#f5f3ff', textColor: '#4c1d95' },
+  'Dental Care':           { icon: 'fa-tooth',                color: '#ecfdf5', textColor: '#065f46' },
+  'Personal Care':         { icon: 'fa-spa',                  color: '#fdf4ff', textColor: '#86198f' },
+};
+
+function getCatMeta(cat) {
+  return CAT_META[cat] || { icon: 'fa-pills', color: '#f1f5f9', textColor: '#475569' };
 }
-window.addEventListener('scroll', updateStickyOffsets, { passive: true });
-window.addEventListener('resize', updateStickyOffsets);
-setTimeout(updateStickyOffsets, 150);
 
-/* Pre-select category / query from URL */
-document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  const cat = params.get('category');
-  if (cat) {
-    const interval = setInterval(() => {
-      const btn = document.querySelector(`.cat-tab[data-cat="${cat}"]`);
-      if (btn) { clearInterval(interval); setCategory(cat, btn); }
-    }, 100);
-  }
-  const q = params.get('q');
-  if (q) {
-    const sb = document.getElementById('search-bar');
-    if (sb) sb.value = q;
-  }
-  setTimeout(updateStickyOffsets, 100);
-  window.addEventListener('resize', updateStickyOffsets);
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', async () => {
+  readURLParams();
+  await loadProducts();
+  setupFilters();
 });
+
+function readURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  searchQuery    = params.get('q')   || params.get('search') || '';
+  activeCategory = params.get('cat') || '';
+}
+
+/* ── Load from API ── */
+async function loadProducts() {
+  showSpinner(true);
+  try {
+    const data = await fetchProducts({ search: searchQuery });
+    allProducts = Array.isArray(data) ? data : (data.products || []);
+    buildCategoryTabs();
+    buildCategorySelect();
+    applyFilters();
+    showSpinner(false);
+  } catch (err) {
+    showSpinner(false);
+    showError(err);
+  }
+}
+
+/* ── Category tabs ── */
+function buildCategoryTabs() {
+  const cats = ['', ...new Set(allProducts.map(p => p.category).filter(Boolean).sort())];
+  const scroll = document.getElementById('category-scroll');
+  if (!scroll) return;
+
+  scroll.innerHTML = cats.map(cat => {
+    const meta   = getCatMeta(cat);
+    const isAll  = cat === '';
+    const label  = isAll ? 'All' : cat;
+    const icon   = isAll ? 'fa-border-all' : meta.icon;
+    const active = activeCategory === cat ? 'active' : '';
+    return `
+      <button class="cat-tab ${active}" role="tab" aria-selected="${activeCategory === cat}"
+              onclick="selectCategory('${cat.replace(/'/g, "\\'")}')">
+        <i class="fas ${icon} cat-tab-icon"></i>
+        ${label}
+      </button>`;
+  }).join('');
+
+  // Measure category bar height for toolbar sticky offset
+  const section = document.getElementById('category-section');
+  if (section) {
+    const setH = () => document.documentElement.style.setProperty('--category-height', section.offsetHeight + 'px');
+    setH();
+    window.addEventListener('resize', setH);
+  }
+}
+
+/* ── Category select in toolbar ── */
+function buildCategorySelect() {
+  const sel = document.getElementById('category-select');
+  if (!sel) return;
+  const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean).sort())];
+  sel.innerHTML = `<option value="">All Products</option>` +
+    cats.map(c => `<option value="${c}" ${activeCategory === c ? 'selected' : ''}>${c}</option>`).join('');
+}
+
+/* ── Setup filter listeners ── */
+function setupFilters() {
+  document.getElementById('sort-select')?.addEventListener('change', e => { sortOrder = e.target.value; applyFilters(); });
+  document.getElementById('category-select')?.addEventListener('change', e => { selectCategory(e.target.value); });
+  document.getElementById('in-stock-toggle')?.addEventListener('change', e => { inStockOnly = e.target.checked; applyFilters(); });
+  document.getElementById('price-filter')?.addEventListener('input', e => {
+    maxPrice = parseInt(e.target.value);
+    const label = document.getElementById('price-label');
+    if (label) label.textContent = maxPrice >= 5000 ? 'Any price' : '₹' + maxPrice;
+    applyFilters();
+  });
+}
+
+/* ── Category selection ── */
+function selectCategory(cat) {
+  activeCategory = cat;
+  // Sync tab active state
+  document.querySelectorAll('.cat-tab').forEach(btn => {
+    const active = btn.textContent.trim() === (cat || 'All');
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-selected', active);
+  });
+  // Sync select
+  const sel = document.getElementById('category-select');
+  if (sel) sel.value = cat;
+  applyFilters();
+  updateURL();
+}
+
+/* ── Filter & sort ── */
+function applyFilters() {
+  let results = [...allProducts];
+
+  // Category
+  if (activeCategory) results = results.filter(p => p.category === activeCategory);
+
+  // Search
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    results = results.filter(p =>
+      p.name?.toLowerCase().includes(q) ||
+      p.description?.toLowerCase().includes(q) ||
+      p.tags?.some?.(t => t.toLowerCase().includes(q))
+    );
+  }
+
+  // In stock
+  if (inStockOnly) results = results.filter(p => p.stock !== false && p.stock !== 0);
+
+  // Price
+  if (maxPrice < 5000) results = results.filter(p => p.price <= maxPrice);
+
+  // Sort
+  results.sort((a, b) => {
+    if (sortOrder === 'name')       return a.name.localeCompare(b.name);
+    if (sortOrder === 'name_desc')  return b.name.localeCompare(a.name);
+    if (sortOrder === 'price_asc')  return (a.price || 0) - (b.price || 0);
+    if (sortOrder === 'price_desc') return (b.price || 0) - (a.price || 0);
+    if (sortOrder === 'discount') {
+      const discA = a.mrp ? ((a.mrp - a.price) / a.mrp) : 0;
+      const discB = b.mrp ? ((b.mrp - b.price) / b.mrp) : 0;
+      return discB - discA;
+    }
+    return 0;
+  });
+
+  filteredProducts = results;
+  renderProducts(results);
+  updateResultsCount(results.length);
+  toggleClearBtn();
+}
+
+/* ── Render product cards ── */
+function renderProducts(products) {
+  const grid = document.getElementById('products-grid');
+  if (!grid) return;
+
+  if (!products.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon"><i class="fas fa-search"></i></div>
+        <h3>No products found</h3>
+        <p>Try adjusting your search or filters.</p>
+        <button class="btn-clear" onclick="clearFilters()">Clear Filters</button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = products.map(p => productCard(p)).join('');
+}
+
+function productCard(p) {
+  const discount   = p.mrp && p.mrp > p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
+  const outOfStock = p.stock === false || p.stock === 0;
+  const meta       = getCatMeta(p.category);
+  const stars      = renderStars(p.rating || 0);
+  const imgHTML    = p.image
+    ? `<img src="${p.image}" alt="${escHtml(p.name)}" class="product-img" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'product-img-placeholder\\'><i class=\\'fas fa-pills\\'></i></span>'">`
+    : `<span class="product-img-placeholder"><i class="fas fa-pills"></i></span>`;
+
+  return `
+    <article class="product-card animate-in" data-id="${p._id}">
+      ${discount > 0 ? `<span class="discount-badge">${discount}% OFF</span>` : ''}
+      ${p.requiresPrescription ? `<span class="rx-badge">Rx</span>` : ''}
+      ${outOfStock ? `<div class="out-badge">Out of Stock</div>` : ''}
+
+      <div class="product-img-wrap" onclick="openProductModal('${p._id}')">
+        ${imgHTML}
+      </div>
+
+      <div class="product-info">
+        <span class="product-category" style="background:${meta.color};color:${meta.textColor}">
+          <i class="fas ${meta.icon}"></i> ${escHtml(p.category || 'General')}
+        </span>
+        <div class="product-name" onclick="openProductModal('${p._id}')">${escHtml(p.name)}</div>
+        ${p.manufacturer ? `<div class="product-mfr">${escHtml(p.manufacturer)}</div>` : ''}
+
+        ${p.rating ? `
+          <div class="product-rating">
+            <span class="stars">${stars}</span>
+            <span class="rating-num">${p.rating}</span>
+            ${p.reviewCount ? `<span class="rating-count">(${p.reviewCount})</span>` : ''}
+          </div>` : ''}
+
+        <div class="product-price-row">
+          <span>
+            <span class="product-price">₹${(p.price || 0).toLocaleString('en-IN')}</span>
+            ${p.mrp && p.mrp > p.price ? `<span class="product-mrp">₹${p.mrp.toLocaleString('en-IN')}</span>` : ''}
+          </span>
+          ${discount > 0 ? `<span class="discount-tag">${discount}% off</span>` : ''}
+        </div>
+
+        <div class="product-actions">
+          ${outOfStock
+            ? `<button class="btn-add-cart disabled" disabled>Out of Stock</button>`
+            : p.requiresPrescription
+              ? `<button class="btn-add-cart rx-btn" onclick="handleAddToCart('${p._id}')"><i class="fas fa-file-prescription"></i> Upload Rx</button>`
+              : `<button class="btn-add-cart" onclick="handleAddToCart('${p._id}')"><i class="fas fa-cart-plus"></i> Add to Cart</button>`
+          }
+          <button class="btn-quick-view" onclick="openProductModal('${p._id}')" aria-label="Quick view ${escHtml(p.name)}">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+/* ── Add to cart ── */
+function handleAddToCart(id) {
+  const p = allProducts.find(x => x._id === id);
+  if (!p) return;
+  if (p.requiresPrescription) {
+    window.location.href = 'upload-prescription.html';
+    return;
+  }
+  addToCart(p);
+  showToast(`${p.name} added to cart!`, 'success');
+  // Bump cart badge animation
+  document.querySelectorAll('.cart-badge').forEach(el => {
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+  });
+}
+
+/* ── Product modal ── */
+function openProductModal(id) {
+  const p = allProducts.find(x => x._id === id);
+  if (!p) return;
+  openProduct = p;
+
+  const discount = p.mrp && p.mrp > p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
+  const meta = getCatMeta(p.category);
+
+  // Image
+  const imgWrap = document.getElementById('pmodal-img-wrap');
+  if (imgWrap) {
+    imgWrap.innerHTML = p.image
+      ? `<img src="${p.image}" alt="${escHtml(p.name)}" style="max-width:100%;max-height:260px;object-fit:contain">`
+      : `<span class="pmodal-img-ph"><i class="fas fa-pills"></i></span>`;
+  }
+
+  setText('pmodal-category', p.category || '');
+  const catEl = document.getElementById('pmodal-category');
+  if (catEl) {
+    catEl.style.background  = meta.color;
+    catEl.style.color       = meta.textColor;
+    catEl.innerHTML = `<i class="fas ${meta.icon}"></i> ${escHtml(p.category || 'General')}`;
+  }
+  setText('pmodal-name', p.name);
+  setText('pmodal-mfr', p.manufacturer ? 'By ' + p.manufacturer : '');
+
+  // Rating
+  const ratingEl = document.getElementById('pmodal-rating');
+  if (ratingEl && p.rating) {
+    ratingEl.innerHTML = `<span class="stars">${renderStars(p.rating)}</span> <span class="rating-num">${p.rating}</span>`;
+  } else if (ratingEl) {
+    ratingEl.innerHTML = '';
+  }
+
+  // Price
+  setText('pmodal-price', '₹' + (p.price || 0).toLocaleString('en-IN'));
+  const mrpEl = document.getElementById('pmodal-mrp');
+  if (mrpEl) {
+    if (p.mrp && p.mrp > p.price) {
+      mrpEl.textContent = '₹' + p.mrp.toLocaleString('en-IN');
+      mrpEl.style.display = '';
+    } else {
+      mrpEl.style.display = 'none';
+    }
+  }
+  const discEl = document.getElementById('pmodal-discount');
+  if (discEl) {
+    if (discount > 0) { discEl.textContent = discount + '% off'; discEl.style.display = ''; }
+    else discEl.style.display = 'none';
+  }
+
+  // Rx banner
+  const rxEl = document.getElementById('pmodal-rx');
+  if (rxEl) rxEl.style.display = p.requiresPrescription ? 'flex' : 'none';
+
+  // Description
+  const descBox  = document.getElementById('pmodal-desc');
+  const descText = document.getElementById('pmodal-desc-text');
+  if (descBox && descText) {
+    if (p.description) {
+      descText.textContent = p.description;
+      descBox.style.display = '';
+    } else {
+      descBox.style.display = 'none';
+    }
+  }
+
+  // Tags
+  const tagsEl = document.getElementById('pmodal-tags');
+  if (tagsEl) {
+    tagsEl.innerHTML = (p.tags || []).map(t => `<span class="tag">${escHtml(t)}</span>`).join('');
+  }
+
+  // Add button
+  const addBtn = document.getElementById('pmodal-add-btn');
+  if (addBtn) {
+    if (p.stock === false || p.stock === 0) {
+      addBtn.className = 'btn-add-cart disabled';
+      addBtn.disabled  = true;
+      addBtn.innerHTML = 'Out of Stock';
+    } else if (p.requiresPrescription) {
+      addBtn.className = 'btn-add-cart rx-btn';
+      addBtn.disabled  = false;
+      addBtn.innerHTML = '<i class="fas fa-file-prescription"></i> Upload Prescription';
+      addBtn.onclick   = () => { window.location.href = 'upload-prescription.html'; };
+    } else {
+      addBtn.className = 'btn-add-cart';
+      addBtn.disabled  = false;
+      addBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+      addBtn.onclick   = () => {
+        addToCart(p);
+        showToast(p.name + ' added to cart!', 'success');
+        closeProductModal();
+      };
+    }
+  }
+
+  const modal = document.getElementById('product-modal');
+  if (modal) {
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeModal(e) {
+  if (e.target === e.currentTarget) closeProductModal();
+}
+
+function closeProductModal() {
+  const modal = document.getElementById('product-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+  openProduct = null;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeProductModal();
+});
+
+/* ── Helpers ── */
+function showSpinner(show) {
+  const spinner = document.getElementById('loading-spinner');
+  const grid    = document.getElementById('products-grid');
+  if (!grid) return;
+  if (show) {
+    grid.innerHTML = `<div class="loading-spinner" id="loading-spinner"><div class="spinner-ring"></div><p>Loading products…</p></div>`;
+  } else {
+    const s = document.getElementById('loading-spinner');
+    if (s) s.remove();
+  }
+}
+
+function showError(err) {
+  const grid = document.getElementById('products-grid');
+  if (!grid) return;
+  grid.innerHTML = `
+    <div class="api-error-state">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Could not load products</h3>
+      <p>${err?.message === 'Failed to fetch' ? 'Unable to reach the server. Please check your connection and try again.' : (err?.message || 'Something went wrong.')}</p>
+      <p style="font-size:.8rem;color:#94a3b8">Make sure the backend is running: <code>cd backend &amp;&amp; node server.js</code></p>
+      <button class="btn-retry" onclick="loadProducts()">
+        <i class="fas fa-redo"></i> Retry
+      </button>
+    </div>`;
+  const count = document.getElementById('results-count');
+  if (count) count.textContent = '';
+}
+
+function updateResultsCount(n) {
+  const el = document.getElementById('results-count');
+  if (!el) return;
+  const catLabel = activeCategory ? ` in "${activeCategory}"` : '';
+  const qLabel   = searchQuery   ? ` for "${searchQuery}"` : '';
+  el.textContent = n > 0 ? `${n} product${n !== 1 ? 's' : ''}${catLabel}${qLabel}` : '';
+}
+
+function toggleClearBtn() {
+  const btn = document.getElementById('clear-filters-btn');
+  if (!btn) return;
+  const hasFilter = activeCategory || searchQuery || inStockOnly || maxPrice < 5000;
+  btn.style.display = hasFilter ? '' : 'none';
+}
+
+function clearFilters() {
+  activeCategory = '';
+  searchQuery    = '';
+  inStockOnly    = false;
+  maxPrice       = 5000;
+  sortOrder      = 'name';
+
+  const sortSel  = document.getElementById('sort-select');
+  const catSel   = document.getElementById('category-select');
+  const stockChk = document.getElementById('in-stock-toggle');
+  const priceRng = document.getElementById('price-filter');
+  const priceLabel = document.getElementById('price-label');
+
+  if (sortSel)   sortSel.value   = 'name';
+  if (catSel)    catSel.value    = '';
+  if (stockChk)  stockChk.checked = false;
+  if (priceRng)  priceRng.value  = 5000;
+  if (priceLabel) priceLabel.textContent = 'Any price';
+
+  document.querySelectorAll('.cat-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', i === 0);
+    btn.setAttribute('aria-selected', i === 0);
+  });
+
+  applyFilters();
+  updateURL();
+}
+
+function updateURL() {
+  const params = new URLSearchParams();
+  if (activeCategory) params.set('cat', activeCategory);
+  if (searchQuery)    params.set('q',   searchQuery);
+  const newURL = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+  history.replaceState(null, '', newURL);
+}
+
+function renderStars(rating) {
+  const full  = Math.floor(rating);
+  const half  = rating % 1 >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 </script>
 <script src="js/chatbot.js"></script>
 </body>
