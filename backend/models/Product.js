@@ -12,7 +12,13 @@ const productSchema = new mongoose.Schema({
   manufacturer:         { type: String, default: '' },
   rating:               { type: Number, default: 4.0 },
   reviews:              { type: Number, default: 0 },
-  tags:                 [String]
+  tags:                 [String],
 });
+
+// Text index for fast, relevance-ranked search
+productSchema.index(
+  { name: 'text', description: 'text', tags: 'text' },
+  { weights: { name: 10, tags: 5, description: 1 }, name: 'product_text_search' }
+);
 
 module.exports = mongoose.model('Product', productSchema);
