@@ -36,7 +36,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..')));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// NOTE: /uploads is NOT served statically — prescription files are gated
+// behind authentication via GET /api/prescriptions/file/:filename
 
 /* ── Database ── */
 const MONGO_URI = process.env.MONGO_URI;
