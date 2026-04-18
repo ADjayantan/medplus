@@ -20,8 +20,7 @@ async function apiFetch(path, options = {}) {
   try {
     res = await fetch(API_BASE + path, { ...options, headers });
   } catch (networkErr) {
-    // Render free tier spin-up can take ~30s — give a friendly message
-    throw new Error('Cannot reach server. If this is the first request, wait 30 seconds for the server to wake up, then try again.');
+    throw new Error('Unable to reach the server. Please check your connection and try again.');
   }
 
   const data = await res.json().catch(() => ({}));
@@ -68,6 +67,9 @@ const PrescriptionAPI = {
   my:     ()            => apiFetch('/prescriptions/my'),
   all:    (params = {}) => apiFetch('/prescriptions?' + new URLSearchParams(params)),
   review: (id, body)    => apiFetch('/prescriptions/' + id + '/review', { method: 'PUT', body: JSON.stringify(body) }),
+  // Returns an authenticated URL for viewing a prescription file.
+  // Use this instead of a bare /uploads/... path.
+  fileUrl: filename => API_BASE + '/prescriptions/file/' + encodeURIComponent(filename),
 };
 
 /* ── Admin ── */
