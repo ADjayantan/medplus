@@ -29,7 +29,7 @@ body.dark .navbar-top { background: var(--teal-900); }
 
 /* ── Main bar ── */
 .navbar-main { padding: .75rem 0; }
-.navbar-main .container { display: flex; align-items: center; gap: 1rem; flex-wrap: nowrap; }
+.navbar-main .container { display: flex; align-items: center; gap: 0.6rem; flex-wrap: nowrap; }
 
 /* ── Logo ── */
 .nav-logo {
@@ -43,11 +43,11 @@ body.dark .navbar-top { background: var(--teal-900); }
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; font-size: .85rem; flex-shrink: 0;
 }
-.nav-logo-text { font-family: var(--font-display); font-size: 1.25rem; font-weight: 900; color: var(--text-primary); }
+.nav-logo-text { font-family: var(--font-display); font-size: 1.05rem; font-weight: 900; color: var(--text-primary); }
 .nav-logo-text span { color: var(--teal-500); }
 
 /* ── Search wrapper ── */
-.nav-search { flex: 1; min-width: 0; max-width: 580px; position: relative; }
+.nav-search { flex: 1; min-width: 0; max-width: 360px; position: relative; }
 
 .nav-search-inner {
   display: flex; align-items: center; width: 100%;
