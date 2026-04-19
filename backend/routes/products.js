@@ -71,4 +71,19 @@ router.delete('/:id', adminMiddleware, async (req, res) => {
   }
 });
 
+/* POST /api/products/:id/decrease-stock — Decrease stock when order placed */
+router.post('/:id/decrease-stock', async (req, res) => {
+  try {
+    const { qty = 1 } = req.body;
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (product.stock < qty) return res.status(400).json({ message: 'Insufficient stock' });
+    product.stock = Math.max(0, product.stock - qty);
+    await product.save();
+    res.json({ stock: product.stock });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
