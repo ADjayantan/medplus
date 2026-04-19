@@ -242,7 +242,7 @@ document.getElementById('order-modal').addEventListener('click', e => { if (e.ta
 /* Admin guard */
 if (sessionStorage.getItem('adminGateway') !== 'genezenz-pharmacy-admin-2025') {
   document.body.innerHTML = '';
-  window.location.replace('Admin/index.html'); // must enter via proper admin entry point
+  window.location.replace('admin-login.html'); // must enter via proper admin entry point
 } else {
   const u = currentUser();
   if (!u || !u.isAdmin) {
