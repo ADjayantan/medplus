@@ -105,15 +105,15 @@ const ProductAPI = {
 /* ── OrderAPI namespace (used by profile.js, checkout.html, admin-orders.html) ── */
 const OrderAPI = {
   create:       (orderData)      => apiFetch('/api/orders', { method: 'POST', body: JSON.stringify(orderData) }),
-  my:           ()               => apiFetch('/api/orders/my'),
+  my:           ()               => apiFetch('/api/orders'),
   all:          (params = {})    => {
     const qs = new URLSearchParams();
     if (params.status) qs.set('status', params.status);
     if (params.limit)  qs.set('limit',  params.limit);
     const q = qs.toString() ? '?' + qs.toString() : '';
-    return apiFetch('/api/orders' + q);
+    return apiFetch('/api/orders/admin/all' + q);
   },
-  updateStatus: (id, status)     => apiFetch(`/api/orders/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateStatus: (id, status)     => apiFetch(`/api/orders/admin/${id}`, { method: 'PUT', body: JSON.stringify({ status }) }),
 };
 
 /* ── PrescriptionAPI namespace (used by upload.js, profile.js, checkout.html, admin-prescriptions.html) ── */
