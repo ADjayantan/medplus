@@ -18,6 +18,7 @@ const ALLOWED_ORIGINS = [
   'http://127.0.0.1:3000',
   'http://localhost:5500',
   'http://127.0.0.1:5500',
+  'https://adjayantan.github.io',   // GitHub Pages deployment
   process.env.FRONTEND_URL || '',
 ].filter(Boolean);
 
