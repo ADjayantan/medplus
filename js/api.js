@@ -26,11 +26,12 @@ async function apiFetch(path, options = {}) {
 /* ── Products ── */
 async function fetchProducts(params = {}) {
   const qs = new URLSearchParams();
-  if (params.category)   qs.set('category',   params.category);
-  if (params.search)     qs.set('search',      params.search);
-  if (params.inStock)    qs.set('inStock',     'true');
-  if (params.limit)      qs.set('limit',       params.limit);
-  if (params.autocomplete) qs.set('autocomplete', 'true');
+  if (params.category)     qs.set('category',     params.category);
+  if (params.search)       qs.set('search',        params.search);
+  if (params.inStock)      qs.set('inStock',       'true');
+  if (params.limit)        qs.set('limit',         params.limit);
+  if (params.sort)         qs.set('sort',          params.sort);
+  if (params.autocomplete) qs.set('autocomplete',  'true');
   const query = qs.toString() ? '?' + qs.toString() : '';
   return apiFetch('/api/products' + query);
 }
@@ -69,6 +70,21 @@ async function apiPlaceOrder(orderData) {
 async function apiGetOrders() {
   return apiFetch('/api/orders');
 }
+
+/* ── ProductAPI namespace (used by Home.js, main.js, search.js) ── */
+const ProductAPI = {
+  /** Fetch products list. Accepts { category, search, inStock, limit, sort } */
+  list: (params = {}) => fetchProducts(params),
+
+  /** Fetch all available categories */
+  categories: () => fetchCategories(),
+
+  /** Autocomplete: returns a plain array of product objects */
+  autocomplete: async (q) => {
+    const data = await fetchProducts({ search: q, autocomplete: true, limit: 8 });
+    return data.products || [];
+  },
+};
 
 /* ── Toast helper (used across pages) ── */
 function showToast(msg, type = 'info') {
