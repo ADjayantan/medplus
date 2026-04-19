@@ -1,5 +1,5 @@
 /* =====================================================
-   UPLOAD.JS — MedPlus Prescription Upload
+   UPLOAD.JS — Genezenz Pharmacy Prescription Upload
 ===================================================== */
 
 let selectedFile = null;
@@ -130,7 +130,7 @@ async function doUpload() {
 
     const result = await PrescriptionAPI.upload(formData);
 
-    localStorage.setItem('medplus_prescription_uploaded', 'true');
+    localStorage.setItem('genezenz-pharmacy_prescription_uploaded', 'true');
 
     showStatus(
       '<i class="fas fa-check-circle"></i> Prescription uploaded successfully! Our pharmacist will review it within 2 hours.' +
