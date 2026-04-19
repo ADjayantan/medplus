@@ -2,7 +2,7 @@
    CHATBOT.JS — Genezenz Pharmacy AI chat widget
 ===================================================== */
 (function () {
-  const BASE = window.API_BASE || 'https://genezenz-pharmacy-lkr7.onrender.com';
+  const BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
 
   /* ── Build widget HTML ── */
   const widget = document.createElement('div');
