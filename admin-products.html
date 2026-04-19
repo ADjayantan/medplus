@@ -213,8 +213,8 @@ let allProducts = [];
 let deleteId    = null;
 
 function adminLogout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  localStorage.removeItem('medplus_token');
+  localStorage.removeItem('medplus_user');
   sessionStorage.removeItem('adminGateway');
   window.location.href = 'index.html';
 }
@@ -452,7 +452,7 @@ async function handleImageFile(file) {
   statusEl.className   = 'upload-status-uploading';
 
   try {
-    const token    = localStorage.getItem('token');
+    const token    = localStorage.getItem('medplus_token');
     const formData = new FormData();
     formData.append('image', file);
 
