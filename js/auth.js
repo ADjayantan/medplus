@@ -41,3 +41,8 @@ function requireAuth(redirectTo) {
   }
   return true;
 }
+
+/* ── Global alias used by main.js, Home.js, checkout.html, upload.js ── */
+function currentUser() {
+  return getCurrentUser();
+}
