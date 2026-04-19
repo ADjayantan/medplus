@@ -21,7 +21,7 @@ const MedNavbar = (() => {
 
     const authBtns = user
       ? `
-        ${user.isAdmin ? `<a href="admin-login.html" class="nav-btn nav-btn-admin"><i class="fas fa-shield-alt"></i> Admin</a>` : ''}
+        ${user.isAdmin ? `<a href="Admin/index.html" class="nav-btn nav-btn-admin"><i class="fas fa-shield-alt"></i> Admin</a>` : ''}
         <a href="profile.html" class="nav-btn nav-btn-ghost"><i class="fas fa-user"></i> ${user.name?.split(' ')[0] || 'Account'}</a>
         <button onclick="MedNavbar.logout()" class="nav-btn nav-btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
       `
@@ -32,7 +32,7 @@ const MedNavbar = (() => {
 
     const mobAuthLinks = user
       ? `
-        ${user.isAdmin ? `<a href="admin-login.html" class="mob-admin"><i class="fas fa-shield-alt"></i> Admin Panel</a>` : ''}
+        ${user.isAdmin ? `<a href="Admin/index.html" class="mob-admin"><i class="fas fa-shield-alt"></i> Admin Panel</a>` : ''}
         <a href="profile.html"><i class="fas fa-user"></i> My Account</a>
         <button class="mob-link mob-logout" onclick="MedNavbar.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
       `
