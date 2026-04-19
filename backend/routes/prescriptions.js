@@ -91,7 +91,7 @@ router.get('/admin/all', adminMiddleware, async (req, res) => {
     const prescriptions = await Prescription.find()
       .sort({ uploadedAt: -1 })
       .populate('userId', 'name email');
-    res.json(prescriptions);
+    res.json({ prescriptions });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
