@@ -64,18 +64,12 @@ body { display: flex; align-items: center; justify-content: center; min-height: 
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
-<script>// ── Gateway Guard ─────────────────────────────────────────────
-// Admin pages are only accessible via /Admin/ entry point.
-// If the session flag is missing, redirect to the proper entry point.
-if (sessionStorage.getItem('adminGateway') !== 'genezenz-pharmacy-admin-2025') {
-  document.body.innerHTML = '';
-  window.location.replace('Admin/index.html');
-} else {
-  // Redirect if already logged in as admin
-  const u = currentUser();
-  if (u && u.isAdmin) window.location.href = 'admin-dashboard.html';
+<script>
+// Redirect if already logged in as admin
+const u = currentUser();
+if (u && u.isAdmin && sessionStorage.getItem('adminGateway') === 'genezenz-pharmacy-admin-2025') {
+  window.location.href = 'admin-dashboard.html';
 }
-// ─────────────────────────────────────────────────────────────
 
 async function doAdminLogin() {
   const email    = document.getElementById('admin-email').value.trim();
@@ -88,6 +82,7 @@ async function doAdminLogin() {
     if (!data.user.isAdmin) throw new Error('Access denied — admin account required');
     localStorage.setItem('genezenz-pharmacy_token', data.token);
     localStorage.setItem('genezenz-pharmacy_user', JSON.stringify(data.user));
+    sessionStorage.setItem('adminGateway', 'genezenz-pharmacy-admin-2025');
     window.location.href = 'admin-dashboard.html';
   } catch (err) {
     errEl.textContent = err.message;
