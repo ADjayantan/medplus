@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cart — MedPlus Pharmacy</title>
+<title>Cart — Genezenz Pharmacy</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/navbar.css">
@@ -160,7 +160,7 @@
       <p>Your trusted online pharmacy for genuine medicines, health products, and expert wellness advice — delivered fast to your door.</p>
       <div class="contact-items">
         <a href="tel:1800-123-456"><i class="fas fa-phone-alt" aria-hidden="true"></i> 1800-123-456 (Toll Free)</a>
-        <a href="mailto:care@medplus.in"><i class="fas fa-envelope" aria-hidden="true"></i> care@medplus.in</a>
+        <a href="mailto:care@genezenz-pharmacy.in"><i class="fas fa-envelope" aria-hidden="true"></i> care@genezenz-pharmacy.in</a>
         <a href="#"><i class="fas fa-clock" aria-hidden="true"></i> Mon – Sat, 9 AM – 8 PM</a>
       </div>
     </div>
@@ -208,7 +208,7 @@
   </div>
   <div class="footer-bottom">
     <div class="footer-bottom-inner">
-      <p>&copy; 2025 MedPlus Pharmacy Pvt. Ltd. All rights reserved.</p>
+      <p>&copy; 2025 Genezenz Pharmacy Pvt. Ltd. All rights reserved.</p>
       <p>Licensed by the Central Drugs Standard Control Organisation (CDSCO).</p>
     </div>
   </div>
@@ -270,7 +270,7 @@ function renderItems(cart) {
       </div>
       <div class="cart-item-body">
         <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-meta">${item.manufacturer || 'MedPlus'}</div>
+        <div class="cart-item-meta">${item.manufacturer || 'Genezenz Pharmacy'}</div>
         <div class="cart-item-footer">
           <div class="cart-item-price">
             ₹${(item.price * (item.qty||1)).toLocaleString('en-IN')}
@@ -352,7 +352,7 @@ function applyCoupon() {
   const code = document.getElementById('coupon-input')?.value?.toUpperCase().trim();
   const msg  = document.getElementById('coupon-msg');
   if (!msg) return;
-  const codes = { 'MEDPLUS10': '10% discount applied!', 'FIRST50': '₹50 off applied on first order!' };
+  const codes = { 'GENEZENZ10': '10% discount applied!', 'FIRST50': '₹50 off applied on first order!' };
   if (codes[code]) {
     msg.innerHTML = `<span style="color:#16a34a"><i class="fas fa-check-circle"></i> ${codes[code]}</span>`;
   } else {
