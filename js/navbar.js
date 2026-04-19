@@ -63,7 +63,7 @@ const MedNavbar = (() => {
   <div class="navbar-main">
     <div class="container">
       <a href="index.html" class="nav-logo" aria-label="Genezenz Pharmacy home">
-        <div class="nav-logo-icon">GZ</div>
+        <img src="logo.png" alt="Genezenz Pharmacy Logo" style="height:38px;width:38px;object-fit:contain;border-radius:6px;">
         <span class="nav-logo-text">Genezenz<span> Pharmacy</span></span>
       </a>
 
