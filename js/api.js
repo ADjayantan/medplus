@@ -71,6 +71,12 @@ async function apiGetOrders() {
   return apiFetch('/api/orders');
 }
 
+/* ── AuthAPI namespace (used by login.html, register.html, admin-login.html) ── */
+const AuthAPI = {
+  login:    ({ email, password }) => apiLogin(email, password),
+  register: (data)               => apiRegister(data),
+};
+
 /* ── ProductAPI namespace (used by Home.js, main.js, search.js) ── */
 const ProductAPI = {
   /** Fetch products list. Accepts { category, search, inStock, limit, sort } */
