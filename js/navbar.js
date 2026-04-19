@@ -63,8 +63,8 @@ const MedNavbar = (() => {
   <div class="navbar-main">
     <div class="container">
       <a href="index.html" class="nav-logo" aria-label="Genezenz Pharmacy home">
-        <div class="nav-logo-icon">M+</div>
-        <span class="nav-logo-text">Med<span>Plus</span></span>
+        <div class="nav-logo-icon">GZ</div>
+        <span class="nav-logo-text">Genezenz<span> Pharmacy</span></span>
       </a>
 
       <!-- Desktop search -->
