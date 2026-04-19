@@ -194,7 +194,7 @@ function filterAndRender() {
           && !p.category.toLowerCase().includes(q)
           && !(p.description||'').toLowerCase().includes(q)
           && !(p.tags || []).some(t => t.toLowerCase().includes(q))) return false;
-    if (inStockOnly && !p.stock) return false;
+    if (inStockOnly && !(typeof p.stock === 'number' ? p.stock > 0 : p.stock)) return false;
     if (rxFilter === 'otc' && p.requiresPrescription) return false;
     if (rxFilter === 'rx'  && !p.requiresPrescription) return false;
     if (p.price > priceMax) return false;
@@ -251,7 +251,7 @@ function productCardHtml(p) {
     <div class="product-card" id="card-${id}">
       ${discount >= 5 ? `<div class="discount-badge">-${discount}%</div>` : ''}
       ${p.requiresPrescription ? `<div class="rx-badge"><i class="fas fa-file-prescription"></i> Rx</div>` : ''}
-      ${!p.stock ? `<div class="out-badge">Out of Stock</div>` : ''}
+      ${(typeof p.stock === 'number' ? p.stock === 0 : !p.stock) ? `<div class="out-badge">Out of Stock</div>` : (typeof p.stock === 'number' && p.stock <= 10 ? `<div class="out-badge" style="background:#f59e0b">Only ${p.stock} left</div>` : '')}
 
       <div class="product-img-wrap" onclick="openProductModal('${id}')" style="background:${meta.bg}">
         ${p.image
@@ -280,7 +280,7 @@ function productCardHtml(p) {
           ${discount >= 5 ? `<span class="discount-tag">${discount}% off</span>` : ''}
         </div>
         <div class="product-actions">
-          ${p.stock
+          ${(typeof p.stock === 'number' ? p.stock > 0 : p.stock)
             ? (p.requiresPrescription && !user
               ? `<a href="login.html" class="btn-add-cart rx-btn"
                    style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px">
@@ -376,9 +376,9 @@ function openProductModal(id) {
               </div>
             </div>` : ''}
             <div style="display:flex;align-items:center;gap:12px;margin:14px 0">
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;${p.stock ? 'background:#dcfce7;color:#166534' : 'background:#fee2e2;color:#991b1b'}">
-                <i class="fas ${p.stock ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                ${p.stock ? 'In Stock' : 'Out of Stock'}
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;${(typeof p.stock==='number'?p.stock===0:!p.stock)?'background:#fee2e2;color:#991b1b':(typeof p.stock==='number'&&p.stock<=10)?'background:#fef3c7;color:#92400e':'background:#dcfce7;color:#166534'}">
+                <i class="fas ${(typeof p.stock==='number'?p.stock===0:!p.stock)?'fa-times-circle':(typeof p.stock==='number'&&p.stock<=10)?'fa-exclamation-triangle':'fa-check-circle'}"></i>
+                ${(typeof p.stock==='number'?p.stock===0:!p.stock)?'Out of Stock':(typeof p.stock==='number'&&p.stock<=10)?`Only ${p.stock} left`:'In Stock'}
               </span>
               ${p.requiresPrescription
                 ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#fef3c7;color:#92400e"><i class="fas fa-prescription"></i> Rx Only</span>`
@@ -389,7 +389,7 @@ function openProductModal(id) {
               ${p.tags.slice(0,6).map(t => `<span class="tag">${t}</span>`).join('')}
             </div>` : ''}
             <div style="display:flex;gap:10px;margin-top:16px">
-              ${p.stock
+              ${(typeof p.stock === 'number' ? p.stock > 0 : p.stock)
                 ? `<button class="btn-add-cart" style="flex:1;padding:14px;font-size:15px" onclick="addToCart('${id}');closeProductModal()">
                      <i class="fas fa-cart-plus"></i> Add to Cart
                    </button>
@@ -425,6 +425,13 @@ function addToCart(productId) {
   const p = allProducts.find(x => x._id === productId);
   if (!p) return;
 
+  const stockNum = typeof p.stock === 'number' ? p.stock : (p.stock ? 999 : 0);
+
+  if (stockNum === 0) {
+    showToast(`<i class="fas fa-times-circle"></i> "${sanitize(p.name)}" is out of stock`, 'error');
+    return;
+  }
+
   if (p.requiresPrescription && !currentUser()) {
     window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
     return;
@@ -432,8 +439,15 @@ function addToCart(productId) {
 
   const cart     = getCart();
   const existing = cart.find(i => i._id === productId);
+  const currentQty = existing ? (existing.qty || 1) : 0;
+
+  if (currentQty >= stockNum) {
+    showToast(`<i class="fas fa-exclamation-triangle"></i> Only ${stockNum} unit(s) available for "${sanitize(p.name)}"`, 'warn');
+    return;
+  }
+
   if (existing) {
-    existing.qty = (existing.qty || 1) + 1;
+    existing.qty = currentQty + 1;
   } else {
     cart.push({
       _id: p._id,
@@ -443,6 +457,7 @@ function addToCart(productId) {
       image: p.image || '',
       manufacturer: p.manufacturer || '',
       requiresPrescription: p.requiresPrescription || false,
+      stock: stockNum,
       qty: 1
     });
   }
