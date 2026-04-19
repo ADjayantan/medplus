@@ -33,8 +33,8 @@ router.post('/', chatLimiter, async (req, res) => {
       headers: {
         'Content-Type':  'application/json',
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer':  process.env.FRONTEND_URL || 'https://medplus.example.com',
-        'X-Title':       'MedPlus AI Chatbot',
+        'HTTP-Referer':  process.env.FRONTEND_URL || 'https://genezenz-pharmacy.example.com',
+        'X-Title':       'Genezenz Pharmacy AI Chatbot',
       },
       body: JSON.stringify({
         model:    'meta-llama/llama-3.3-8b-instruct:free',
