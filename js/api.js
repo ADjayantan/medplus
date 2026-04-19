@@ -77,7 +77,7 @@ const AuthAPI = {
   register: (data)               => apiRegister(data),
 };
 
-/* ── ProductAPI namespace (used by Home.js, main.js, search.js) ── */
+/* ── ProductAPI namespace (used by Home.js, main.js, search.js, admin-products.html) ── */
 const ProductAPI = {
   list: (params = {}) => fetchProducts(params),
   categories: () => fetchCategories(),
@@ -85,6 +85,9 @@ const ProductAPI = {
     const data = await fetchProducts({ search: q, autocomplete: true, limit: 8 });
     return data.products || [];
   },
+  create: (body) => apiFetch('/api/products', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => apiFetch(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  delete: (id) => apiFetch(`/api/products/${id}`, { method: 'DELETE' }),
 };
 
 /* ── OrderAPI namespace (used by profile.js, checkout.html, admin-orders.html) ── */
@@ -129,6 +132,11 @@ const PrescriptionAPI = {
   review: (id, { status, adminNote }) => apiFetch(`/api/prescriptions/${id}/review`, {
     method: 'PUT', body: JSON.stringify({ status, adminNote }),
   }),
+};
+
+/* ── AdminAPI namespace (used by admin-dashboard.html) ── */
+const AdminAPI = {
+  stats: () => apiFetch('/api/admin/stats'),
 };
 
 /* ── Toast helper (used across pages) ── */
