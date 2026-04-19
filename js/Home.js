@@ -161,11 +161,18 @@ function featuredCardHtml(p) {
     ? `<img src="${sanitizeHome(p.image)}" alt="${sanitizeHome(p.name)}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fas ${meta.icon}\\' style=\\'font-size:3rem;color:${meta.color}\\'></i>'">`
     : `<i class="fas ${meta.icon}" style="font-size:3rem;color:${meta.color}"></i>`;
 
-  const addBtnHtml = p.stock
+  const stockNum = typeof p.stock === 'number' ? p.stock : (p.stock ? 100 : 0);
+  const lowStock = stockNum > 0 && stockNum <= 10;
+  const addBtnHtml = stockNum > 0
     ? `<button class="fp-add-btn" onclick="homeAddToCart('${id}')">
          <i class="fas fa-cart-plus"></i> Add
        </button>`
     : `<button class="fp-add-btn out-of-stock" disabled>Out of Stock</button>`;
+  const stockBadge = stockNum === 0
+    ? `<span style="display:inline-block;margin-top:4px;font-size:11px;color:#dc2626;font-weight:600;"><i class="fas fa-times-circle"></i> Out of stock</span>`
+    : lowStock
+    ? `<span style="display:inline-block;margin-top:4px;font-size:11px;color:#d97706;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> Only ${stockNum} left</span>`
+    : '';
 
   return `
     <div class="fp-card" id="fp-${id}">
@@ -178,6 +185,7 @@ function featuredCardHtml(p) {
         <div class="fp-cat">${sanitizeHome(p.category)}</div>
         <div class="fp-name">${sanitizeHome(p.name)}</div>
         <div class="fp-mfr">${sanitizeHome(p.manufacturer || 'Genezenz Pharmacy')}</div>
+        ${stockBadge}
         <div class="fp-rating">
           <span class="fp-stars">${stars}</span>
           <span class="fp-rating-num">${(p.rating || 0).toFixed(1)}</span>
