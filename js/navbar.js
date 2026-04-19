@@ -87,9 +87,17 @@ const MedNavbar = (() => {
       <!-- Desktop actions -->
       <div class="nav-actions">
         <a href="products.html" class="nav-btn nav-btn-ghost"><i class="fas fa-pills"></i> Products</a>
-        <a href="about.html" class="nav-btn nav-btn-ghost"><i class="fas fa-info-circle"></i> About</a>
-        <a href="contact.html" class="nav-btn nav-btn-ghost"><i class="fas fa-envelope"></i> Contact</a>
-        <a href="insurance.html" class="nav-btn nav-btn-ghost"><i class="fas fa-shield-alt"></i> Insurance</a>
+        <div class="nav-more-wrap">
+          <button class="nav-btn nav-btn-ghost nav-more-btn" onclick="MedNavbar.toggleMore(event)">
+            More <i class="fas fa-chevron-down" style="font-size:.7rem;margin-left:2px"></i>
+          </button>
+          <div class="nav-more-dropdown" id="nav-more-dropdown">
+            <a href="about.html"><i class="fas fa-info-circle"></i> About Us</a>
+            <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            <a href="insurance.html"><i class="fas fa-shield-alt"></i> Insurance</a>
+            <a href="upload-prescription.html"><i class="fas fa-file-prescription"></i> Upload Rx</a>
+          </div>
+        </div>
         <a href="cart.html" class="nav-btn nav-btn-cart" aria-label="Cart">
           <i class="fas fa-shopping-cart"></i> Cart ${badge}
         </a>
@@ -159,6 +167,12 @@ const MedNavbar = (() => {
     if (ham)     ham.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
     if (overlay) overlay.addEventListener('click', closeDrawer);
 
+    // Close "More" dropdown on outside click
+    document.addEventListener('click', () => {
+      const dd = document.getElementById('nav-more-dropdown');
+      if (dd) dd.classList.remove('open');
+    });
+
     // Navbar scroll shadow
     window.addEventListener('scroll', () => {
       ph.querySelector('.navbar')?.classList.toggle('scrolled', window.scrollY > 10);
@@ -213,11 +227,17 @@ const MedNavbar = (() => {
     if (q) window.location.href = `products.html?q=${encodeURIComponent(q)}`;
   }
 
+  function toggleMore(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('nav-more-dropdown');
+    if (dd) dd.classList.toggle('open');
+  }
+
   function logout() {
     localStorage.removeItem('genezenz-pharmacy_token');
     localStorage.removeItem('genezenz-pharmacy_user');
     window.location.href = 'index.html';
   }
 
-  return { init, doSearch, doMobSearch, logout };
+  return { init, doSearch, doMobSearch, logout, toggleMore };
 })();
