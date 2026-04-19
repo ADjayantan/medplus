@@ -335,44 +335,60 @@ async function placeOrder() {
 
   const cart = getCart();
 
-  // ── PRESCRIPTION CHECK (API-based) ──────────────────────────
-  const hasRxItem = cart.some(i => i.requiresPrescription);
-  if (hasRxItem) {
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-sm"></span> Verifying prescription…';
-    try {
-      const rxData = await PrescriptionAPI.my();
-      const prescriptions = rxData.prescriptions || [];
-      const hasValidRx = prescriptions.some(
-        rx => rx.status === 'approved' || rx.status === 'pending'
-      );
-      if (!hasValidRx) {
-        errMsg.innerHTML =
-          '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
-          'One or more items require a prescription. Please ' +
-          '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
-          'before placing the order.';
-        errEl.style.display = 'flex';
-        errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
-        return;
-      }
-    } catch (rxErr) {
-      // API failed (e.g. server cold start) — always block to be safe
+  // ── PRESCRIPTION CHECK — ALL orders require an approved prescription ──
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Verifying prescription…';
+  try {
+    const rxData = await PrescriptionAPI.my();
+    const prescriptions = rxData.prescriptions || [];
+    const hasApproved = prescriptions.some(rx => rx.status === 'approved');
+    const hasPending  = prescriptions.some(rx => rx.status === 'pending');
+
+    if (!hasApproved && !hasPending) {
+      // No prescription at all — block order
       errMsg.innerHTML =
         '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
-        'Could not verify prescription. Please ' +
+        'A valid prescription is required to place an order at Genezenz Pharmacy. Please ' +
         '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
-        'and try again in a moment.';
+        'first. Our pharmacist will review and approve it before your order is confirmed.';
       errEl.style.display = 'flex';
       errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       btn.disabled = false;
       btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
       return;
     }
+
+    if (hasPending && !hasApproved) {
+      // Prescription uploaded but not yet approved — block order
+      errMsg.innerHTML =
+        '<i class="fas fa-hourglass-half" style="margin-right:6px"></i> ' +
+        'Your prescription is under review by our pharmacist. ' +
+        'You will be able to place your order once it is approved (usually within 2 hours). ' +
+        'Please check back soon.';
+      errEl.style.display = 'flex';
+      errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+      return;
+    }
+    // hasApproved === true — allow order to proceed
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+  } catch (rxErr) {
+    // API unreachable — always block to protect patient safety
+    errMsg.innerHTML =
+      '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
+      'Could not verify your prescription. Please ' +
+      '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
+      'and try again in a moment.';
+    errEl.style.display = 'flex';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+    return;
   }
-  // ─────────────────────────────────────────────────────────────
+  if (btn.disabled) return; // safety guard
+  // ────────────────────────────────────────────────────────────────────
 
   const subtotal = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
   const delivery = subtotal >= 499 ? 0 : 40;
