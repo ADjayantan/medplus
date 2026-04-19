@@ -1,7 +1,7 @@
- {
-  "name": "medplus-backend",
+{
+  "name": "genezenz-pharmacy-backend",
   "version": "7.0.0",
-  "description": "MedPlus Pharmacy — Backend API",
+  "description": "Genezenz Pharmacy — Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
