@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedPlus Admin</title>
+<title>Genezenz Pharmacy Admin</title>
 <style>
   body {
     margin: 0;
@@ -40,10 +40,10 @@
   // It sets a sessionStorage flag that all admin pages check.
   // Without visiting this URL first, admin pages are inaccessible.
   // ─────────────────────────────────────────────────────────────
-  sessionStorage.setItem('adminGateway', 'medplus-admin-2025');
+  sessionStorage.setItem('adminGateway', 'genezenz-pharmacy-admin-2025');
   // Redirect to login (or dashboard if already authenticated)
   setTimeout(function () {
-    const user = JSON.parse(localStorage.getItem('medplus_user') || 'null');
+    const user = JSON.parse(localStorage.getItem('genezenz-pharmacy_user') || 'null');
     if (user && user.isAdmin) {
       window.location.href = '../admin-dashboard.html';
     } else {
