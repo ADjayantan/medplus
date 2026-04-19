@@ -135,34 +135,47 @@ function setCategory(cat, btn) {
 }
 
 /* ── Products ── */
+/* ── Products ── */
+let _wakeInterval = null;
+
 async function loadProducts() {
   const grid = document.getElementById('products-grid');
-  const isLive = location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
 
-  if (grid) grid.innerHTML = `<div class="loading-spinner">
+  if (grid) grid.innerHTML = `
+    <div class="loading-spinner" id="loading-msg">
       <div class="spinner-ring"></div>
-      <p>Loading medicines&hellip;</p>
+      <p id="loading-text">Connecting to server&hellip;</p>
+      <p id="loading-sub" style="font-size:13px;color:#64748b;margin-top:4px">This may take up to 30 seconds if the server is starting up</p>
     </div>`;
+
+  let elapsed = 0;
+  if (_wakeInterval) clearInterval(_wakeInterval);
+  _wakeInterval = setInterval(() => {
+    elapsed += 1;
+    const sub = document.getElementById('loading-sub');
+    if (sub) sub.textContent = `Server waking up… ${elapsed}s elapsed (may take up to 30s on first load)`;
+  }, 1000);
 
   try {
     const data  = await ProductAPI.list();
+    clearInterval(_wakeInterval);
     allProducts = data.products || [];
     filterAndRender();
     renderCategoryCards(allCategories);
     const statEl = document.getElementById('product-stat');
     if (statEl) statEl.textContent = allProducts.length + '+ medicines';
   } catch (err) {
-    const localHint = !isLive
-      ? ''
-      : '<p style="font-size:13px;margin-top:8px;opacity:.7">Make sure the backend is running on port 3000: <code>cd backend &amp;&amp; node server.js</code></p>';
+    clearInterval(_wakeInterval);
+    const isTimeout = err.message && err.message.includes('too long');
     if (grid) grid.innerHTML = `
       <div class="api-error-state">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h3>Could not connect to server</h3>
-        <p>${err.message}</p>
-        ${localHint}
-        <button onclick="loadProducts()" class="btn-retry">
-          <i class="fas fa-redo"></i> Retry
+        <i class="fas ${isTimeout ? 'fa-hourglass-half' : 'fa-exclamation-triangle'}"></i>
+        <h3>${isTimeout ? 'Server is still waking up' : 'Could not connect to server'}</h3>
+        <p>${isTimeout
+          ? 'The backend takes up to 60s to start after inactivity. Wait a moment then click Retry.'
+          : err.message}</p>
+        <button onclick="loadProducts()" class="btn-retry" style="margin-top:16px">
+          <i class="fas fa-redo"></i> ${isTimeout ? 'Try Again' : 'Retry'}
         </button>
       </div>`;
   }
