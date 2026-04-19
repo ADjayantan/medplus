@@ -37,7 +37,7 @@ body.dark .navbar-top { background: var(--teal-900); }
   cursor: pointer; flex-shrink: 0; text-decoration: none;
 }
 .nav-logo-icon {
-  width: 2rem; height: 2rem;
+  width: 2.2rem; height: 2.2rem;
   background: linear-gradient(135deg, var(--teal-400), var(--teal-600));
   color: #fff; border-radius: var(--radius-md);
   display: flex; align-items: center; justify-content: center;
