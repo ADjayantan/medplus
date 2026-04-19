@@ -1,16 +1,16 @@
 /* =====================================================
-   AUTH.JS — MedPlus auth state helpers
+   AUTH.JS — Genezenz Pharmacy auth state helpers
 ===================================================== */
 
 function isLoggedIn() {
-  const token = localStorage.getItem('medplus_token');
+  const token = localStorage.getItem('genezenz-pharmacy_token');
   const user  = getCurrentUser();
   return !!(token && user);
 }
 
 function getCurrentUser() {
   try {
-    const raw = localStorage.getItem('medplus_user');
+    const raw = localStorage.getItem('genezenz-pharmacy_user');
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
@@ -18,13 +18,13 @@ function getCurrentUser() {
 }
 
 function setSession(token, user) {
-  localStorage.setItem('medplus_token', token);
-  localStorage.setItem('medplus_user', JSON.stringify(user));
+  localStorage.setItem('genezenz-pharmacy_token', token);
+  localStorage.setItem('genezenz-pharmacy_user', JSON.stringify(user));
 }
 
 function clearSession() {
-  localStorage.removeItem('medplus_token');
-  localStorage.removeItem('medplus_user');
+  localStorage.removeItem('genezenz-pharmacy_token');
+  localStorage.removeItem('genezenz-pharmacy_user');
 }
 
 function logout() {
