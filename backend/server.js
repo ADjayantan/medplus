@@ -1,5 +1,5 @@
 /* =====================================================
-   SERVER.JS — MedPlus Pharmacy Backend
+   SERVER.JS — Genezenz Pharmacy Backend
 ===================================================== */
 require('dotenv').config();
 const express  = require('express');
@@ -99,7 +99,7 @@ app.use((err, _req, res, _next) => {
 
 // FIX: removed the line that printed admin credentials on every startup
 app.listen(PORT, () => {
-  console.log('[OK] MedPlus server running on port', PORT);
+  console.log('[OK] Genezenz Pharmacy server running on port', PORT);
 });
 
 module.exports = app;
