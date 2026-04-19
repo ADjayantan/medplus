@@ -3,377 +3,433 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cart — Genezenz Pharmacy</title>
+<title>Checkout — Genezenz Pharmacy</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/navbar.css">
 <link rel="stylesheet" href="css/cart.css">
-<style>
-/* ── Mobile spacing overrides ── */
-@media (max-width: 640px) {
-  .page-shell { padding-top: 1rem; padding-bottom: 2rem; }
-  .page-container { padding-left: 1rem; padding-right: 1rem; }
-  .page-header { flex-direction: column; align-items: flex-start; gap: .5rem; margin-bottom: 1.25rem; }
-  .page-title { font-size: 1.4rem; }
-  .cart-layout { grid-template-columns: 1fr !important; gap: 1rem; }
-  .cart-item { flex-direction: row; gap: .75rem; padding: .9rem; }
-  .cart-item-img { width: 64px; height: 64px; flex-shrink: 0; }
-  .cart-item-footer { flex-direction: column; align-items: flex-start; gap: .5rem; }
-  .qty-control { width: 100%; justify-content: flex-start; }
-  .card { padding: 1rem; border-radius: 12px; }
-  .btn-primary, .btn-secondary { padding: .85rem 1rem; font-size: .9rem; }
-  .info-banner { font-size: .82rem; padding: .65rem .9rem; }
-}
-</style>
 </head>
 <body>
 
-<!-- Shared navbar injected here -->
-<div id="navbar-placeholder"></div>
+<!-- ── Navbar ── -->
+<nav class="navbar" id="main-navbar">
+  <div class="navbar-main">
+    <div class="container">
+      <div class="nav-logo" onclick="window.location.href='index.html'">
+        <img src="logo.png" alt="Logo" style="height:34px;width:34px;object-fit:contain;border-radius:6px;">
+        <span class="nav-logo-text">Genezenz<span> Pharmacy</span></span>
+      </div>
+      <div style="flex:1;text-align:center">
+        <span style="font-size:.875rem;color:var(--text-secondary);font-weight:600">
+          <i class="fas fa-lock" style="color:var(--teal-500)"></i> Secure Checkout
+        </span>
+      </div>
+      <a href="cart.html" class="nav-btn nav-btn-ghost" style="font-size:.875rem">
+        <i class="fas fa-arrow-left"></i> Back to Cart
+      </a>
+    </div>
+  </div>
+</nav>
 
-<!-- Page -->
-<main class="page-shell">
+<!-- ── Success Screen (hidden by default) ── -->
+<div id="success-screen" style="display:none" class="page-shell">
+  <div class="page-container" style="max-width:580px">
+    <div class="card order-success">
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+      <h2>Order Placed Successfully!</h2>
+      <p>Your order has been confirmed. We'll deliver your medicines within 24–48 hours.</p>
+      <div class="order-id-badge">
+        Order ID: <strong id="success-order-id">—</strong>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="profile.html" class="btn-primary" style="width:auto;padding:.8rem 1.75rem">
+          <i class="fas fa-box"></i> Track Order
+        </a>
+        <a href="products.html" class="btn-secondary" style="width:auto;padding:.8rem 1.75rem">
+          <i class="fas fa-shopping-bag"></i> Continue Shopping
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Checkout ── -->
+<div id="checkout-main" class="page-shell">
   <div class="page-container">
 
-    <div class="page-header">
-      <a href="products.html" class="page-back-btn">
-        <i class="fas fa-arrow-left" aria-hidden="true"></i> Continue Shopping
-      </a>
-      <div>
-        <h1 class="page-title">Your Cart</h1>
-        <p class="page-subtitle" id="cart-subtitle">0 items</p>
+    <!-- Stepper -->
+    <div class="checkout-steps">
+      <div class="step done">
+        <div class="step-num"><i class="fas fa-check" style="font-size:.65rem"></i></div>
+        <span>Cart</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step active">
+        <div class="step-num">2</div>
+        <span>Details</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <span>Payment</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <span>Confirm</span>
       </div>
     </div>
 
-    <!-- Empty State -->
-    <div id="cart-empty" class="cart-empty" style="display:none" aria-live="polite">
-      <div class="cart-empty-icon"><i class="fas fa-shopping-cart" aria-hidden="true"></i></div>
-      <h2>Your cart is empty</h2>
-      <p>Add medicines and healthcare products to your cart to get started.</p>
-      <a href="products.html" class="btn-primary" style="width:auto;display:inline-flex;padding:.9rem 2rem">
-        <i class="fas fa-pills" aria-hidden="true"></i> Browse Medicines
-      </a>
+    <!-- Error banner -->
+    <div id="checkout-error" class="err-banner info-banner" style="display:none;max-width:900px;margin:0 auto 1.25rem">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="checkout-error-msg"></span>
     </div>
 
-    <!-- Cart with items -->
-    <div id="cart-content" class="cart-layout" style="display:none">
+    <div class="checkout-layout">
 
-      <!-- Left: Items -->
+      <!-- Left Column -->
       <div>
-        <div class="info-banner" id="free-delivery-banner">
-          <i class="fas fa-truck" aria-hidden="true"></i>
-          <span id="delivery-msg">Add items worth <strong id="delivery-diff">₹0</strong> more for <strong>FREE delivery</strong>!</span>
-        </div>
 
+        <!-- Delivery Address -->
         <div class="card">
-          <div class="card-title">
-            <i class="fas fa-shopping-bag" aria-hidden="true"></i>
-            Cart Items <span style="font-weight:400;color:#9ca3af;font-size:.85rem" id="item-count-label"></span>
-          </div>
-          <div id="cart-items-list" aria-live="polite"><!-- rendered by JS --></div>
-        </div>
+          <div class="card-title"><i class="fas fa-map-marker-alt"></i> Delivery Address</div>
 
-        <div class="warn-banner info-banner" id="rx-notice" style="display:none" role="alert">
-          <i class="fas fa-file-prescription" aria-hidden="true"></i>
-          <span>Some items require a prescription. Please
-            <a href="upload-prescription.html" style="color:#92400e;font-weight:700">upload your prescription</a>
-            before or after ordering.
-          </span>
-        </div>
-
-        <div class="card">
-          <div class="card-title"><i class="fas fa-tag" aria-hidden="true"></i> Promo Code</div>
-          <div style="display:flex;gap:.75rem">
-            <input type="text" id="coupon-input" class="form-input" placeholder="Enter promo code"
-                   style="flex:1" aria-label="Promo code">
-            <button onclick="applyCoupon()" style="padding:.7rem 1.25rem;background:var(--teal-500);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;white-space:nowrap">
-              Apply
-            </button>
-          </div>
-          <div id="coupon-msg" style="margin-top:.5rem;font-size:.82rem" aria-live="polite"></div>
-        </div>
-      </div>
-
-      <!-- Right: Summary -->
-      <div>
-        <div class="card">
-          <div class="card-title"><i class="fas fa-receipt" aria-hidden="true"></i> Order Summary</div>
-          <div class="summary-row"><span>Subtotal</span><span id="subtotal-val">₹0</span></div>
-          <div class="summary-row"><span>Discount</span><span id="discount-val" style="color:#22c55e">-₹0</span></div>
-          <div class="summary-row"><span>Delivery Charges</span><span id="delivery-val">₹40</span></div>
-          <div class="summary-row total"><span>Total Amount</span><span id="total-val">₹0</span></div>
-
-          <div class="summary-savings" id="savings-badge" style="display:none" aria-live="polite">
-            <i class="fas fa-piggy-bank" aria-hidden="true"></i>
-            You save <strong id="savings-val">₹0</strong> on this order!
-          </div>
-
-          <button class="btn-primary" onclick="proceedToCheckout()" id="checkout-btn">
-            <i class="fas fa-lock" aria-hidden="true"></i> Proceed to Checkout
-          </button>
-          <a href="products.html" class="btn-secondary">
-            <i class="fas fa-arrow-left" aria-hidden="true"></i> Continue Shopping
-          </a>
-
-          <div style="display:flex;justify-content:center;gap:1rem;margin-top:1.25rem">
-            <span style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:4px">
-              <i class="fas fa-lock" aria-hidden="true"></i> Secure Checkout
-            </span>
-            <span style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:4px">
-              <i class="fas fa-undo" aria-hidden="true"></i> Easy Returns
-            </span>
-            <span style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:4px">
-              <i class="fas fa-shield-alt" aria-hidden="true"></i> Authentic
-            </span>
-          </div>
-        </div>
-
-        <div class="card" style="background:linear-gradient(135deg,var(--teal-950),var(--teal-700));color:#fff;border:none">
-          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
-            <i class="fas fa-file-prescription" style="font-size:1.5rem;opacity:.8" aria-hidden="true"></i>
-            <div>
-              <div style="font-weight:700;font-size:.95rem">Have a prescription?</div>
-              <div style="font-size:.8rem;opacity:.75">Upload it for faster processing</div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Full Name <span class="required">*</span></label>
+              <input type="text" id="del-name" class="form-input" placeholder="Your full name" autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number <span class="required">*</span></label>
+              <input type="tel" id="del-phone" class="form-input" placeholder="10-digit mobile number" autocomplete="tel">
             </div>
           </div>
-          <a href="upload-prescription.html"
-             style="display:block;text-align:center;padding:.7rem;background:rgba(255,255,255,.15);border-radius:10px;color:#fff;font-weight:700;font-size:.875rem;text-decoration:none;border:1.5px solid rgba(255,255,255,.25);transition:background .18s"
-             onmouseover="this.style.background='rgba(255,255,255,.25)'"
-             onmouseout="this.style.background='rgba(255,255,255,.15)'">
-            <i class="fas fa-upload" aria-hidden="true"></i> Upload Prescription
-          </a>
+
+          <div class="form-group">
+            <label class="form-label">Full Address <span class="required">*</span></label>
+            <textarea id="del-address" class="form-input" placeholder="House/Flat No., Street, Area, Locality" rows="3"></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">City <span class="required">*</span></label>
+              <input type="text" id="del-city" class="form-input" placeholder="City">
+            </div>
+            <div class="form-group">
+              <label class="form-label">PIN Code <span class="required">*</span></label>
+              <input type="text" id="del-pin" class="form-input" placeholder="6-digit PIN" maxlength="6">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <select id="del-state" class="form-input">
+              <option value="">Select State</option>
+              <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+              <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+              <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+              <option>Himachal Pradesh</option><option>Jharkhand</option>
+              <option>Karnataka</option><option>Kerala</option>
+              <option>Madhya Pradesh</option><option>Maharashtra</option>
+              <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+              <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+              <option>Rajasthan</option><option>Sikkim</option>
+              <option selected>Tamil Nadu</option>
+              <option>Telangana</option><option>Tripura</option>
+              <option>Uttar Pradesh</option><option>Uttarakhand</option>
+              <option>West Bengal</option><option>Delhi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-credit-card"></i> Payment Method</div>
+
+          <div class="payment-options">
+            <div class="payment-option selected" data-method="COD" onclick="selectPayment('COD', this)">
+              <div class="payment-option-icon"><i class="fas fa-money-bill-wave"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">Cash on Delivery</div>
+                <div style="font-size:.75rem;opacity:.7">Pay on arrival</div>
+              </div>
+            </div>
+            <div class="payment-option" data-method="UPI" onclick="selectPayment('UPI', this)">
+              <div class="payment-option-icon"><i class="fas fa-mobile-alt"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">UPI</div>
+                <div style="font-size:.75rem;opacity:.7">GPay, PhonePe, Paytm</div>
+              </div>
+            </div>
+            <div class="payment-option" data-method="Card" onclick="selectPayment('Card', this)">
+              <div class="payment-option-icon"><i class="fas fa-credit-card"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">Card</div>
+                <div style="font-size:.75rem;opacity:.7">Debit or Credit</div>
+              </div>
+            </div>
+            <div class="payment-option" data-method="NetBanking" onclick="selectPayment('NetBanking', this)">
+              <div class="payment-option-icon"><i class="fas fa-university"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:.875rem">Net Banking</div>
+                <div style="font-size:.75rem;opacity:.7">All major banks</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- UPI field (shown when UPI selected) -->
+          <div id="upi-field" style="display:none;margin-top:1rem">
+            <div class="form-group">
+              <label class="form-label">UPI ID</label>
+              <input type="text" id="upi-id" class="form-input" placeholder="yourname@upi">
+            </div>
+          </div>
+        </div>
+
+        <div class="info-banner">
+          <i class="fas fa-shield-alt"></i>
+          <span>All transactions are safe and secured with end-to-end encryption.</span>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Summary -->
+      <div>
+        <div class="card" style="position:sticky;top:80px">
+          <div class="card-title"><i class="fas fa-receipt"></i> Order Summary</div>
+
+          <!-- Items list -->
+          <div id="checkout-items-list" style="margin-bottom:1rem;max-height:260px;overflow-y:auto">
+            <!-- rendered by JS -->
+          </div>
+
+          <div class="summary-row">
+            <span>Subtotal (<span id="co-item-count">0</span> items)</span>
+            <span id="co-subtotal">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Discount</span>
+            <span id="co-discount" style="color:#22c55e">-₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Delivery</span>
+            <span id="co-delivery">₹40</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total Payable</span>
+            <span id="co-total">₹0</span>
+          </div>
+
+          <button class="btn-primary" id="place-order-btn" onclick="placeOrder()">
+            <i class="fas fa-check-circle"></i> Place Order
+          </button>
         </div>
       </div>
 
-    </div><!-- /cart-content -->
+    </div>
   </div>
-</main>
+</div>
 
-<!-- Shared footer -->
-<footer class="site-footer" role="contentinfo">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <a href="index.html" class="logo">
-        <img src="logo.png" alt="Logo" style="height:34px;width:34px;object-fit:contain;border-radius:6px;">
-        <span class="logo-text">Genezenz<span> Pharmacy</span></span>
-      </a>
-      <p>Your trusted online pharmacy for genuine medicines, health products, and expert wellness advice — delivered fast to your door.</p>
-      <div class="contact-items">
-        <a href="tel:1800-123-456"><i class="fas fa-phone-alt" aria-hidden="true"></i> 1800-123-456 (Toll Free)</a>
-        <a href="mailto:care@genezenz-pharmacy.in"><i class="fas fa-envelope" aria-hidden="true"></i> care@genezenz-pharmacy.in</a>
-        <a href="#"><i class="fas fa-clock" aria-hidden="true"></i> Mon – Sat, 9 AM – 8 PM</a>
-      </div>
-    </div>
-    <div class="footer-col">
-      <h4>Quick Links</h4>
-      <ul>
-        <li><a href="index.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> Home</a></li>
-        <li><a href="products.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> Medicines</a></li>
-        <li><a href="upload-prescription.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> Upload Rx</a></li>
-        <li><a href="cart.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> My Cart</a></li>
-        <li><a href="profile.html"><i class="fas fa-chevron-right" aria-hidden="true"></i> My Account</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Help &amp; Support</h4>
-      <ul>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Track Order</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Return Policy</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> FAQ</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Contact Us</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Policies</h4>
-      <ul>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Privacy Policy</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Terms of Use</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Shipping Policy</a></li>
-        <li><a href="#"><i class="fas fa-chevron-right" aria-hidden="true"></i> Rx Policy</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-trust">
-    <div class="trust-badges">
-      <span class="trust-badge"><i class="fas fa-shield-alt" aria-hidden="true"></i> 100% Genuine</span>
-      <span class="trust-badge"><i class="fas fa-truck" aria-hidden="true"></i> Fast Delivery</span>
-      <span class="trust-badge"><i class="fas fa-lock" aria-hidden="true"></i> Secure Payments</span>
-      <span class="trust-badge"><i class="fas fa-undo-alt" aria-hidden="true"></i> Easy Returns</span>
-    </div>
-    <div class="footer-social">
-      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
-      <a href="#" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
-      <a href="#" aria-label="Twitter / X"><i class="fab fa-x-twitter" aria-hidden="true"></i></a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <div class="footer-bottom-inner">
-      <p>&copy; 2025 Genezenz Pharmacy Pvt. Ltd. All rights reserved.</p>
-      <p>Licensed by the Central Drugs Standard Control Organisation (CDSCO).</p>
-    </div>
-  </div>
+<!-- Footer -->
+<footer class="footer">
+  <p>&copy; 2025 Genezenz Pharmacy. All rights reserved.</p>
 </footer>
 
-<!-- Scripts -->
+<div id="toast-container" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px"></div>
+
 <script src="js/api.js"></script>
-<script src="js/auth.js"></script>
 <script src="js/cart.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/navbar.js"></script>
 <script>
-MedNavbar.init('');
-
-const FREE_DELIVERY_THRESHOLD = 499;
+let selectedPayment = 'COD';
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderCartPage();
-});
-
-function renderCartPage() {
-  const cart    = getCart();
-  const emptyEl = document.getElementById('cart-empty');
-  const contentEl = document.getElementById('cart-content');
-  const countEl = document.getElementById('cart-count');
-
-  const totalQty = cart.reduce((s,i) => s + (i.qty||1), 0);
-  if (countEl) { countEl.textContent = totalQty; countEl.style.display = totalQty > 0 ? '' : 'none'; }
-
-  if (!cart.length) {
-    if (emptyEl)   emptyEl.style.display   = 'block';
-    if (contentEl) contentEl.style.display = 'none';
+  if (!isLoggedIn()) {
+    window.location.href = 'login.html?redirect=checkout.html';
     return;
   }
-  if (emptyEl)   emptyEl.style.display   = 'none';
-  if (contentEl) contentEl.style.display = 'grid';
+  const cart = getCart();
+  if (!cart.length) { window.location.href = 'cart.html'; return; }
 
-  const subtitle = document.getElementById('cart-subtitle');
-  if (subtitle) subtitle.textContent = totalQty + ' item' + (totalQty !== 1 ? 's' : '');
+  // Pre-fill from user profile
+  const user = currentUser();
+  if (user) {
+    const nameEl = document.getElementById('del-name');
+    const phoneEl= document.getElementById('del-phone');
+    if (nameEl && user.name)  nameEl.value  = user.name;
+    if (phoneEl && user.phone) phoneEl.value = user.phone;
+  }
 
-  const label = document.getElementById('item-count-label');
-  if (label) label.textContent = '(' + cart.length + ' product' + (cart.length !== 1 ? 's' : '') + ')';
+  renderCheckoutItems(cart);
+  renderCheckoutSummary(cart);
+});
 
-  renderItems(cart);
-  renderSummary(cart);
-
-  const rxNotice = document.getElementById('rx-notice');
-  if (rxNotice) rxNotice.style.display = cart.some(i => i.requiresPrescription) ? 'flex' : 'none';
-}
-
-function renderItems(cart) {
-  const list = document.getElementById('cart-items-list');
+function renderCheckoutItems(cart) {
+  const list = document.getElementById('checkout-items-list');
   if (!list) return;
   list.innerHTML = cart.map(item => `
-    <div class="cart-item" id="item-${item._id}">
-      <div class="cart-item-img">
-        ${item.image
-          ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-pills\\'></i>'">`
-          : '<i class="fas fa-pills"></i>'}
-      </div>
-      <div class="cart-item-body">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-meta">${item.manufacturer || 'Genezenz Pharmacy'}</div>
-        <div class="cart-item-footer">
-          <div class="cart-item-price">
-            ₹${(item.price * (item.qty||1)).toLocaleString('en-IN')}
-            ${item.mrp ? `<span>₹${(item.mrp*(item.qty||1)).toLocaleString('en-IN')}</span>` : ''}
-          </div>
-          <div style="display:flex;align-items:center;gap:.5rem">
-            <div class="qty-control">
-              <button class="qty-btn" onclick="changeQty('${item._id}',-1)" aria-label="Decrease quantity"><i class="fas fa-minus"></i></button>
-              <span class="qty-value">${item.qty||1}</span>
-              <button class="qty-btn" onclick="changeQty('${item._id}',1)" aria-label="Increase quantity"><i class="fas fa-plus"></i></button>
-            </div>
-            <button class="remove-btn" onclick="removeItem('${item._id}')" aria-label="Remove ${item.name}">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </div>
-        </div>
-      </div>
+    <div class="checkout-item">
+      <div class="checkout-item-name">${item.name}</div>
+      <div class="checkout-item-qty" style="color:var(--text-secondary);font-size:.8rem">×${item.qty||1}</div>
+      <div class="checkout-item-price">₹${(item.price*(item.qty||1)).toLocaleString('en-IN')}</div>
     </div>
   `).join('');
 }
 
-function renderSummary(cart) {
-  const subtotal  = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
-  const mrpTotal  = cart.reduce((s,i) => s + (i.mrp||i.price)*(i.qty||1), 0);
-  const discount  = mrpTotal - subtotal;
-  const delivery  = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : 40;
-  const total     = subtotal + delivery;
+function renderCheckoutSummary(cart) {
+  const subtotal = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
+  const mrpTotal = cart.reduce((s,i) => s + (i.mrp||i.price)*(i.qty||1), 0);
+  const discount = mrpTotal - subtotal;
+  const delivery = subtotal >= 499 ? 0 : 40;
+  const total    = subtotal + delivery;
 
-  setText('subtotal-val', '₹' + subtotal.toLocaleString('en-IN'));
-  setText('discount-val', '-₹' + discount.toLocaleString('en-IN'));
-  setText('delivery-val', delivery === 0 ? '<span style="color:#22c55e;font-weight:700">FREE</span>' : '₹' + delivery, true);
-  setText('total-val',    '₹' + total.toLocaleString('en-IN'));
-
-  const savingsBadge = document.getElementById('savings-badge');
-  const savingsVal   = document.getElementById('savings-val');
-  if (discount > 0) {
-    if (savingsBadge) savingsBadge.style.display = 'flex';
-    if (savingsVal)   savingsVal.textContent = '₹' + discount.toLocaleString('en-IN');
-  } else {
-    if (savingsBadge) savingsBadge.style.display = 'none';
-  }
-
-  const diff   = FREE_DELIVERY_THRESHOLD - subtotal;
-  const banner = document.getElementById('free-delivery-banner');
-  if (banner) {
-    if (delivery === 0) {
-      banner.innerHTML = '<i class="fas fa-truck"></i><span><strong>🎉 You have FREE delivery!</strong></span>';
-      banner.style.cssText += ';background:var(--green-50);border-color:var(--green-200);color:var(--green-700)';
-    } else {
-      banner.style.background = banner.style.borderColor = banner.style.color = '';
-      const delivMsg = document.getElementById('delivery-msg');
-      if (delivMsg) delivMsg.innerHTML = 'Add items worth <strong>₹' + diff + '</strong> more for <strong>FREE delivery</strong>!';
-    }
-  }
+  setText('co-item-count', cart.reduce((s,i)=>s+(i.qty||1),0));
+  setText('co-subtotal', '₹' + subtotal.toLocaleString('en-IN'));
+  setText('co-discount', '-₹' + discount.toLocaleString('en-IN'));
+  setHTML('co-delivery',  delivery===0 ? '<span style="color:#22c55e;font-weight:700">FREE</span>' : '₹' + delivery);
+  setText('co-total', '₹' + total.toLocaleString('en-IN'));
 }
 
-function setText(id, val, html) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (html) el.innerHTML = val; else el.textContent = val;
+function setText(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+function setHTML(id, v) { const el=document.getElementById(id); if(el) el.innerHTML=v; }
+
+function selectPayment(method, el) {
+  selectedPayment = method;
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const upiField = document.getElementById('upi-field');
+  if (upiField) upiField.style.display = method === 'UPI' ? 'block' : 'none';
 }
 
-function changeQty(id, delta) {
+async function placeOrder() {
+  const btn   = document.getElementById('place-order-btn');
+  const errEl = document.getElementById('checkout-error');
+  const errMsg = document.getElementById('checkout-error-msg');
+
+  const name    = document.getElementById('del-name')?.value.trim();
+  const phone   = document.getElementById('del-phone')?.value.trim();
+  const addr    = document.getElementById('del-address')?.value.trim();
+  const city    = document.getElementById('del-city')?.value.trim();
+  const pin     = document.getElementById('del-pin')?.value.trim();
+  const state   = document.getElementById('del-state')?.value;
+
+  if (!name || !phone || !addr || !city || !pin) {
+    errMsg.textContent = 'Please fill in all required delivery details.';
+    errEl.style.display = 'flex';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (!/^\d{10}$/.test(phone)) {
+    errMsg.textContent = 'Please enter a valid 10-digit mobile number.';
+    errEl.style.display = 'flex';
+    return;
+  }
+  if (!/^\d{6}$/.test(pin)) {
+    errMsg.textContent = 'Please enter a valid 6-digit PIN code.';
+    errEl.style.display = 'flex';
+    return;
+  }
+  errEl.style.display = 'none';
+
   const cart = getCart();
-  const item = cart.find(i => i._id === id);
-  if (!item) return;
-  item.qty = Math.max(1, (item.qty||1) + delta);
-  saveCart(cart);
-  renderCartPage();
-}
 
-function removeItem(id) {
-  saveCart(getCart().filter(i => i._id !== id));
-  renderCartPage();
-  showToast('Item removed from cart');
-}
+  // ── PRESCRIPTION CHECK — ALL orders require an approved prescription ──
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Verifying prescription…';
+  try {
+    const rxData = await PrescriptionAPI.my();
+    const prescriptions = rxData.prescriptions || [];
+    const hasApproved = prescriptions.some(rx => rx.status === 'approved');
+    const hasPending  = prescriptions.some(rx => rx.status === 'pending');
 
-function applyCoupon() {
-  const code = document.getElementById('coupon-input')?.value?.toUpperCase().trim();
-  const msg  = document.getElementById('coupon-msg');
-  if (!msg) return;
-  const codes = { 'GENEZENZ10': '10% discount applied!', 'FIRST50': '₹50 off applied on first order!' };
-  if (codes[code]) {
-    msg.innerHTML = `<span style="color:#16a34a"><i class="fas fa-check-circle"></i> ${codes[code]}</span>`;
-  } else {
-    msg.innerHTML = '<span style="color:#dc2626"><i class="fas fa-times-circle"></i> Invalid promo code.</span>';
+    if (!hasApproved && !hasPending) {
+      // No prescription at all — block order
+      errMsg.innerHTML =
+        '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
+        'A valid prescription is required to place an order at Genezenz Pharmacy. Please ' +
+        '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
+        'first. Our pharmacist will review and approve it before your order is confirmed.';
+      errEl.style.display = 'flex';
+      errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+      return;
+    }
+
+    if (hasPending && !hasApproved) {
+      // Prescription uploaded but not yet approved — block order
+      errMsg.innerHTML =
+        '<i class="fas fa-hourglass-half" style="margin-right:6px"></i> ' +
+        'Your prescription is under review by our pharmacist. ' +
+        'You will be able to place your order once it is approved (usually within 2 hours). ' +
+        'Please check back soon.';
+      errEl.style.display = 'flex';
+      errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+      return;
+    }
+    // hasApproved === true — allow order to proceed
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+  } catch (rxErr) {
+    // API unreachable — always block to protect patient safety
+    errMsg.innerHTML =
+      '<i class="fas fa-file-prescription" style="margin-right:6px"></i> ' +
+      'Could not verify your prescription. Please ' +
+      '<a href="upload-prescription.html" style="color:#92400e;font-weight:700;text-decoration:underline">upload your prescription</a> ' +
+      'and try again in a moment.';
+    errEl.style.display = 'flex';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+    return;
   }
-}
+  if (btn.disabled) return; // safety guard
+  // ────────────────────────────────────────────────────────────────────
 
-function proceedToCheckout() {
-  if (!isLoggedIn()) { window.location.href = 'login.html?redirect=checkout.html'; return; }
-  if (!getCart().length) return;
-  window.location.href = 'checkout.html';
-}
+  const subtotal = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
+  const delivery = subtotal >= 499 ? 0 : 40;
+  const total    = subtotal + delivery;
 
-function showToast(msg, type) {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-  const toast = document.createElement('div');
-  toast.style.cssText = `background:${type==='error'?'#ef4444':'#1e293b'};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;max-width:320px;pointer-events:auto`;
-  toast.innerHTML = `<i class="fas ${type==='error'?'fa-exclamation-circle':'fa-check-circle'}"></i> ${msg}`;
-  container.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 300); }, 3000);
+  const fullAddress = `${addr}, ${city}, ${state} - ${pin}`;
+
+  const payload = {
+    items: cart.map(i => ({
+      productId: i._id,
+      name: i.name,
+      price: i.price,
+      qty: i.qty || 1,
+      image: i.image || ''
+    })),
+    total,
+    address: fullAddress,
+    phone,
+    paymentMethod: selectedPayment
+  };
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Placing Order...';
+
+  try {
+    const order = await OrderAPI.create(payload);
+    saveCart([]);
+    renderCart();
+    // Clear the prescription flag after successful order
+    localStorage.removeItem('genezenz-pharmacy_prescription_uploaded');
+    document.getElementById('checkout-main').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+    const oid = document.getElementById('success-order-id');
+    if (oid) oid.textContent = order._id || order.id || 'MP' + Date.now();
+    window.scrollTo(0, 0);
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+    errMsg.textContent = err.message || 'Failed to place order. Please try again.';
+    errEl.style.display = 'flex';
+  }
 }
 </script>
 <script src="js/chatbot.js"></script>
