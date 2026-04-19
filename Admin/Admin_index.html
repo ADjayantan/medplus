@@ -43,7 +43,7 @@
   sessionStorage.setItem('adminGateway', 'medplus-admin-2025');
   // Redirect to login (or dashboard if already authenticated)
   setTimeout(function () {
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const user = JSON.parse(localStorage.getItem('medplus_user') || 'null');
     if (user && user.isAdmin) {
       window.location.href = '../admin-dashboard.html';
     } else {
