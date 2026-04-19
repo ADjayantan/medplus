@@ -1,24 +1,74 @@
-const mongoose = require('mongoose');
+/* =====================================================
+   routes/products.js — Browse & Manage Products
+===================================================== */
+const express = require('express');
+const Product = require('../models/Product');
+const { adminMiddleware } = require('../middleware/auth');
+const router  = express.Router();
 
-const productSchema = new mongoose.Schema({
-  name:                 { type: String, required: true, trim: true },
-  price:                { type: Number, required: true },
-  mrp:                  { type: Number, required: true },
-  category:             { type: String, required: true },
-  description:          { type: String, default: '' },
-  image:                { type: String, default: '' },
-  stock:                { type: Boolean, default: true },
-  requiresPrescription: { type: Boolean, default: false },
-  manufacturer:         { type: String, default: '' },
-  rating:               { type: Number, default: 4.0 },
-  reviews:              { type: Number, default: 0 },
-  tags:                 [String],
+/* GET /api/products — List / search products */
+router.get('/', async (req, res) => {
+  try {
+    const { q, category, page = 1, limit = 20 } = req.query;
+    const filter = {};
+
+    if (q) filter.$text = { $search: q };
+    if (category && category !== 'all') filter.category = category;
+
+    const skip    = (parseInt(page) - 1) * parseInt(limit);
+    const total   = await Product.countDocuments(filter);
+    const products = await Product.find(filter)
+      .sort(q ? { score: { $meta: 'textScore' } } : { name: 1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    res.json({ products, total, page: parseInt(page) });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
-// Text index for fast, relevance-ranked search
-productSchema.index(
-  { name: 'text', description: 'text', tags: 'text' },
-  { weights: { name: 10, tags: 5, description: 1 }, name: 'product_text_search' }
-);
+/* GET /api/products/:id — Single product */
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
-module.exports = mongoose.model('Product', productSchema);
+/* POST /api/products — Admin: add product */
+router.post('/', adminMiddleware, async (req, res) => {
+  try {
+    const product = await Product.create(req.body);
+    res.status(201).json(product);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+/* PUT /api/products/:id — Admin: update product */
+router.put('/:id', adminMiddleware, async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.json(product);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+/* DELETE /api/products/:id — Admin: delete product */
+router.delete('/:id', adminMiddleware, async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.json({ message: 'Product deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+module.exports = router;
