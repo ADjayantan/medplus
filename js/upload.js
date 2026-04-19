@@ -133,7 +133,8 @@ async function doUpload() {
     localStorage.setItem('medplus_prescription_uploaded', 'true');
 
     showStatus(
-      '<i class="fas fa-check-circle"></i> Prescription uploaded successfully! Our pharmacist will review it within 2 hours.',
+      '<i class="fas fa-check-circle"></i> Prescription uploaded successfully! Our pharmacist will review it within 2 hours.' +
+      '<br><br><a href="checkout.html" style="display:inline-block;margin-top:.25rem;padding:.5rem 1.25rem;background:var(--teal-600);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.875rem"><i class="fas fa-shopping-bag"></i> Continue to Checkout</a>',
       'success'
     );
     clearFile();
