@@ -96,13 +96,40 @@ body.dark .navbar-top { background: var(--teal-900); }
 .ac-cat { font-size: .75rem; color: var(--text-secondary); white-space: nowrap; }
 
 /* ── Nav Actions (desktop) ── */
-.nav-actions { display: flex; align-items: center; gap: .375rem; flex-shrink: 0; }
+.nav-actions { display: flex; align-items: center; gap: .25rem; flex-shrink: 0; }
+
+/* ── "More" dropdown ── */
+.nav-more-wrap { position: relative; }
+.nav-more-btn  { display: inline-flex; align-items: center; gap: 4px; }
+.nav-more-dropdown {
+  display: none;
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  min-width: 190px;
+  z-index: 600;
+  overflow: hidden;
+  animation: dropFade .15s ease;
+}
+.nav-more-dropdown.open { display: block; }
+@keyframes dropFade { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.nav-more-dropdown a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  font-size: .875rem; font-weight: 600;
+  color: var(--text-secondary); text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+}
+.nav-more-dropdown a:hover { background: var(--bg-muted); color: var(--teal-600); }
+.nav-more-dropdown a i { width: 16px; text-align: center; color: var(--teal-400); font-size: .85rem; }
 
 /* Shared nav button base */
 .nav-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: 8px;
-  font-size: 14px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 11px; border-radius: 8px;
+  font-size: 13.5px; font-weight: 600;
   text-decoration: none; cursor: pointer; border: none;
   background: transparent; transition: all var(--transition);
   white-space: nowrap;
