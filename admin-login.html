@@ -63,8 +63,8 @@ body { display: flex; align-items: center; justify-content: center; min-height: 
 </div>
 
 <script src="js/api.js"></script>
-<script>
-// ── Gateway Guard ─────────────────────────────────────────────
+<script src="js/auth.js"></script>
+<script>// ── Gateway Guard ─────────────────────────────────────────────
 // Admin pages are only accessible via /Admin/ entry point.
 // If the session flag is missing, redirect to the proper entry point.
 if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
