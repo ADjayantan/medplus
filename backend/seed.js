@@ -1,5 +1,5 @@
- /* =====================================================
-   SEED.JS — MedPlus Pharmacy
+/* =====================================================
+   SEED.JS — Genezenz Pharmacy
    100+ Real medicines with full details
    Run: node backend/seed.js
 ===================================================== */
@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const User     = require('./models/User');
 const Product  = require('./models/Product');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/medplus';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/genezenz-pharmacy';
 
 /* ── SVG placeholder images by category color ── */
 const IMG = {
@@ -1074,16 +1074,16 @@ async function seed() {
   console.log('[OK] Connected to MongoDB');
 
   // Create admin user
-  const adminExists = await User.findOne({ email: 'admin@medplus.com' });
+  const adminExists = await User.findOne({ email: 'admin@genezenz-pharmacy.com' });
   if (!adminExists) {
     await User.create({
-      name: 'MedPlus Admin',
-      email: 'admin@medplus.com',
+      name: 'Genezenz Pharmacy Admin',
+      email: 'admin@genezenz-pharmacy.com',
       password: 'Admin@123',
       phone: '9999999999',
       isAdmin: true
     });
-    console.log('[OK] Admin created → admin@medplus.com / Admin@123');
+    console.log('[OK] Admin created → admin@genezenz-pharmacy.com / Admin@123');
   } else {
     console.log('[INFO] Admin already exists');
   }
