@@ -63,7 +63,9 @@ const MedNavbar = (() => {
   <div class="navbar-main">
     <div class="container">
       <a href="index.html" class="nav-logo" aria-label="Genezenz Pharmacy home">
-        <img src="logo.png" alt="Genezenz Pharmacy Logo" style="height:38px;width:38px;object-fit:contain;border-radius:6px;">
+        <div class="nav-logo-icon" style="overflow:hidden;padding:0;background:#fff;">
+          <img src="logo.png" alt="GZ" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML='GZ';this.parentElement.style.background='linear-gradient(135deg,var(--teal-400),var(--teal-600))';this.parentElement.style.color='#fff';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';">
+        </div>
         <span class="nav-logo-text">Genezenz<span> Pharmacy</span></span>
       </a>
 
