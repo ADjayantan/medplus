@@ -139,9 +139,9 @@ const PrescriptionAPI = {
     if (params.status) qs.set('status', params.status);
     if (params.limit)  qs.set('limit',  params.limit);
     const q = qs.toString() ? '?' + qs.toString() : '';
-    return apiFetch('/api/prescriptions' + q);
+    return apiFetch('/api/prescriptions/admin/all' + q);
   },
-  review: (id, { status, adminNote }) => apiFetch(`/api/prescriptions/${id}/review`, {
+  review: (id, { status, adminNote }) => apiFetch(`/api/prescriptions/admin/${id}`, {
     method: 'PUT', body: JSON.stringify({ status, adminNote }),
   }),
 };
