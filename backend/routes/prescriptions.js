@@ -33,15 +33,15 @@ const upload = multer({
   },
 });
 
-/* POST /api/prescriptions — Upload prescription */
-router.post('/', authMiddleware, upload.single('prescription'), async (req, res) => {
+/* POST /api/prescriptions/upload — Upload prescription (called by frontend) */
+router.post('/upload', authMiddleware, upload.single('prescription'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'Prescription file is required' });
-
     const prescription = await Prescription.create({
       userId:   req.user.id,
       filename: req.file.filename,
       url:      `/uploads/${req.file.filename}`,
+      notes:    req.body.notes || '',
     });
     res.status(201).json(prescription);
   } catch (err) {
@@ -49,11 +49,37 @@ router.post('/', authMiddleware, upload.single('prescription'), async (req, res)
   }
 });
 
-/* GET /api/prescriptions — Get current user's prescriptions */
+/* POST /api/prescriptions — Upload prescription (alias) */
+router.post('/', authMiddleware, upload.single('prescription'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'Prescription file is required' });
+    const prescription = await Prescription.create({
+      userId:   req.user.id,
+      filename: req.file.filename,
+      url:      `/uploads/${req.file.filename}`,
+      notes:    req.body.notes || '',
+    });
+    res.status(201).json(prescription);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* GET /api/prescriptions/my — Get current user's prescriptions */
+router.get('/my', authMiddleware, async (req, res) => {
+  try {
+    const prescriptions = await Prescription.find({ userId: req.user.id }).sort({ uploadedAt: -1 });
+    res.json({ prescriptions });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* GET /api/prescriptions — Get current user's prescriptions (alias) */
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const prescriptions = await Prescription.find({ userId: req.user.id }).sort({ uploadedAt: -1 });
-    res.json(prescriptions);
+    res.json({ prescriptions });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
