@@ -183,7 +183,7 @@ const MedNavbar = (() => {
 
   async function runAutocomplete(q, drop) {
     try {
-      const base = window.API_BASE || 'https://genezenz-pharmacy-lkr7.onrender.com';
+      const base = window.API_BASE || 'https://medplus-lkr7.onrender.com';
       const res  = await fetch(`${base}/api/products?search=${encodeURIComponent(q)}&autocomplete=true&limit=6`);
       if (!res.ok) return;
       const items = await res.json();
