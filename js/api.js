@@ -1,16 +1,16 @@
 /* =====================================================
-   API.JS — MedPlus shared API config & helpers
+   API.JS — Genezenz Pharmacy shared API config & helpers
 ===================================================== */
 
 /* Backend URL — set window.API_BASE before loading this
    script if you need to override (e.g. in dev).
    Falls back to the deployed Render instance.           */
-window.API_BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
+window.API_BASE = window.API_BASE || 'https://genezenz-pharmacy-lkr7.onrender.com';
 
 /* ── Generic fetch wrapper with 35s timeout ── */
 async function apiFetch(path, options = {}) {
   const url = window.API_BASE + path;
-  const token = localStorage.getItem('medplus_token');
+  const token = localStorage.getItem('genezenz-pharmacy_token');
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
@@ -119,7 +119,7 @@ const OrderAPI = {
 /* ── PrescriptionAPI namespace (used by upload.js, profile.js, checkout.html, admin-prescriptions.html) ── */
 const PrescriptionAPI = {
   upload: (formData) => {
-    const token = localStorage.getItem('medplus_token');
+    const token = localStorage.getItem('genezenz-pharmacy_token');
     const headers = {};
     if (token) headers['Authorization'] = 'Bearer ' + token;
     return fetch(window.API_BASE + '/api/prescriptions/upload', {
