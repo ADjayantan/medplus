@@ -21,7 +21,7 @@ const MedNavbar = (() => {
 
     const authBtns = user
       ? `
-        ${user.isAdmin ? `<a href="Admin/index.html" class="nav-btn nav-btn-admin"><i class="fas fa-shield-alt"></i> Admin</a>` : ''}
+        ${user.isAdmin ? `<a href="admin-dashboard.html" class="nav-btn nav-btn-admin"><i class="fas fa-shield-alt"></i> Admin</a>` : ''}
         <a href="profile.html" class="nav-btn nav-btn-ghost"><i class="fas fa-user"></i> ${user.name?.split(' ')[0] || 'Account'}</a>
         <button onclick="MedNavbar.logout()" class="nav-btn nav-btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
       `
