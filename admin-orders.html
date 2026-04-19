@@ -96,8 +96,8 @@
 let allOrders = [];
 
 function adminLogout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  localStorage.removeItem('medplus_token');
+  localStorage.removeItem('medplus_user');
   sessionStorage.removeItem('adminGateway');
   window.location.href = 'index.html';
 }
