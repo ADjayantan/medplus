@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — MedPlus</title>
+<title>Admin Dashboard — Genezenz Pharmacy</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -277,7 +277,7 @@
   <div class="sb-brand">
     <div class="sb-logo">M+</div>
     <div class="sb-brand-text">
-      <div class="name">MedPlus</div>
+      <div class="name">Genezenz Pharmacy</div>
       <div class="sub">Admin Panel</div>
     </div>
   </div>
@@ -547,7 +547,7 @@ function adminGuard() {
   // Gateway check — must have entered via /Admin/ entry point URL.
   // Users who log in through the normal login.html never get this flag,
   // so they cannot reach admin pages even if their account is isAdmin.
-  if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
+  if (sessionStorage.getItem('adminGateway') !== 'genezenz-pharmacy-admin-2025') {
     document.body.innerHTML = '';
     window.location.replace('Admin/index.html'); // send to proper admin entry
     return false;
@@ -561,8 +561,8 @@ function adminGuard() {
   return true;
 }
 function adminLogout() {
-  localStorage.removeItem('medplus_token');
-  localStorage.removeItem('medplus_user');
+  localStorage.removeItem('genezenz-pharmacy_token');
+  localStorage.removeItem('genezenz-pharmacy_user');
   sessionStorage.removeItem('adminGateway'); // clear the gateway flag on logout
   window.location.href = 'index.html';
 }
