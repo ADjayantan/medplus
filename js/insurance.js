@@ -1,12 +1,12 @@
 /* =====================================================
-   INSURANCE.JS — MedPlus Insurance Comparison Page
+   INSURANCE.JS — Genezenz Pharmacy Insurance Comparison Page
 ===================================================== */
 
 const INSURANCE_PLANS = [
   {
     id: 'mp-basic',
-    name: 'MedPlus Shield Basic',
-    company: 'MedPlus Health',
+    name: 'Genezenz Pharmacy Shield Basic',
+    company: 'Genezenz Pharmacy Health',
     tagline: 'Essential coverage for individuals',
     color: '#228080',
     letter: 'M',
