@@ -257,8 +257,7 @@ function initHeroAutocomplete() {
 
 async function fetchHeroSuggestions(q, input, list) {
   try {
-    const data = await ProductAPI.autocomplete(q);
-    const products = data.products || [];
+    const products = await ProductAPI.autocomplete(q);
     if (!products.length) { list.style.display = 'none'; return; }
     list.innerHTML = products.map(p => `
       <div onclick="window.location.href='products.html?q=${encodeURIComponent(p.name)}'"
