@@ -32,7 +32,7 @@ const MedNavbar = (() => {
 
     const mobAuthLinks = user
       ? `
-        ${user.isAdmin ? `<a href="Admin/index.html" class="mob-admin"><i class="fas fa-shield-alt"></i> Admin Panel</a>` : ''}
+        ${user.isAdmin ? `<a href="admin-dashboard.html" class="mob-admin"><i class="fas fa-shield-alt"></i> Admin Panel</a>` : ''}
         <a href="profile.html"><i class="fas fa-user"></i> My Account</a>
         <button class="mob-link mob-logout" onclick="MedNavbar.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
       `
