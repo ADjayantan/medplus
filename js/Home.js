@@ -1,5 +1,5 @@
 /* =================================================================
-   home.js — MedPlus Homepage
+   home.js — Genezenz Pharmacy Homepage
    Responsibilities:
    - Load 8 featured/top-rated products only (NOT full catalog)
    - Render featured product cards with Add to Cart
@@ -177,7 +177,7 @@ function featuredCardHtml(p) {
       <div class="fp-body">
         <div class="fp-cat">${sanitizeHome(p.category)}</div>
         <div class="fp-name">${sanitizeHome(p.name)}</div>
-        <div class="fp-mfr">${sanitizeHome(p.manufacturer || 'MedPlus')}</div>
+        <div class="fp-mfr">${sanitizeHome(p.manufacturer || 'Genezenz Pharmacy')}</div>
         <div class="fp-rating">
           <span class="fp-stars">${stars}</span>
           <span class="fp-rating-num">${(p.rating || 0).toFixed(1)}</span>
