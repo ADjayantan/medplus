@@ -1,4 +1,4 @@
- /* =====================================================
+/* =====================================================
    middleware/auth.js — JWT Authentication
    FIXED: warns if JWT_SECRET is missing
 ===================================================== */
@@ -8,7 +8,7 @@ const SECRET = process.env.JWT_SECRET;
 if (!SECRET) {
   console.warn('[WARN] JWT_SECRET is not set! Using insecure fallback. Set it in your .env file.');
 }
-const EFFECTIVE_SECRET = SECRET || 'medplus_INSECURE_fallback_set_JWT_SECRET_in_env';
+const EFFECTIVE_SECRET = SECRET || 'genezenz-pharmacy_INSECURE_fallback_set_JWT_SECRET_in_env';
 
 function authMiddleware(req, res, next) {
   const auth = req.headers.authorization;
