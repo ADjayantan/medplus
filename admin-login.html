@@ -86,8 +86,8 @@ async function doAdminLogin() {
   try {
     const data = await AuthAPI.login({ email, password });
     if (!data.user.isAdmin) throw new Error('Access denied — admin account required');
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('medplus_token', data.token);
+    localStorage.setItem('medplus_user', JSON.stringify(data.user));
     window.location.href = 'admin-dashboard.html';
   } catch (err) {
     errEl.textContent = err.message;
