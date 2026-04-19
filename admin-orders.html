@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orders — MedPlus Admin</title>
+<title>Orders — Genezenz Pharmacy Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -12,7 +12,7 @@
   <aside class="admin-sidebar">
     <div class="sidebar-brand">
       <span class="brand-icon"><i class="fas fa-pills"></i></span>
-      <div><div class="brand-name">MedPlus</div><div class="brand-sub">Admin Panel</div></div>
+      <div><div class="brand-name">Genezenz Pharmacy</div><div class="brand-sub">Admin Panel</div></div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
@@ -97,8 +97,8 @@
 let allOrders = [];
 
 function adminLogout() {
-  localStorage.removeItem('medplus_token');
-  localStorage.removeItem('medplus_user');
+  localStorage.removeItem('genezenz-pharmacy_token');
+  localStorage.removeItem('genezenz-pharmacy_user');
   sessionStorage.removeItem('adminGateway');
   window.location.href = 'index.html';
 }
@@ -240,7 +240,7 @@ function closeModal() { document.getElementById('order-modal').classList.remove(
 document.getElementById('order-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
 /* Admin guard */
-if (sessionStorage.getItem('adminGateway') !== 'medplus-admin-2025') {
+if (sessionStorage.getItem('adminGateway') !== 'genezenz-pharmacy-admin-2025') {
   document.body.innerHTML = '';
   window.location.replace('Admin/index.html'); // must enter via proper admin entry point
 } else {
