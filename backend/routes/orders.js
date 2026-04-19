@@ -100,7 +100,7 @@ router.put('/:id/cancel', authMiddleware, async (req, res) => {
 router.get('/admin/all', adminMiddleware, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 }).populate('userId', 'name email');
-    res.json(orders);
+    res.json({ orders });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
