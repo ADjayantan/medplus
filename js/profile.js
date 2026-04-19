@@ -2,7 +2,7 @@
 
 function initProfile() {
   const user  = currentUser();
-  const token = localStorage.getItem('medplus_token');
+  const token = localStorage.getItem('genezenz-pharmacy_token');
   if (!user || !token) { showPage('home'); openAuthModal('login'); return; }
 
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
