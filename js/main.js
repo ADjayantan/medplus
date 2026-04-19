@@ -1,5 +1,5 @@
 /* =====================================================
-   MAIN.JS — MedPlus (Stage Final — 100+ Products)
+   MAIN.JS — Genezenz Pharmacy (Stage Final — 100+ Products)
 ===================================================== */
 
 let allProducts   = [];
@@ -350,7 +350,7 @@ function openProductModal(id) {
             </div>
             <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;line-height:1.3">${sanitize(p.name)}</h2>
             <div style="font-size:13px;color:#64748b;margin-bottom:12px">
-              <i class="fas fa-industry" style="margin-right:4px;opacity:.5"></i>${sanitize(p.manufacturer || 'MedPlus')}
+              <i class="fas fa-industry" style="margin-right:4px;opacity:.5"></i>${sanitize(p.manufacturer || 'Genezenz Pharmacy')}
             </div>
             <div class="product-rating" style="margin-bottom:14px">
               <span class="stars">${renderStars(p.rating)}</span>
