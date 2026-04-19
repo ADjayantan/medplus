@@ -5,7 +5,7 @@
 /* Backend URL — set window.API_BASE before loading this
    script if you need to override (e.g. in dev).
    Falls back to the deployed Render instance.           */
-window.API_BASE = window.API_BASE || 'https://genezenz-pharmacy-lkr7.onrender.com';
+window.API_BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
 
 /* ── Generic fetch wrapper with 35s timeout ── */
 async function apiFetch(path, options = {}) {
