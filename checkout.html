@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout — MedPlus Pharmacy</title>
+<title>Checkout — Genezenz Pharmacy</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/navbar.css">
@@ -233,7 +233,7 @@
 
 <!-- Footer -->
 <footer class="footer">
-  <p>&copy; 2025 MedPlus Pharmacy. All rights reserved.</p>
+  <p>&copy; 2025 Genezenz Pharmacy. All rights reserved.</p>
 </footer>
 
 <div id="toast-container" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px"></div>
@@ -402,7 +402,7 @@ async function placeOrder() {
     saveCart([]);
     renderCart();
     // Clear the prescription flag after successful order
-    localStorage.removeItem('medplus_prescription_uploaded');
+    localStorage.removeItem('genezenz-pharmacy_prescription_uploaded');
     document.getElementById('checkout-main').style.display = 'none';
     document.getElementById('success-screen').style.display = 'block';
     const oid = document.getElementById('success-order-id');
