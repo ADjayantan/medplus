@@ -203,7 +203,7 @@ function saveAccount() {
   if (user) {
     if (name)  user.name  = name;
     if (phone) user.phone = phone;
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('medplus_user', JSON.stringify(user));
   }
   showAccountMsg(msg, 'success', 'Profile updated successfully!');
   setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3000);
@@ -219,8 +219,8 @@ function showAccountMsg(el, type, text) {
 }
 
 function doLogout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  localStorage.removeItem('medplus_token');
+  localStorage.removeItem('medplus_user');
   window.location.href = 'index.html';
 }
 </script>
