@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema({
   category:             { type: String, required: true },
   description:          { type: String, default: '' },
   image:                { type: String, default: '' },
-  stock:                { type: Boolean, default: true },
+  stock:                { type: Number, default: 100, min: 0 },
   requiresPrescription: { type: Boolean, default: false },
   manufacturer:         { type: String, default: '' },
   rating:               { type: Number, default: 4.0 },
@@ -15,7 +15,6 @@ const productSchema = new mongoose.Schema({
   tags:                 [String],
 });
 
-// Text index for fast, relevance-ranked search
 productSchema.index(
   { name: 'text', description: 'text', tags: 'text' },
   { weights: { name: 10, tags: 5, description: 1 }, name: 'product_text_search' }
