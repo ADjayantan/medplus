@@ -87,6 +87,8 @@ const MedNavbar = (() => {
       <!-- Desktop actions -->
       <div class="nav-actions">
         <a href="products.html" class="nav-btn nav-btn-ghost"><i class="fas fa-pills"></i> Products</a>
+        <a href="about.html" class="nav-btn nav-btn-ghost"><i class="fas fa-info-circle"></i> About</a>
+        <a href="contact.html" class="nav-btn nav-btn-ghost"><i class="fas fa-envelope"></i> Contact</a>
         <a href="insurance.html" class="nav-btn nav-btn-ghost"><i class="fas fa-shield-alt"></i> Insurance</a>
         <a href="cart.html" class="nav-btn nav-btn-cart" aria-label="Cart">
           <i class="fas fa-shopping-cart"></i> Cart ${badge}
@@ -110,6 +112,8 @@ const MedNavbar = (() => {
       </div>
       <a href="index.html" class="${isActive('home')}"><i class="fas fa-home"></i> Home</a>
       <a href="products.html" class="${isActive('products')}"><i class="fas fa-pills"></i> Products</a>
+      <a href="about.html" class="${isActive('about')}"><i class="fas fa-info-circle"></i> About</a>
+      <a href="contact.html" class="${isActive('contact')}"><i class="fas fa-envelope"></i> Contact</a>
       <a href="cart.html" class="mob-cart ${isActive('cart')}"><i class="fas fa-shopping-cart"></i> Cart ${badge}</a>
       <a href="upload-prescription.html" class="${isActive('rx')}"><i class="fas fa-file-prescription"></i> Upload Rx</a>
       <a href="insurance.html" class="${isActive('insurance')}"><i class="fas fa-shield-alt"></i> Insurance</a>
