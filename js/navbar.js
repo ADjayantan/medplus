@@ -5,7 +5,7 @@
 const MedNavbar = (() => {
   function cartCount() {
     try {
-      const cart = JSON.parse(localStorage.getItem('medplus_cart')) || [];
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
       return cart.reduce((s, i) => s + (i.qty || 1), 0);
     } catch { return 0; }
   }
