@@ -1,8 +1,8 @@
 /* =====================================================
-   CHATBOT.JS — MedPlus AI chat widget
+   CHATBOT.JS — Genezenz Pharmacy AI chat widget
 ===================================================== */
 (function () {
-  const BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
+  const BASE = window.API_BASE || 'https://genezenz-pharmacy-lkr7.onrender.com';
 
   /* ── Build widget HTML ── */
   const widget = document.createElement('div');
@@ -52,13 +52,13 @@
       #chatbot-send:hover { background: var(--teal-500, #228080); }
     </style>
 
-    <div id="chatbot-box" role="dialog" aria-label="MedPlus chat assistant">
+    <div id="chatbot-box" role="dialog" aria-label="Genezenz Pharmacy chat assistant">
       <div id="chatbot-header">
-        <i class="fas fa-comment-medical"></i> MedPlus Assistant
+        <i class="fas fa-comment-medical"></i> Genezenz Pharmacy Assistant
         <button id="chatbot-close" aria-label="Close chat"><i class="fas fa-times"></i></button>
       </div>
       <div id="chatbot-messages">
-        <div class="cb-msg bot">👋 Hi! I'm the MedPlus assistant. Ask me about medicines, products, or your order.</div>
+        <div class="cb-msg bot">👋 Hi! I'm the Genezenz Pharmacy assistant. Ask me about medicines, products, or your order.</div>
       </div>
       <div id="chatbot-input-row">
         <input id="chatbot-input" type="text" placeholder="Type your message…" aria-label="Chat message" maxlength="300">
