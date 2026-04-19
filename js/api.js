@@ -7,20 +7,32 @@
    Falls back to the deployed Render instance.           */
 window.API_BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
 
-/* ── Generic fetch wrapper ── */
+/* ── Generic fetch wrapper with 35s timeout ── */
 async function apiFetch(path, options = {}) {
   const url = window.API_BASE + path;
   const token = localStorage.getItem('medplus_token');
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
-  const res = await fetch(url, { ...options, headers });
-  if (!res.ok) {
-    let msg = 'Request failed';
-    try { const body = await res.json(); msg = body.message || msg; } catch {}
-    throw Object.assign(new Error(msg), { status: res.status });
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(() => controller.abort(), 35000); // 35s timeout
+
+  try {
+    const res = await fetch(url, { ...options, headers, signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      let msg = 'Request failed';
+      try { const body = await res.json(); msg = body.message || msg; } catch {}
+      throw Object.assign(new Error(msg), { status: res.status });
+    }
+    return res.json();
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error('Server took too long to respond — please retry');
+    }
+    throw err;
   }
-  return res.json();
 }
 
 /* ── Products ── */
