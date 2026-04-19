@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login — MedPlus Pharmacy</title>
+<title>Login — Genezenz Pharmacy</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/auth.css">
@@ -25,7 +25,7 @@ body { background: linear-gradient(135deg, #0d2b2e 0%, #1a5454 50%, #2ea89a 100%
     <div class="brand-back">
       <a href="index.html" class="brand-link">
         <div class="brand-icon">M+</div>
-        <span style="color:#fff">MedPlus</span>
+        <span style="color:#fff">Genezenz Pharmacy</span>
       </a>
     </div>
 
@@ -38,7 +38,7 @@ body { background: linear-gradient(135deg, #0d2b2e 0%, #1a5454 50%, #2ea89a 100%
       </div>
 
       <h2 class="auth-title">Welcome back</h2>
-      <p class="auth-sub">Sign in to your MedPlus account</p>
+      <p class="auth-sub">Sign in to your Genezenz Pharmacy account</p>
 
       <div class="auth-error" id="login-error" style="display:none"></div>
 
@@ -122,8 +122,8 @@ async function doLogin(e) {
 
   try {
     const data = await AuthAPI.login({ email, password });
-    localStorage.setItem('medplus_token', data.token);
-    localStorage.setItem('medplus_user',  JSON.stringify(data.user));
+    localStorage.setItem('genezenz-pharmacy_token', data.token);
+    localStorage.setItem('genezenz-pharmacy_user',  JSON.stringify(data.user));
 
     const redirect = new URLSearchParams(window.location.search).get('redirect');
     // Admin users are NOT redirected to the admin dashboard from here.
