@@ -121,8 +121,8 @@ async function doLogin(e) {
 
   try {
     const data = await AuthAPI.login({ email, password });
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user',  JSON.stringify(data.user));
+    localStorage.setItem('medplus_token', data.token);
+    localStorage.setItem('medplus_user',  JSON.stringify(data.user));
 
     const redirect = new URLSearchParams(window.location.search).get('redirect');
     // Admin users are NOT redirected to the admin dashboard from here.
