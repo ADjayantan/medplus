@@ -79,17 +79,56 @@ const AuthAPI = {
 
 /* ── ProductAPI namespace (used by Home.js, main.js, search.js) ── */
 const ProductAPI = {
-  /** Fetch products list. Accepts { category, search, inStock, limit, sort } */
   list: (params = {}) => fetchProducts(params),
-
-  /** Fetch all available categories */
   categories: () => fetchCategories(),
-
-  /** Autocomplete: returns a plain array of product objects */
   autocomplete: async (q) => {
     const data = await fetchProducts({ search: q, autocomplete: true, limit: 8 });
     return data.products || [];
   },
+};
+
+/* ── OrderAPI namespace (used by profile.js, checkout.html, admin-orders.html) ── */
+const OrderAPI = {
+  create:       (orderData)      => apiFetch('/api/orders', { method: 'POST', body: JSON.stringify(orderData) }),
+  my:           ()               => apiFetch('/api/orders/my'),
+  all:          (params = {})    => {
+    const qs = new URLSearchParams();
+    if (params.status) qs.set('status', params.status);
+    if (params.limit)  qs.set('limit',  params.limit);
+    const q = qs.toString() ? '?' + qs.toString() : '';
+    return apiFetch('/api/orders' + q);
+  },
+  updateStatus: (id, status)     => apiFetch(`/api/orders/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+};
+
+/* ── PrescriptionAPI namespace (used by upload.js, profile.js, checkout.html, admin-prescriptions.html) ── */
+const PrescriptionAPI = {
+  upload: (formData) => {
+    const token = localStorage.getItem('medplus_token');
+    const headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    return fetch(window.API_BASE + '/api/prescriptions/upload', {
+      method: 'POST', headers, body: formData,
+    }).then(async res => {
+      if (!res.ok) {
+        let msg = 'Upload failed';
+        try { const b = await res.json(); msg = b.message || msg; } catch {}
+        throw new Error(msg);
+      }
+      return res.json();
+    });
+  },
+  my:     ()                        => apiFetch('/api/prescriptions/my'),
+  all:    (params = {})             => {
+    const qs = new URLSearchParams();
+    if (params.status) qs.set('status', params.status);
+    if (params.limit)  qs.set('limit',  params.limit);
+    const q = qs.toString() ? '?' + qs.toString() : '';
+    return apiFetch('/api/prescriptions' + q);
+  },
+  review: (id, { status, adminNote }) => apiFetch(`/api/prescriptions/${id}/review`, {
+    method: 'PUT', body: JSON.stringify({ status, adminNote }),
+  }),
 };
 
 /* ── Toast helper (used across pages) ── */
