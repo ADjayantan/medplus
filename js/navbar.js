@@ -1,5 +1,5 @@
 /* =====================================================
-   NAVBAR.JS — MedPlus shared navbar injector
+   NAVBAR.JS — Genezenz Pharmacy shared navbar injector
 ===================================================== */
 
 const MedNavbar = (() => {
@@ -11,7 +11,7 @@ const MedNavbar = (() => {
   }
 
   function currentUser() {
-    try { return JSON.parse(localStorage.getItem('medplus_user')); } catch { return null; }
+    try { return JSON.parse(localStorage.getItem('genezenz-pharmacy_user')); } catch { return null; }
   }
 
   function buildHTML(activePage) {
@@ -50,7 +50,7 @@ const MedNavbar = (() => {
     <div class="container">
       <div class="top-links">
         <a href="tel:1800-123-456"><i class="fas fa-phone-alt"></i> 1800-123-456</a>
-        <a href="mailto:support@medplus.com"><i class="fas fa-envelope"></i> support@medplus.com</a>
+        <a href="mailto:support@genezenz-pharmacy.com"><i class="fas fa-envelope"></i> support@genezenz-pharmacy.com</a>
       </div>
       <div class="top-links">
         <a href="upload-prescription.html"><i class="fas fa-file-prescription"></i> Upload Rx</a>
@@ -62,7 +62,7 @@ const MedNavbar = (() => {
   <!-- Main bar -->
   <div class="navbar-main">
     <div class="container">
-      <a href="index.html" class="nav-logo" aria-label="MedPlus home">
+      <a href="index.html" class="nav-logo" aria-label="Genezenz Pharmacy home">
         <div class="nav-logo-icon">M+</div>
         <span class="nav-logo-text">Med<span>Plus</span></span>
       </a>
@@ -183,7 +183,7 @@ const MedNavbar = (() => {
 
   async function runAutocomplete(q, drop) {
     try {
-      const base = window.API_BASE || 'https://medplus-lkr7.onrender.com';
+      const base = window.API_BASE || 'https://genezenz-pharmacy-lkr7.onrender.com';
       const res  = await fetch(`${base}/api/products?search=${encodeURIComponent(q)}&autocomplete=true&limit=6`);
       if (!res.ok) return;
       const items = await res.json();
@@ -210,8 +210,8 @@ const MedNavbar = (() => {
   }
 
   function logout() {
-    localStorage.removeItem('medplus_token');
-    localStorage.removeItem('medplus_user');
+    localStorage.removeItem('genezenz-pharmacy_token');
+    localStorage.removeItem('genezenz-pharmacy_user');
     window.location.href = 'index.html';
   }
 
