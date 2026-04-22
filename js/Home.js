@@ -162,16 +162,16 @@ function featuredCardHtml(p) {
     : `<i class="fas ${meta.icon}" style="font-size:3rem;color:${meta.color}"></i>`;
 
   const stockNum = typeof p.stock === 'number' ? p.stock : (p.stock ? 100 : 0);
-  const lowStock = stockNum > 0 && stockNum <= 10;
+  const lowStock = stockNum > 0 && stockNum <= 2;
   const addBtnHtml = stockNum > 0
     ? `<button class="fp-add-btn" onclick="homeAddToCart('${id}')">
          <i class="fas fa-cart-plus"></i> Add
        </button>`
     : `<button class="fp-add-btn out-of-stock" disabled>Out of Stock</button>`;
   const stockBadge = stockNum === 0
-    ? `<span style="display:inline-block;margin-top:4px;font-size:11px;color:#dc2626;font-weight:600;"><i class="fas fa-times-circle"></i> Out of stock</span>`
+    ? `<span class="fp-stock-badge fp-stock-badge--oos"><i class="fas fa-times-circle"></i> Out of Stock</span>`
     : lowStock
-    ? `<span style="display:inline-block;margin-top:4px;font-size:11px;color:#d97706;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> Only ${stockNum} left</span>`
+    ? `<span class="fp-stock-badge fp-stock-badge--low"><i class="fas fa-exclamation-triangle"></i> Only ${stockNum} left!</span>`
     : '';
 
   return `
