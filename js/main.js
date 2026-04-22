@@ -251,7 +251,11 @@ function productCardHtml(p) {
     <div class="product-card" id="card-${id}">
       ${discount >= 5 ? `<div class="discount-badge">-${discount}%</div>` : ''}
       ${p.requiresPrescription ? `<div class="rx-badge"><i class="fas fa-file-prescription"></i> Rx</div>` : ''}
-      ${(typeof p.stock === 'number' ? p.stock === 0 : !p.stock) ? `<div class="out-badge">Out of Stock</div>` : (typeof p.stock === 'number' && p.stock <= 10 ? `<div class="out-badge" style="background:#f59e0b">Only ${p.stock} left</div>` : '')}
+      ${(typeof p.stock === 'number' ? p.stock === 0 : !p.stock)
+          ? `<div class="out-badge out-badge--oos">Out of Stock</div>`
+          : (typeof p.stock === 'number' && p.stock <= 2
+            ? `<div class="out-badge out-badge--low"><i class="fas fa-exclamation-triangle"></i> Only ${p.stock} left!</div>`
+            : '')}
 
       <div class="product-img-wrap" onclick="openProductModal('${id}')" style="background:${meta.bg}">
         ${p.image
@@ -376,9 +380,9 @@ function openProductModal(id) {
               </div>
             </div>` : ''}
             <div style="display:flex;align-items:center;gap:12px;margin:14px 0">
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;${(typeof p.stock==='number'?p.stock===0:!p.stock)?'background:#fee2e2;color:#991b1b':(typeof p.stock==='number'&&p.stock<=10)?'background:#fef3c7;color:#92400e':'background:#dcfce7;color:#166534'}">
-                <i class="fas ${(typeof p.stock==='number'?p.stock===0:!p.stock)?'fa-times-circle':(typeof p.stock==='number'&&p.stock<=10)?'fa-exclamation-triangle':'fa-check-circle'}"></i>
-                ${(typeof p.stock==='number'?p.stock===0:!p.stock)?'Out of Stock':(typeof p.stock==='number'&&p.stock<=10)?`Only ${p.stock} left`:'In Stock'}
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;${(typeof p.stock==='number'?p.stock===0:!p.stock)?'background:#fee2e2;color:#991b1b':(typeof p.stock==='number'&&p.stock<=2)?'background:#fef3c7;color:#92400e':'background:#dcfce7;color:#166534'}">
+                <i class="fas ${(typeof p.stock==='number'?p.stock===0:!p.stock)?'fa-times-circle':(typeof p.stock==='number'&&p.stock<=2)?'fa-exclamation-triangle':'fa-check-circle'}"></i>
+                ${(typeof p.stock==='number'?p.stock===0:!p.stock)?'Out of Stock':(typeof p.stock==='number'&&p.stock<=2)?`Only ${p.stock} left!`:'In Stock'}
               </span>
               ${p.requiresPrescription
                 ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#fef3c7;color:#92400e"><i class="fas fa-prescription"></i> Rx Only</span>`
