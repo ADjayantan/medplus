@@ -71,8 +71,49 @@
 }
 .out-badge {
   position: absolute; top: 0; left: 0; right: 0; z-index: 5;
-  background: rgba(0,0,0,0.5); color: #fff; font-size: 12px; font-weight: 700;
+  color: #fff; font-size: 12px; font-weight: 700;
   text-align: center; padding: 6px; letter-spacing: 0.5px;
+}
+/* Out of Stock — dark overlay across full top */
+.out-badge--oos {
+  background: rgba(30, 30, 30, 0.72);
+  backdrop-filter: blur(2px);
+}
+/* Low stock (1 or 2 left) — amber ribbon */
+.out-badge--low {
+  background: #f59e0b;
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 8px;
+  animation: pulse-low 1.8s ease-in-out infinite;
+}
+@keyframes pulse-low {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .75; }
+}
+/* Home page featured-card stock badge */
+.fp-stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.fp-stock-badge--oos {
+  color: #dc2626;
+  background: #fee2e2;
+}
+.fp-stock-badge--low {
+  color: #92400e;
+  background: #fef3c7;
+  animation: pulse-low 1.8s ease-in-out infinite;
 }
 
 /* Image */
