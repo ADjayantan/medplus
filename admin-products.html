@@ -6,6 +6,96 @@
 <title>Products — Genezenz Pharmacy Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="css/admin.css">
+<style>
+/* ── Stock badge styles ─────────────────────────────── */
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+.stock-badge.high   { background: #dcfce7; color: #15803d; }
+.stock-badge.medium { background: #fef9c3; color: #a16207; }
+.stock-badge.low    { background: #fee2e2; color: #b91c1c; }
+.stock-badge.zero   { background: #f1f5f9; color: #94a3b8; }
+
+/* ── Live dot ───────────────────────────────────────── */
+.live-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #16a34a;
+  font-weight: 600;
+  background: #dcfce7;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.live-dot::before {
+  content: '';
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+@keyframes stock-flash {
+  0%   { background: #fef08a; }
+  100% { background: transparent; }
+}
+.stock-updated { animation: stock-flash 1.2s ease-out; border-radius: 6px; }
+
+/* ── Stock input in modal ────────────────────────────── */
+.stock-input-wrap { position: relative; }
+.stock-input-wrap input { padding-right: 60px; font-size: 16px; font-weight: 700; }
+.stock-spinners {
+  position: absolute; right: 6px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.stock-spinners button {
+  width: 22px; height: 18px;
+  background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px;
+  font-size: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s; color: #475569;
+}
+.stock-spinners button:hover { background: #e2e8f0; }
+
+/* ── Stock bar ───────────────────────────────────────── */
+.stock-bar-wrap { margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+.stock-bar-track { flex: 1; height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+.stock-bar-fill  { height: 100%; border-radius: 10px; transition: width .4s, background .4s; }
+.stock-bar-label { font-size: 11px; font-weight: 600; min-width: 70px; text-align: right; }
+
+/* ── Quick ±1 buttons in table ───────────────────────── */
+.quick-stock-btn {
+  width: 20px; height: 20px;
+  border-radius: 4px; border: 1px solid #e2e8f0;
+  background: #f8fafc; font-size: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  vertical-align: middle; color: #64748b; margin: 0 1px;
+  transition: background .15s, border-color .15s;
+}
+.quick-stock-btn:hover         { background: #e0f2fe; border-color: #38bdf8; color: #0369a1; }
+.quick-stock-btn.minus:hover   { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
+
+.refresh-info { font-size: 11px; color: #94a3b8; margin-left: 4px; }
+
+.stock-section-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: #94a3b8; font-weight: 700; margin-bottom: 8px;
+}
+</style>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -29,7 +119,9 @@
   <main class="admin-main">
     <div class="admin-topbar">
       <div class="topbar-title">Products <span>Manage catalogue</span></div>
-      <div class="topbar-actions">
+      <div class="topbar-actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="live-dot" title="Stock counts auto-refresh every 15s">Live Stock</span>
+        <span class="refresh-info" id="last-refresh">loading...</span>
         <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Add Product</button>
         <button class="btn btn-ghost btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
@@ -50,8 +142,9 @@
         </select>
         <select id="stock-filter" onchange="filterProducts()">
           <option value="">All Stock</option>
-          <option value="true">In Stock</option>
-          <option value="false">Out of Stock</option>
+          <option value="in">In Stock (&ge;1)</option>
+          <option value="low">Low Stock (1&ndash;10)</option>
+          <option value="out">Out of Stock</option>
         </select>
         <span id="product-count" style="color:#64748b;font-size:13px;white-space:nowrap"></span>
       </div>
@@ -80,7 +173,7 @@
   </main>
 </div>
 
-<!-- Add/Edit Modal -->
+<!-- ══ Add/Edit Modal ══ -->
 <div class="modal-overlay" id="product-modal">
   <div class="modal">
     <div class="modal-header">
@@ -120,17 +213,13 @@
         <input class="form-control" id="f-mfr" placeholder="e.g. Sun Pharma">
       </div>
 
-      <!-- ── Product Image ── -->
+      <!-- Image upload -->
       <div class="form-group">
         <label class="form-label">Product Image</label>
-
-        <!-- Drop Zone -->
         <div class="img-upload-zone" id="img-drop-zone" onclick="document.getElementById('f-image-file').click()">
           <div class="img-upload-preview" id="img-preview-wrap" style="display:none">
             <img id="img-preview" src="" alt="Preview">
-            <button type="button" class="img-remove-btn" onclick="removeImage(event)" title="Remove image">
-              <i class="fas fa-times"></i>
-            </button>
+            <button type="button" class="img-remove-btn" onclick="removeImage(event)" title="Remove image"><i class="fas fa-times"></i></button>
           </div>
           <div class="img-upload-placeholder" id="img-placeholder">
             <i class="fas fa-cloud-upload-alt"></i>
@@ -139,8 +228,6 @@
           </div>
           <input type="file" id="f-image-file" accept="image/*" style="display:none" onchange="handleImageFile(this.files[0])">
         </div>
-
-        <!-- URL fallback -->
         <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
           <span style="font-size:12px;color:#94a3b8;white-space:nowrap">or paste URL</span>
           <input class="form-control" id="f-image" placeholder="https://example.com/image.jpg"
@@ -148,6 +235,7 @@
         </div>
         <div id="img-upload-status" style="font-size:12px;margin-top:4px"></div>
       </div>
+
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Rating (0-5)</label>
@@ -162,22 +250,47 @@
         <label class="form-label">Tags (comma separated)</label>
         <input class="form-control" id="f-tags" placeholder="pain, fever, relief">
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">In Stock</label>
-          <select class="form-control" id="f-stock">
-            <option value="true">Yes — In Stock</option>
-            <option value="false">No — Out of Stock</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Requires Prescription</label>
-          <select class="form-control" id="f-rx">
-            <option value="false">No — OTC</option>
-            <option value="true">Yes — Rx Required</option>
-          </select>
+
+      <!-- ════ STOCK SECTION ════ -->
+      <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#f8fafc;">
+        <div class="stock-section-label"><i class="fas fa-cubes" style="margin-right:5px"></i>Stock Management</div>
+        <div class="form-row" style="margin-bottom:0">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Stock Quantity *</label>
+            <div class="stock-input-wrap">
+              <input class="form-control" id="f-stock-qty" type="number" min="0" step="1"
+                     placeholder="0" oninput="updateStockBar()">
+              <div class="stock-spinners">
+                <button type="button" onclick="adjustStock(10)" title="+10"><i class="fas fa-plus"></i></button>
+                <button type="button" onclick="adjustStock(-10)" title="-10"><i class="fas fa-minus"></i></button>
+              </div>
+            </div>
+            <div class="stock-bar-wrap">
+              <div class="stock-bar-track"><div class="stock-bar-fill" id="stock-bar-fill"></div></div>
+              <div class="stock-bar-label" id="stock-bar-label"></div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Requires Prescription</label>
+            <select class="form-control" id="f-rx">
+              <option value="false">No — OTC</option>
+              <option value="true">Yes — Rx Required</option>
+            </select>
+            <div style="margin-top:12px">
+              <label class="form-label" style="margin-bottom:6px">Quick Set</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setStock(0)">0</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="setStock(10)">10</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="setStock(50)">50</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="setStock(100)">100</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="setStock(500)">500</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <!-- ════════════════════ -->
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
@@ -210,9 +323,15 @@
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script>
-let allProducts = [];
-let deleteId    = null;
+/* ═══ STATE ═══════════════════════════════════════════════ */
+let allProducts  = [];
+let deleteId     = null;
+let liveInterval = null;
+const POLL_MS    = 15000;   // live refresh every 15 s
+const LOW_STOCK  = 10;      // low-stock threshold
+const MAX_STOCK  = 500;     // bar reference ceiling
 
+/* ═══ UTILITY ═════════════════════════════════════════════ */
 function adminLogout() {
   localStorage.removeItem('genezenz-pharmacy_token');
   localStorage.removeItem('genezenz-pharmacy_user');
@@ -222,7 +341,7 @@ function adminLogout() {
 
 function showAlert(msg, type) {
   document.getElementById('alert-area').innerHTML =
-    `<div class="alert alert-${type || 'danger'}"><i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${msg}</div>`;
+    `<div class="alert alert-${type||'danger'}"><i class="fas fa-${type==='success'?'check-circle':'exclamation-triangle'}"></i> ${msg}</div>`;
   if (type === 'success') setTimeout(() => document.getElementById('alert-area').innerHTML = '', 3000);
 }
 
@@ -231,40 +350,106 @@ function showModalAlert(msg) {
     `<div class="alert alert-danger" style="margin-bottom:12px"><i class="fas fa-exclamation-circle"></i> ${msg}</div>`;
 }
 
+/* Stock badge helper */
+function stockBadge(stock) {
+  const n = Number(stock);
+  if (n <= 0)         return `<span class="stock-badge zero"><i class="fas fa-times-circle"></i> Out of Stock</span>`;
+  if (n <= LOW_STOCK) return `<span class="stock-badge low"><i class="fas fa-exclamation-circle"></i> ${n} units</span>`;
+  if (n <= 50)        return `<span class="stock-badge medium"><i class="fas fa-dot-circle"></i> ${n} units</span>`;
+  return                     `<span class="stock-badge high"><i class="fas fa-check-circle"></i> ${n} units</span>`;
+}
+
+/* ═══ LOAD & RENDER ═══════════════════════════════════════ */
 async function loadProducts() {
   try {
-    const data  = await ProductAPI.list();
+    const data  = await ProductAPI.list({ limit: 1000 });
     allProducts = data.products || [];
     populateCategoryFilter();
-    renderProducts(allProducts);
+    renderProducts(filterList());
+    updateLastRefresh();
   } catch (err) {
     document.getElementById('products-tbody').innerHTML =
       `<tr><td colspan="7" style="text-align:center;color:red;padding:24px">${err.message}</td></tr>`;
   }
 }
 
+/* Live poll — only updates stock cells that changed */
+async function pollStockUpdates() {
+  try {
+    const data  = await ProductAPI.list({ limit: 1000 });
+    const fresh = data.products || [];
+
+    const map = {};
+    fresh.forEach(p => { map[p._id] = p.stock; });
+
+    let needFullRender = (fresh.length !== allProducts.length);
+
+    allProducts.forEach(p => {
+      const newStock = map[p._id];
+      if (newStock !== undefined && newStock !== p.stock) {
+        p.stock = newStock;
+        if (!needFullRender) {
+          const cell = document.querySelector(`[data-stock-id="${p._id}"]`);
+          if (cell) {
+            cell.innerHTML = stockBadge(newStock);
+            cell.classList.remove('stock-updated');
+            void cell.offsetWidth;   // restart animation
+            cell.classList.add('stock-updated');
+          }
+        }
+      }
+    });
+
+    if (needFullRender) {
+      allProducts = fresh;
+      populateCategoryFilter();
+      renderProducts(filterList());
+    }
+
+    updateLastRefresh();
+  } catch (_) { /* silent — don't disrupt UX */ }
+}
+
+function startLivePolling() {
+  if (liveInterval) clearInterval(liveInterval);
+  liveInterval = setInterval(pollStockUpdates, POLL_MS);
+}
+
+function updateLastRefresh() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('last-refresh').textContent =
+    `Updated ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+
 function populateCategoryFilter() {
   const cats = [...new Set(allProducts.map(p => p.category))].sort();
   const sel  = document.getElementById('cat-filter');
   const dl   = document.getElementById('cat-list');
-  sel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
-  dl.innerHTML  = cats.map(c => `<option value="${c}">`).join('');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">All Categories</option>' +
+    cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  if (prev) sel.value = prev;
+  dl.innerHTML = cats.map(c => `<option value="${c}">`).join('');
 }
 
-function filterProducts() {
+function filterList() {
   const q     = document.getElementById('search-input').value.toLowerCase();
   const cat   = document.getElementById('cat-filter').value;
   const rx    = document.getElementById('rx-filter').value;
   const stock = document.getElementById('stock-filter').value;
-  const filtered = allProducts.filter(p => {
-    if (q && !p.name.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q)) return false;
-    if (cat   && p.category !== cat) return false;
-    if (rx    !== '' && String(p.requiresPrescription) !== rx) return false;
-    if (stock !== '' && String(p.stock) !== stock) return false;
+  return allProducts.filter(p => {
+    if (q   && !p.name.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q)) return false;
+    if (cat && p.category !== cat) return false;
+    if (rx !== '' && String(p.requiresPrescription) !== rx) return false;
+    if (stock === 'in'  && !(p.stock > 0))                          return false;
+    if (stock === 'low' && !(p.stock > 0 && p.stock <= LOW_STOCK))  return false;
+    if (stock === 'out' && p.stock > 0)                             return false;
     return true;
   });
-  renderProducts(filtered);
 }
+
+function filterProducts() { renderProducts(filterList()); }
 
 function renderProducts(products) {
   document.getElementById('product-count').textContent = products.length + ' products';
@@ -289,21 +474,28 @@ function renderProducts(products) {
       </td>
       <td><span style="font-size:13px">${p.category}</span></td>
       <td>
-        <div style="font-weight:700">\u20b9${p.price}</div>
-        <div style="text-decoration:line-through;color:#94a3b8;font-size:12px">\u20b9${p.mrp}</div>
+        <div style="font-weight:700">&#8377;${p.price}</div>
+        <div style="text-decoration:line-through;color:#94a3b8;font-size:12px">&#8377;${p.mrp}</div>
         <div style="font-size:11px;color:#22c55e;font-weight:600">${discount(p)}% off</div>
       </td>
       <td>
         <div style="color:#f59e0b;font-size:13px">${'&#9733;'.repeat(Math.floor(p.rating))}${'&#9734;'.repeat(5 - Math.floor(p.rating))}</div>
         <div style="font-size:11px;color:#64748b">${p.rating} (${p.reviews})</div>
       </td>
-      <td>${p.stock ? '<span class="badge badge-in-stock">In Stock</span>' : '<span class="badge badge-out">Out</span>'}</td>
+      <td>
+        <div data-stock-id="${p._id}">${stockBadge(p.stock)}</div>
+        <div style="margin-top:5px;display:flex;align-items:center;gap:3px">
+          <button class="quick-stock-btn minus" onclick="quickStock('${p._id}',-1)" title="-1 unit">&#8722;</button>
+          <button class="quick-stock-btn"       onclick="quickStock('${p._id}', 1)" title="+1 unit">&#43;</button>
+          <span style="font-size:10px;color:#94a3b8;margin-left:2px">quick</span>
+        </div>
+      </td>
       <td>${p.requiresPrescription ? '<span class="badge badge-rx">Rx</span>' : '<span class="badge" style="background:#f1f5f9;color:#475569">OTC</span>'}</td>
       <td style="text-align:right;white-space:nowrap">
         <button class="btn btn-outline btn-sm" onclick="openEdit('${p._id}')">
           <i class="fas fa-edit"></i> Edit
         </button>
-        <button class="btn btn-danger btn-sm" onclick="openDelete('${p._id}','${p.name.replace(/'/g, "\\'")}')">
+        <button class="btn btn-danger btn-sm" onclick="openDelete('${p._id}','${p.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
           <i class="fas fa-trash"></i>
         </button>
       </td>
@@ -311,17 +503,39 @@ function renderProducts(products) {
   `).join('');
 }
 
+/* Quick +/- stock from table row */
+async function quickStock(id, delta) {
+  const p = allProducts.find(x => x._id === id);
+  if (!p) return;
+  const newStock = Math.max(0, (Number(p.stock) || 0) + delta);
+  try {
+    await ProductAPI.update(id, { stock: newStock });
+    p.stock = newStock;
+    const cell = document.querySelector(`[data-stock-id="${id}"]`);
+    if (cell) {
+      cell.innerHTML = stockBadge(newStock);
+      cell.classList.remove('stock-updated');
+      void cell.offsetWidth;
+      cell.classList.add('stock-updated');
+    }
+  } catch (err) { showAlert('Stock update failed: ' + err.message); }
+}
+
+/* ═══ MODAL OPEN / CLOSE ══════════════════════════════════ */
 function openModal(reset) {
   if (reset !== false) {
     document.getElementById('modal-title').textContent = 'Add Product';
     document.getElementById('edit-id').value = '';
     document.getElementById('modal-alert').innerHTML = '';
-    ['f-name','f-category','f-price','f-mrp','f-desc','f-mfr','f-image','f-tags'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    ['f-name','f-category','f-price','f-mrp','f-desc','f-mfr','f-image','f-tags'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
     resetImageWidget();
-    document.getElementById('f-rating').value  = '4.5';
-    document.getElementById('f-reviews').value = '0';
-    document.getElementById('f-stock').value   = 'true';
-    document.getElementById('f-rx').value      = 'false';
+    document.getElementById('f-rating').value    = '4.5';
+    document.getElementById('f-reviews').value   = '0';
+    document.getElementById('f-stock-qty').value = '100';
+    document.getElementById('f-rx').value        = 'false';
+    updateStockBar();
   }
   document.getElementById('product-modal').classList.add('open');
 }
@@ -345,31 +559,66 @@ function openEdit(id) {
   document.getElementById('f-rating').value          = p.rating;
   document.getElementById('f-reviews').value         = p.reviews;
   document.getElementById('f-tags').value            = (p.tags || []).join(', ');
-  document.getElementById('f-stock').value           = String(p.stock);
+  document.getElementById('f-stock-qty').value       = (p.stock != null ? p.stock : 0);
   document.getElementById('f-rx').value              = String(p.requiresPrescription);
   document.getElementById('modal-alert').innerHTML   = '';
+  updateStockBar();
   openModal(false);
 }
 
+/* ═══ STOCK BAR ═══════════════════════════════════════════ */
+function updateStockBar() {
+  const qty   = Math.max(0, parseInt(document.getElementById('f-stock-qty').value) || 0);
+  const pct   = Math.min(100, Math.round((qty / MAX_STOCK) * 100));
+  const fill  = document.getElementById('stock-bar-fill');
+  const label = document.getElementById('stock-bar-label');
+  let color, status;
+  if (qty === 0)      { color = '#94a3b8'; status = 'Out of Stock'; }
+  else if (qty <= 10) { color = '#ef4444'; status = 'Critical Low'; }
+  else if (qty <= 50) { color = '#f59e0b'; status = 'Medium'; }
+  else                { color = '#22c55e'; status = 'Good'; }
+  fill.style.width      = pct + '%';
+  fill.style.background = color;
+  label.textContent     = status;
+  label.style.color     = color;
+}
+
+function adjustStock(delta) {
+  const el  = document.getElementById('f-stock-qty');
+  el.value  = Math.max(0, (parseInt(el.value) || 0) + delta);
+  updateStockBar();
+}
+
+function setStock(val) {
+  document.getElementById('f-stock-qty').value = val;
+  updateStockBar();
+}
+
+/* ═══ SAVE PRODUCT ════════════════════════════════════════ */
 async function saveProduct() {
   const id       = document.getElementById('edit-id').value;
   const name     = document.getElementById('f-name').value.trim();
   const category = document.getElementById('f-category').value.trim();
   const price    = parseFloat(document.getElementById('f-price').value);
   const mrp      = parseFloat(document.getElementById('f-mrp').value);
+  const stockQty = parseInt(document.getElementById('f-stock-qty').value);
+
   if (!name || !category || isNaN(price) || isNaN(mrp)) { showModalAlert('Name, category, price and MRP are required'); return; }
-  if (price > mrp) { showModalAlert('Price cannot be greater than MRP'); return; }
+  if (price > mrp)              { showModalAlert('Price cannot be greater than MRP'); return; }
+  if (isNaN(stockQty) || stockQty < 0) { showModalAlert('Stock quantity must be 0 or more'); return; }
+
   const body = {
     name, category, price, mrp,
-    description: document.getElementById('f-desc').value.trim(),
-    manufacturer: document.getElementById('f-mfr').value.trim(),
-    image: document.getElementById('f-image').value.trim(),
-    rating: parseFloat(document.getElementById('f-rating').value) || 4.0,
-    reviews: parseInt(document.getElementById('f-reviews').value) || 0,
-    tags: document.getElementById('f-tags').value.split(',').map(t => t.trim()).filter(Boolean),
-    stock: document.getElementById('f-stock').value === 'true',
+    description:          document.getElementById('f-desc').value.trim(),
+    manufacturer:         document.getElementById('f-mfr').value.trim(),
+    image:                document.getElementById('f-image').value.trim(),
+    rating:               parseFloat(document.getElementById('f-rating').value) || 4.0,
+    reviews:              parseInt(document.getElementById('f-reviews').value) || 0,
+    tags:                 document.getElementById('f-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    stock:                stockQty,   // ← numeric quantity
     requiresPrescription: document.getElementById('f-rx').value === 'true'
   };
+
   const btn = document.getElementById('save-btn');
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -378,7 +627,7 @@ async function saveProduct() {
     else    await ProductAPI.create(body);
     showAlert((id ? 'Product updated' : 'Product added') + ' successfully', 'success');
     closeModal();
-    loadProducts();
+    await loadProducts();
   } catch (err) {
     showModalAlert(err.message);
   } finally {
@@ -387,6 +636,7 @@ async function saveProduct() {
   }
 }
 
+/* ═══ DELETE ══════════════════════════════════════════════ */
 function openDelete(id, name) {
   deleteId = id;
   document.getElementById('delete-name').textContent = name;
@@ -413,91 +663,71 @@ async function confirmDelete() {
   }
 }
 
-// ── Image Upload Widget ──────────────────────────────────────────────────────
+/* ═══ IMAGE WIDGET ════════════════════════════════════════ */
 function resetImageWidget() {
   document.getElementById('f-image-file').value = '';
   document.getElementById('img-preview').src    = '';
-  document.getElementById('img-preview-wrap').style.display   = 'none';
-  document.getElementById('img-placeholder').style.display    = 'flex';
-  document.getElementById('img-upload-status').textContent    = '';
-  document.getElementById('img-upload-status').className      = '';
+  document.getElementById('img-preview-wrap').style.display = 'none';
+  document.getElementById('img-placeholder').style.display  = 'flex';
+  document.getElementById('img-upload-status').textContent  = '';
+  document.getElementById('img-upload-status').className    = '';
 }
-
 function setImagePreview(src) {
-  document.getElementById('img-preview').src                 = src;
-  document.getElementById('img-preview-wrap').style.display  = 'flex';
-  document.getElementById('img-placeholder').style.display   = 'none';
+  document.getElementById('img-preview').src                = src;
+  document.getElementById('img-preview-wrap').style.display = 'flex';
+  document.getElementById('img-placeholder').style.display  = 'none';
 }
-
-function removeImage(e) {
-  e.stopPropagation();
-  resetImageWidget();
-  document.getElementById('f-image').value = '';
-}
-
-function handleImageUrl(url) {
-  if (!url) { resetImageWidget(); return; }
-  setImagePreview(url);
-}
+function removeImage(e) { e.stopPropagation(); resetImageWidget(); document.getElementById('f-image').value = ''; }
+function handleImageUrl(url) { if (!url) { resetImageWidget(); return; } setImagePreview(url); }
 
 async function handleImageFile(file) {
   if (!file) return;
-  // Show local preview immediately
   const reader = new FileReader();
   reader.onload = e => setImagePreview(e.target.result);
   reader.readAsDataURL(file);
-
-  // Upload to server
   const statusEl = document.getElementById('img-upload-status');
-  statusEl.textContent = '⏳ Uploading image...';
-  statusEl.className   = 'upload-status-uploading';
-
+  statusEl.textContent = '⏳ Uploading...'; statusEl.className = 'upload-status-uploading';
   try {
     const token    = localStorage.getItem('genezenz-pharmacy_token');
-    const formData = new FormData();
-    formData.append('image', file);
-
+    const formData = new FormData(); formData.append('image', file);
     const API_BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
     const res  = await fetch(`${API_BASE}/api/products/upload-image`, {
-      method:  'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body:    formData
+      method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Upload failed');
-
-    // Store server URL so it gets saved with the product
     document.getElementById('f-image').value = data.imageUrl;
-    statusEl.textContent = '✓ Image uploaded successfully';
-    statusEl.className   = 'upload-status-success';
+    statusEl.textContent = '✓ Uploaded successfully'; statusEl.className = 'upload-status-success';
   } catch (err) {
-    statusEl.textContent = '✗ Upload failed: ' + err.message + ' (URL saved from preview will still work if pasted)';
-    statusEl.className   = 'upload-status-error';
+    statusEl.textContent = '✗ ' + err.message; statusEl.className = 'upload-status-error';
   }
 }
-
-// Drag-and-drop support
 const dropZone = document.getElementById('img-drop-zone');
 dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('drag-over'));
 dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
+  e.preventDefault(); dropZone.classList.remove('drag-over');
   const file = e.dataTransfer.files[0];
   if (file && file.type.startsWith('image/')) handleImageFile(file);
 });
-// ─────────────────────────────────────────────────────────────────────────────
 
+/* ═══ CLOSE MODAL ON BACKDROP ══════════════════════════════ */
 document.getElementById('product-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 document.getElementById('delete-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteModal(); });
 
-// Admin guard
+/* ═══ BOOT ════════════════════════════════════════════════ */
 if (sessionStorage.getItem('adminGateway') !== 'genezenz-pharmacy-admin-2025') {
   document.body.innerHTML = '';
-  window.location.replace('admin-login.html'); // must enter via proper admin entry point
+  window.location.replace('admin-login.html');
 } else {
   const u = currentUser();
-  if (!u || !u.isAdmin) { document.body.innerHTML = ''; window.location.replace('admin-login.html'); } else { loadProducts(); }
+  if (!u || !u.isAdmin) {
+    document.body.innerHTML = '';
+    window.location.replace('admin-login.html');
+  } else {
+    loadProducts();
+    startLivePolling();
+  }
 }
 </script>
 <script src="js/chatbot.js"></script>
