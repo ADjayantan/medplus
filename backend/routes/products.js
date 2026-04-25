@@ -9,18 +9,48 @@ const router  = express.Router();
 /* GET /api/products — List / search products */
 router.get('/', async (req, res) => {
   try {
-    const { q, category, page = 1, limit = 20 } = req.query;
+    const { q, category, inStock, sort, page = 1, limit = 20 } = req.query;
     const filter = {};
 
-    if (q) filter.$text = { $search: q };
-    if (category && category !== 'all') filter.category = category;
+    // Regex search — works for partial typing ("dol" → "Dolo 650")
+    // Falls back gracefully with no index needed
+    if (q && q.trim()) {
+      const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.$or = [
+        { name:         { $regex: escaped, $options: 'i' } },
+        { category:     { $regex: escaped, $options: 'i' } },
+        { manufacturer: { $regex: escaped, $options: 'i' } },
+        { description:  { $regex: escaped, $options: 'i' } },
+        { tags:         { $regex: escaped, $options: 'i' } },
+      ];
+    }
 
-    const skip    = (parseInt(page) - 1) * parseInt(limit);
-    const total   = await Product.countDocuments(filter);
+    if (category && category !== 'all') filter.category = category;
+    if (inStock === 'true') filter.stock = { $gt: 0 };
+
+    const skip  = (parseInt(page) - 1) * parseInt(limit);
+    const total = await Product.countDocuments(filter);
+
+    // Sort: when searching, rank name-starts-with higher by pulling them first
+    let sortOpt = { name: 1 };
+    if (sort === 'price_asc')  sortOpt = { price:  1 };
+    if (sort === 'price_desc') sortOpt = { price: -1 };
+    if (sort === 'rating')     sortOpt = { rating: -1 };
+
     const products = await Product.find(filter)
-      .sort(q ? { score: { $meta: 'textScore' } } : { name: 1 })
+      .sort(sortOpt)
       .skip(skip)
       .limit(parseInt(limit));
+
+    // If searching, re-sort: name starts-with query ranks above name contains
+    if (q && q.trim() && products.length > 1) {
+      const lower = q.trim().toLowerCase();
+      products.sort((a, b) => {
+        const aStarts = a.name.toLowerCase().startsWith(lower) ? 0 : 1;
+        const bStarts = b.name.toLowerCase().startsWith(lower) ? 0 : 1;
+        return aStarts - bStarts || a.name.localeCompare(b.name);
+      });
+    }
 
     res.json({ products, total, page: parseInt(page) });
   } catch (err) {
