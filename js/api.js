@@ -115,6 +115,7 @@ const OrderAPI = {
     return apiFetch('/api/orders/admin/all' + q);
   },
   updateStatus: (id, status)     => apiFetch(`/api/orders/admin/${id}`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  cancel:       (id)             => apiFetch(`/api/orders/${id}/cancel`, { method: 'PUT' }),
 };
 
 /* ── PrescriptionAPI namespace (used by upload.js, profile.js, checkout.html, admin-prescriptions.html) ── */
