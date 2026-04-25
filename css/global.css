@@ -183,3 +183,33 @@ body.dark .input{background:var(--bg-muted);}
 .deal-tab.active{background:var(--teal-400);color:#fff;border-color:var(--teal-400);}
 .deal-tab:hover:not(.active){border-color:var(--teal-300);}
 #dealsTabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+
+/* ── Back to Top Button ── */
+#back-to-top {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.5rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--teal-600);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity .25s, transform .25s;
+  z-index: 8999;
+}
+#back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+#back-to-top:hover { background: var(--teal-500); }
