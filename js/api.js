@@ -39,7 +39,8 @@ async function apiFetch(path, options = {}) {
 async function fetchProducts(params = {}) {
   const qs = new URLSearchParams();
   if (params.category)     qs.set('category',     params.category);
-  if (params.search)       qs.set('search',        params.search);
+  if (params.search)       qs.set('q',             params.search);   // backend reads 'q'
+  if (params.q)            qs.set('q',             params.q);
   if (params.inStock)      qs.set('inStock',       'true');
   if (params.limit)        qs.set('limit',         params.limit);
   if (params.sort)         qs.set('sort',          params.sort);
