@@ -100,6 +100,7 @@
           <div class="card-title"><i class="fas fa-receipt" aria-hidden="true"></i> Order Summary</div>
           <div class="summary-row"><span>Subtotal</span><span id="subtotal-val">₹0</span></div>
           <div class="summary-row"><span>Discount</span><span id="discount-val" style="color:#22c55e">-₹0</span></div>
+          <div class="summary-row" id="coupon-row" style="display:none"><span>Coupon (<span id="coupon-code-label"></span>)</span><span id="coupon-discount-val" style="color:#16a34a;font-weight:700">-₹0</span></div>
           <div class="summary-row"><span>Delivery Charges</span><span id="delivery-val">₹40</span></div>
           <div class="summary-row total"><span>Total Amount</span><span id="total-val">₹0</span></div>
 
@@ -296,24 +297,48 @@ function renderSummary(cart) {
   const subtotal  = cart.reduce((s,i) => s + i.price*(i.qty||1), 0);
   const mrpTotal  = cart.reduce((s,i) => s + (i.mrp||i.price)*(i.qty||1), 0);
   const discount  = mrpTotal - subtotal;
-  const delivery  = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : 40;
-  const total     = subtotal + delivery;
+
+  // Apply coupon
+  const coupon = window._appliedCoupon || null;
+  let couponAmt = 0;
+  if (coupon) {
+    couponAmt = coupon.type === 'percent'
+      ? Math.round(subtotal * coupon.value / 100)
+      : coupon.value;
+    couponAmt = Math.min(couponAmt, subtotal); // can't discount more than subtotal
+  }
+  const afterCoupon = subtotal - couponAmt;
+  const delivery  = afterCoupon >= FREE_DELIVERY_THRESHOLD ? 0 : 40;
+  const total     = afterCoupon + delivery;
 
   setText('subtotal-val', '₹' + subtotal.toLocaleString('en-IN'));
   setText('discount-val', '-₹' + discount.toLocaleString('en-IN'));
+
+  const couponRow = document.getElementById('coupon-row');
+  if (couponRow) {
+    if (coupon && couponAmt > 0) {
+      couponRow.style.display = '';
+      setText('coupon-code-label', coupon.code);
+      setText('coupon-discount-val', '-₹' + couponAmt.toLocaleString('en-IN'));
+    } else {
+      couponRow.style.display = 'none';
+    }
+  }
+
   setText('delivery-val', delivery === 0 ? '<span style="color:#22c55e;font-weight:700">FREE</span>' : '₹' + delivery, true);
   setText('total-val',    '₹' + total.toLocaleString('en-IN'));
 
+  const totalSaved = discount + couponAmt;
   const savingsBadge = document.getElementById('savings-badge');
   const savingsVal   = document.getElementById('savings-val');
-  if (discount > 0) {
+  if (totalSaved > 0) {
     if (savingsBadge) savingsBadge.style.display = 'flex';
-    if (savingsVal)   savingsVal.textContent = '₹' + discount.toLocaleString('en-IN');
+    if (savingsVal)   savingsVal.textContent = '₹' + totalSaved.toLocaleString('en-IN');
   } else {
     if (savingsBadge) savingsBadge.style.display = 'none';
   }
 
-  const diff   = FREE_DELIVERY_THRESHOLD - subtotal;
+  const diff   = FREE_DELIVERY_THRESHOLD - afterCoupon;
   const banner = document.getElementById('free-delivery-banner');
   if (banner) {
     if (delivery === 0) {
@@ -352,11 +377,23 @@ function applyCoupon() {
   const code = document.getElementById('coupon-input')?.value?.toUpperCase().trim();
   const msg  = document.getElementById('coupon-msg');
   if (!msg) return;
-  const codes = { 'GENEZENZ10': '10% discount applied!', 'FIRST50': '₹50 off applied on first order!' };
+  const codes = {
+    'GENEZENZ10': { type: 'percent', value: 10,  msg: '10% discount applied!' },
+    'FIRST50':    { type: 'flat',    value: 50,  msg: '₹50 off on your first order!' },
+    'SAVE100':    { type: 'flat',    value: 100, msg: '₹100 off applied!' },
+    'HEALTH20':   { type: 'percent', value: 20,  msg: '20% discount applied!' },
+    'MEDPLUS5':   { type: 'percent', value: 5,   msg: '5% discount applied!' },
+    'FREESHIP':   { type: 'flat',    value: 40,  msg: 'Delivery charge waived — ₹40 off!' },
+  };
   if (codes[code]) {
-    msg.innerHTML = `<span style="color:#16a34a"><i class="fas fa-check-circle"></i> ${codes[code]}</span>`;
+    const coupon = codes[code];
+    window._appliedCoupon = { code, ...coupon };
+    msg.innerHTML = `<span style="color:#16a34a"><i class="fas fa-check-circle"></i> ${coupon.msg}</span>`;
+    renderCart();
   } else {
+    window._appliedCoupon = null;
     msg.innerHTML = '<span style="color:#dc2626"><i class="fas fa-times-circle"></i> Invalid promo code.</span>';
+    renderCart();
   }
 }
 
