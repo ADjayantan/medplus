@@ -276,6 +276,19 @@ const MedNavbar = (() => {
 
     initDesktopSearch();
     initMobSearch();
+
+    // ── Back to top button ──
+    if (!document.getElementById('back-to-top')) {
+      const btn = document.createElement('button');
+      btn.id = 'back-to-top';
+      btn.title = 'Back to top';
+      btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+      btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      document.body.appendChild(btn);
+      window.addEventListener('scroll', () => {
+        btn.classList.toggle('visible', window.scrollY > 300);
+      }, { passive: true });
+    }
   }
 
   function doSearch() {
