@@ -67,6 +67,7 @@ async function loadOrderHistory() {
             <div style="display:flex;align-items:center;gap:12px">
               <span style="background:${bg};color:${col};padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;text-transform:capitalize;border:1.5px solid ${col}22">${order.status}</span>
               <span style="font-size:16px;font-weight:800;color:#1e293b">\u20b9${order.total.toLocaleString('en-IN')}</span>
+              ${order.status === 'pending' ? `<button onclick="cancelOrder('${order._id}', this)" style="padding:5px 12px;background:#fef2f2;color:#b91c1c;border:1.5px solid #fecaca;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'"><i class="fas fa-times-circle"></i> Cancel</button>` : ''}
             </div>
           </div>
           <div style="padding:14px 18px">
@@ -91,6 +92,21 @@ async function loadOrderHistory() {
     }).join('');
   } catch (err) {
     container.innerHTML = `<div style="color:#ef4444;padding:16px"><i class="fas fa-exclamation-circle"></i> Failed to load orders: ${err.message}</div>`;
+  }
+}
+
+async function cancelOrder(id, btn) {
+  if (!confirm('Cancel this order? This cannot be undone.')) return;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelling...';
+  try {
+    await OrderAPI.cancel(id);
+    showToast('Order cancelled successfully', 'success');
+    loadOrderHistory();
+  } catch (err) {
+    showToast(err.message || 'Failed to cancel order', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-times-circle"></i> Cancel';
   }
 }
 
