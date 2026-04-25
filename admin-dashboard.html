@@ -134,6 +134,38 @@
         </div>
 
       </div>
+
+      <!-- Low Stock Alerts Panel -->
+      <div class="admin-card" style="margin-top:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;color:#ea580c;font-size:16px">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:16px">Low Stock Alerts</div>
+              <div style="font-size:12px;color:#64748b">Products with 10 or fewer units remaining</div>
+            </div>
+          </div>
+          <a href="admin-products.html?stock=low" style="font-size:13px;color:#2563eb;text-decoration:none">Manage Stock</a>
+        </div>
+        <div class="admin-table-wrap" style="margin-top:12px">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th style="text-align:right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="low-stock-tbody">
+              <tr><td colspan="5" class="loading-center"><div class="spinner"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -212,6 +244,34 @@ async function loadDashboard() {
   }
 }
 
+async function loadLowStock() {
+  const tbody = document.getElementById('low-stock-tbody');
+  try {
+    const data = await ProductAPI.list({ limit: 100 });
+    const products = (data.products || []).filter(p => p.stock <= 10).sort((a,b) => a.stock - b.stock);
+    if (!products.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#22c55e;padding:24px"><i class="fas fa-check-circle"></i> All products are well stocked</td></tr>';
+      return;
+    }
+    tbody.innerHTML = products.map(p => {
+      const s = Number(p.stock);
+      const color = s === 0 ? '#b91c1c' : s <= 5 ? '#dc2626' : '#ea580c';
+      const bg    = s === 0 ? '#fef2f2' : s <= 5 ? '#fff1f0' : '#fff7ed';
+      const label = s === 0 ? 'Out of Stock' : s + ' left';
+      return '<tr>' +
+        '<td><div style="font-weight:600;font-size:13px">' + p.name + '</div>' +
+        (p.manufacturer ? '<div style="font-size:11px;color:#64748b">' + p.manufacturer + '</div>' : '') + '</td>' +
+        '<td style="font-size:13px;color:#475569">' + p.category + '</td>' +
+        '<td style="font-weight:700">&#8377;' + p.price + '</td>' +
+        '<td><span style="background:' + bg + ';color:' + color + ';padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid ' + color + '33">' + label + '</span></td>' +
+        '<td style="text-align:right"><a href="admin-products.html" class="btn btn-outline btn-sm" style="font-size:12px;padding:4px 10px;text-decoration:none"><i class="fas fa-edit"></i> Restock</a></td>' +
+        '</tr>';
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:20px">Could not load stock data</td></tr>';
+  }
+}
+
 if (sessionStorage.getItem('adminGateway') !== 'genezenz-pharmacy-admin-2025') {
   document.body.innerHTML = '';
   window.location.replace('admin-login.html');
@@ -224,6 +284,7 @@ if (sessionStorage.getItem('adminGateway') !== 'genezenz-pharmacy-admin-2025') {
     document.getElementById('admin-name').textContent   = u.name || 'Admin';
     document.getElementById('admin-avatar').textContent = (u.name || 'A')[0].toUpperCase();
     loadDashboard();
+    loadLowStock();
   }
 }
 </script>
