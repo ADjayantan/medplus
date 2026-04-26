@@ -105,7 +105,7 @@
         body: JSON.stringify({ message: text }),
       });
       const data = await res.json();
-      msgs.lastChild.textContent = data.reply || data.message || 'Sorry, I couldn't get a response.';
+      msgs.lastChild.textContent = data.reply || data.message || "Sorry, I couldn't get a response.";
     } catch {
       msgs.lastChild.textContent = 'Unable to reach the assistant. Please try again.';
     }
