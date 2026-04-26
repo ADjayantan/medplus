@@ -81,6 +81,7 @@
                onkeydown="if(event.key==='Enter'){syncMobSearch(this.value);filterAndRender();}">
         <i class="fas fa-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--text-secondary);pointer-events:none"></i>
         <button id="mob-search-clear" onclick="clearMobSearch()" style="display:none;position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:4px"><i class="fas fa-times"></i></button>
+        <div id="mob-autocomplete-list" style="position:absolute;top:100%;left:0;right:0;z-index:9999"></div>
       </div>
       <!-- Mobile Category scroll -->
       <div id="mob-category-tabs" style="display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:.75rem"></div>
