@@ -51,13 +51,16 @@
         </p>
 
         <!-- Mobile-only inline search -->
-        <div class="hero-mobile-search anim-in anim-delay-2" role="search">
+        <div class="hero-mobile-search anim-in anim-delay-2" role="search" style="position:relative">
           <input type="text" id="hero-search-mobile"
             placeholder="Search medicines, vitamins…"
-            onkeydown="if(event.key==='Enter'){var v=this.value.trim();if(v)window.location.href='products.html?q='+encodeURIComponent(v);}">
-          <button onclick="var v=document.getElementById('hero-search-mobile').value.trim();if(v)window.location.href='products.html?q='+encodeURIComponent(v);">
+            autocomplete="off"
+            oninput="heroAc(this.value)"
+            onkeydown="heroKey(event)">
+          <button onclick="heroGo()">
             <i class="fas fa-search"></i> Search
           </button>
+          <div id="hero-ac-drop" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.18);z-index:99999;max-height:380px;overflow-y:auto;overflow-x:hidden"></div>
         </div>
 
         <div class="hero-cta-row anim-in anim-delay-3">
@@ -435,5 +438,127 @@
   MedNavbar.init('');
 </script>
 <script src="js/chatbot.js"></script>
+
+<script>
+/* ── Hero Search Autocomplete ── */
+(function () {
+  const API = window.API_BASE || 'https://medplus-lkr7.onrender.com';
+  let _timer = null, _items = [], _idx = -1;
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function hl(text, q) {
+    let out = esc(text);
+    (q||'').trim().split(/\s+/).filter(Boolean).forEach(w => {
+      out = out.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark style="background:#fef08a;color:#92400e;border-radius:2px;padding:0 1px">$1</mark>');
+    });
+    return out;
+  }
+
+  function drop() { return document.getElementById('hero-ac-drop'); }
+  function input() { return document.getElementById('hero-search-mobile'); }
+
+  function close() {
+    const d = drop(); if (d) d.style.display = 'none';
+    _items = []; _idx = -1;
+  }
+
+  function highlight(idx) {
+    _idx = idx;
+    document.querySelectorAll('#hero-ac-drop .hac-item').forEach((el,i) => {
+      el.style.background = i === idx ? '#f0f9ff' : '';
+    });
+  }
+
+  async function fetch_ac(q) {
+    try {
+      const res = await fetch(`${API}/api/products?q=${encodeURIComponent(q)}&limit=7`);
+      const data = await res.json();
+      return data.products || [];
+    } catch { return []; }
+  }
+
+  function build(products, q) {
+    const d = drop(); if (!d) return;
+    if (!products.length) {
+      d.innerHTML = `<div style="padding:18px 14px;text-align:center;color:#94a3b8;font-size:13px"><i class="fas fa-search" style="display:block;font-size:20px;margin-bottom:6px;color:#cbd5e1"></i>No results for "<strong>${esc(q)}</strong>"</div>`;
+      d.style.display = 'block'; return;
+    }
+    let html = `<div style="padding:7px 14px 5px;font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;color:#94a3b8;border-bottom:1px solid #f1f5f9"><i class="fas fa-fire" style="color:#f59e0b;margin-right:4px"></i>${products.length} result${products.length!==1?'s':''}</div>`;
+    products.forEach((p, i) => {
+      const stock = Number(p.stock);
+      const sc = stock<=0?'#f1f5f9,#94a3b8,Out of Stock':stock<=10?'#fee2e2,#b91c1c,'+stock+' left':'#dcfce7,#15803d,In Stock';
+      const [sbg,scol,slabel] = sc.split(',');
+      const img = p.image
+        ? `<img src="${esc(p.image)}" style="width:40px;height:40px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;flex-shrink:0" onerror="this.outerHTML='<div style=width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#f1f5f9;display:flex;align-items:center;justify-content:center;flex-shrink:0><i class=fas\\ fa-pills style=color:#cbd5e1></i></div>'">`
+        : `<div style="width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#f1f5f9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-pills" style="color:#cbd5e1"></i></div>`;
+      html += `<div class="hac-item" data-id="${esc(p._id)}" data-name="${esc(p.name)}"
+        style="display:flex;align-items:center;gap:11px;padding:9px 14px;cursor:pointer;border-bottom:1px solid #f8fafc;transition:background .1s"
+        onmousedown="window._heroAcSelect('${esc(p._id)}','${esc(p.name).replace(/'/g,"\\'")}')">
+        ${img}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${hl(p.name,q)}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:1px">${esc(p.category)}${p.manufacturer?' · '+esc(p.manufacturer):''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:13px;font-weight:700;color:#0f172a">₹${p.price}</div>
+          <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:${sbg};color:${scol};display:inline-block;margin-top:2px">${slabel}</span>
+        </div>
+      </div>`;
+    });
+    html += `<div style="padding:9px 14px;border-top:1px solid #f1f5f9;font-size:12px;color:#2563eb;font-weight:600;text-align:center;cursor:pointer"
+      onmousedown="window._heroAcSelect('','${esc(q)}')"><i class="fas fa-search"></i> See all results for "${esc(q)}"</div>`;
+    d.innerHTML = html;
+    d.style.display = 'block';
+    _items = Array.from(d.querySelectorAll('.hac-item'));
+    _idx = -1;
+  }
+
+  /* Public functions called from HTML */
+  window.heroAc = function(val) {
+    clearTimeout(_timer);
+    const q = val.trim();
+    if (q.length < 2) { close(); return; }
+    _timer = setTimeout(async () => {
+      const products = await fetch_ac(q);
+      build(products, q);
+    }, 220);
+  };
+
+  window.heroKey = function(e) {
+    const d = drop();
+    if (!d || d.style.display === 'none') {
+      if (e.key === 'Enter') { e.preventDefault(); window.heroGo(); }
+      return;
+    }
+    if (e.key === 'ArrowDown')  { e.preventDefault(); highlight(Math.min(_idx+1, _items.length-1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); highlight(Math.max(_idx-1, -1)); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (_idx >= 0 && _items[_idx]) {
+        const name = _items[_idx].dataset.name;
+        window._heroAcSelect('', name);
+      } else { window.heroGo(); }
+    }
+    else if (e.key === 'Escape') { close(); }
+  };
+
+  window.heroGo = function() {
+    const q = (input()?.value||'').trim();
+    if (q) window.location.href = 'products.html?q=' + encodeURIComponent(q);
+  };
+
+  window._heroAcSelect = function(id, nameOrQ) {
+    close();
+    if (input()) input().value = nameOrQ;
+    window.location.href = 'products.html?q=' + encodeURIComponent(nameOrQ);
+  };
+
+  /* Close dropdown on outside click */
+  document.addEventListener('mousedown', function(e) {
+    const d = drop(), inp = input();
+    if (d && inp && !d.contains(e.target) && e.target !== inp) close();
+  });
+})();
+</script>
 </body>
 </html>
