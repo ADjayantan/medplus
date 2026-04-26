@@ -46,7 +46,7 @@ const MedNavbar = (() => {
     <div class="container">
       <a href="index.html" class="nav-logo" aria-label="Genezenz Pharmacy home">
         <div class="nav-logo-icon">
-          <img src="logo.png" alt="GZ" class="nav-logo-img" onerror="this.style.display='none';this.parentElement.textContent='GZ';this.parentElement.style.background='linear-gradient(135deg,var(--teal-400),var(--teal-600))';this.parentElement.style.color='#fff';">
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIyMCIgZmlsbD0iIzBkOTQ4OCIvPgogIDxyZWN0IHg9IjQyIiB5PSIyMCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjYwIiByeD0iOCIgZmlsbD0id2hpdGUiLz4KICA8cmVjdCB4PSIyMCIgeT0iNDIiIHdpZHRoPSI2MCIgaGVpZ2h0PSIxNiIgcng9IjgiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="GZ" class="nav-logo-img">
         </div>
         <span class="nav-logo-text">Genezenz<span> Pharmacy</span></span>
       </a>
