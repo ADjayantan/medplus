@@ -33,8 +33,8 @@ const MedNavbar = (() => {
   <div class="navbar-top">
     <div class="container">
       <div class="top-links">
-        <a href="tel:1800-123-456"><i class="fas fa-phone-alt"></i> 1800-123-456</a>
-        <a href="mailto:support@genezenz-pharmacy.com"><i class="fas fa-envelope"></i> support@genezenz-pharmacy.com</a>
+        <a href="tel:+918044560873"><i class="fas fa-phone-alt"></i> +91 80445 60873</a>
+        <a href="mailto:care@genezenz-pharmacy.in"><i class="fas fa-envelope"></i> care@genezenz-pharmacy.in</a>
       </div>
       <div class="top-links">
         <a href="upload-prescription.html"><i class="fas fa-file-prescription"></i> Upload Rx</a>
