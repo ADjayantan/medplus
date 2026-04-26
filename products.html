@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d9488'/><rect x='42' y='20' width='16' height='60' rx='8' fill='white'/><rect x='20' y='42' width='60' height='16' rx='8' fill='white'/></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Products — Genezenz Pharmacy</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -26,61 +27,132 @@
       <span id="results-count" style="font-size:.85rem;color:var(--text-secondary);margin-left:auto"></span>
     </div>
 
+
+
     <!-- Category Cards (top) -->
     <div id="category-cards" style="margin-bottom:1.5rem"></div>
 
-    <!-- Filters Row -->
-    <div class="filters-row" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-bottom:1.25rem">
-
-      <!-- Search -->
-      <div style="position:relative;flex:1;min-width:200px;max-width:340px">
+    <!-- ── Desktop Filters Row ────────────────────────────────── -->
+    <div class="filters-row desktop-filters">
+      <div style="position:relative;flex:1;min-width:200px;max-width:360px">
         <input id="search-bar" type="text" class="form-input"
                placeholder="Search medicines, brands…"
                style="padding-left:2.25rem"
+               oninput="filterAndRender()"
                onkeydown="if(event.key==='Enter')filterAndRender()">
         <i class="fas fa-search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text-secondary);pointer-events:none"></i>
         <div id="autocomplete-list" class="autocomplete-dropdown" style="display:none"></div>
       </div>
-
-      <!-- Category Tabs -->
       <div id="category-tabs" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
-
-      <!-- Sort -->
       <select id="sort-select" class="form-input" style="width:auto;min-width:150px" onchange="filterAndRender()">
         <option value="">Sort: Default</option>
-        <option value="price-asc">Price: Low → High</option>
-        <option value="price-desc">Price: High → Low</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
         <option value="rating">Top Rated</option>
         <option value="discount">Best Discount</option>
-        <option value="name">Name A → Z</option>
+        <option value="name">Name A to Z</option>
       </select>
-
-      <!-- Price Filter -->
       <div style="display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--text-secondary)">
         <i class="fas fa-rupee-sign"></i>
         <input id="price-filter" type="range" min="0" max="2000" value="2000" step="50"
-               oninput="document.getElementById('price-label').textContent='Under ₹'+this.value;filterAndRender()"
+               oninput="document.getElementById('price-label').textContent='Under Rs.'+this.value;filterAndRender()"
                style="width:100px;accent-color:var(--teal-500)">
-        <span id="price-label" style="white-space:nowrap;font-weight:600;color:var(--text-primary)">Under ₹2000</span>
+        <span id="price-label" style="white-space:nowrap;font-weight:600;color:var(--text-primary)">Under Rs.2000</span>
       </div>
-
-      <!-- In Stock Toggle -->
       <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;color:var(--text-secondary)">
         <input id="in-stock-toggle" type="checkbox" onchange="filterAndRender()" style="accent-color:var(--teal-500)">
         In Stock Only
       </label>
-
-      <!-- Rx Filter -->
       <select id="rx-filter" class="form-input" style="width:auto;min-width:110px;font-size:.85rem" onchange="filterAndRender()">
         <option value="">All Types</option>
         <option value="otc">OTC Only</option>
         <option value="rx">Rx Only</option>
       </select>
-
     </div>
 
-    <!-- Product stat -->
-    <div id="product-stat" style="font-size:.82rem;color:var(--text-secondary);margin-bottom:1rem"></div>
+    <!-- ── Mobile Filters ─────────────────────────────────────── -->
+    <div class="mobile-filters">
+      <!-- Mobile Search -->
+      <div style="position:relative;margin-bottom:.75rem">
+        <input id="mob-search-bar" type="search" class="form-input"
+               placeholder="Search medicines..."
+               style="padding-left:2.5rem;padding-right:2.5rem;width:100%;box-sizing:border-box;font-size:15px"
+               oninput="syncMobSearch(this.value)"
+               onkeydown="if(event.key==='Enter'){syncMobSearch(this.value);filterAndRender();}">
+        <i class="fas fa-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--text-secondary);pointer-events:none"></i>
+        <button id="mob-search-clear" onclick="clearMobSearch()" style="display:none;position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:4px"><i class="fas fa-times"></i></button>
+      </div>
+      <!-- Mobile Category scroll -->
+      <div id="mob-category-tabs" style="display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:.75rem"></div>
+      <!-- Sort + Filter trigger buttons -->
+      <div style="display:flex;gap:.6rem;align-items:center">
+        <button class="mob-action-btn" id="mob-sort-btn" onclick="openMobSort()">
+          <i class="fas fa-sort-amount-down"></i>
+          <span id="mob-sort-label">Sort</span>
+        </button>
+        <button class="mob-action-btn" id="mob-filter-btn" onclick="openMobFilter()">
+          <i class="fas fa-sliders-h"></i>
+          <span>Filter</span>
+          <span id="mob-filter-count" class="mob-filter-badge" style="display:none">0</span>
+        </button>
+        <span id="results-count-mob" style="margin-left:auto;font-size:.78rem;color:var(--text-secondary);white-space:nowrap"></span>
+      </div>
+    </div>
+
+    <!-- ── Sort Bottom Sheet ──────────────────────────────────── -->
+    <div id="mob-sort-sheet" class="mob-sheet-overlay" onclick="if(event.target===this)closeMobSort()">
+      <div class="mob-sheet">
+        <div class="mob-sheet-handle"></div>
+        <div class="mob-sheet-title">Sort By</div>
+        <button class="mob-sort-opt active" data-val="" onclick="applyMobSort(this)"><i class="fas fa-th-large"></i> Default</button>
+        <button class="mob-sort-opt" data-val="price-asc" onclick="applyMobSort(this)"><i class="fas fa-arrow-up" style="color:#22c55e"></i> Price: Low to High</button>
+        <button class="mob-sort-opt" data-val="price-desc" onclick="applyMobSort(this)"><i class="fas fa-arrow-down" style="color:#ef4444"></i> Price: High to Low</button>
+        <button class="mob-sort-opt" data-val="rating" onclick="applyMobSort(this)"><i class="fas fa-star" style="color:#f59e0b"></i> Top Rated</button>
+        <button class="mob-sort-opt" data-val="discount" onclick="applyMobSort(this)"><i class="fas fa-tag" style="color:#8b5cf6"></i> Best Discount</button>
+        <button class="mob-sort-opt" data-val="name" onclick="applyMobSort(this)"><i class="fas fa-sort-alpha-down" style="color:#3b82f6"></i> Name A to Z</button>
+      </div>
+    </div>
+
+    <!-- ── Filter Bottom Sheet ───────────────────────────────── -->
+    <div id="mob-filter-sheet" class="mob-sheet-overlay" onclick="if(event.target===this)closeMobFilter()">
+      <div class="mob-sheet">
+        <div class="mob-sheet-handle"></div>
+        <div class="mob-sheet-title">Filters</div>
+        <div class="mob-filter-section">
+          <div class="mob-filter-label"><i class="fas fa-rupee-sign"></i> Max Price</div>
+          <input id="mob-price-filter" type="range" min="0" max="2000" value="2000" step="50"
+                 oninput="document.getElementById('mob-price-label').textContent='Under Rs.'+this.value"
+                 style="width:100%;accent-color:var(--teal-500);margin:.5rem 0">
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;color:#64748b">
+            <span>Rs.0</span>
+            <span id="mob-price-label" style="font-weight:700;color:var(--text-primary)">Under Rs.2000</span>
+            <span>Rs.2000</span>
+          </div>
+        </div>
+        <div class="mob-filter-section">
+          <div class="mob-filter-label"><i class="fas fa-boxes"></i> Availability</div>
+          <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:.5rem 0">
+            <span style="font-size:.9rem;color:#475569">In Stock Only</span>
+            <input id="mob-in-stock" type="checkbox" style="accent-color:var(--teal-500);width:18px;height:18px">
+          </label>
+        </div>
+        <div class="mob-filter-section">
+          <div class="mob-filter-label"><i class="fas fa-prescription-bottle"></i> Type</div>
+          <div style="display:flex;gap:.5rem;margin-top:.5rem">
+            <button class="mob-type-btn active" data-val="" onclick="setMobType(this)">All</button>
+            <button class="mob-type-btn" data-val="otc" onclick="setMobType(this)">OTC Only</button>
+            <button class="mob-type-btn" data-val="rx" onclick="setMobType(this)">Rx Only</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:.75rem;margin-top:1.5rem">
+          <button onclick="resetMobFilters()" class="mob-reset-btn">Reset All</button>
+          <button onclick="applyMobFilters()" class="mob-apply-btn">Apply Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product stat (desktop only) -->
+    <div id="product-stat" class="desktop-only" style="font-size:.82rem;color:var(--text-secondary);margin-bottom:1rem"></div>
 
     <!-- Products Section -->
     <section id="products-section">
@@ -114,5 +186,147 @@
 MedNavbar.init('products');
 </script>
 <script src="js/chatbot.js"></script>
+<script>
+// ── Mobile search sync ──────────────────────────────
+function syncMobSearch(val) {
+  const desktop = document.getElementById('search-bar');
+  const clearBtn = document.getElementById('mob-search-clear');
+  if (desktop) desktop.value = val;
+  if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
+  filterAndRender();
+}
+function clearMobSearch() {
+  const mob = document.getElementById('mob-search-bar');
+  const desktop = document.getElementById('search-bar');
+  if (mob) mob.value = '';
+  if (desktop) desktop.value = '';
+  document.getElementById('mob-search-clear').style.display = 'none';
+  filterAndRender();
+}
+
+// ── Sort sheet ─────────────────────────────────────
+function openMobSort() {
+  document.getElementById('mob-sort-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobSort() {
+  document.getElementById('mob-sort-sheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function applyMobSort(btn) {
+  // Update desktop select (single source of truth)
+  const val = btn.dataset.val;
+  const desktop = document.getElementById('sort-select');
+  if (desktop) desktop.value = val;
+
+  // Update button states
+  document.querySelectorAll('.mob-sort-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Update label
+  const labels = { '':'Sort', 'price-asc':'Low to High', 'price-desc':'High to Low', 'rating':'Top Rated', 'discount':'Best Discount', 'name':'A to Z' };
+  document.getElementById('mob-sort-label').textContent = labels[val] || 'Sort';
+  document.getElementById('mob-sort-btn').classList.toggle('mob-btn-active', !!val);
+
+  closeMobSort();
+  filterAndRender();
+}
+
+// ── Filter sheet ───────────────────────────────────
+let _mobTypeVal = '';
+function openMobFilter() {
+  // Sync current desktop values into mobile sheet
+  const priceDesktop = document.getElementById('price-filter');
+  const stockDesktop = document.getElementById('in-stock-toggle');
+  const rxDesktop    = document.getElementById('rx-filter');
+  if (priceDesktop) {
+    document.getElementById('mob-price-filter').value = priceDesktop.value;
+    document.getElementById('mob-price-label').textContent = 'Under Rs.' + priceDesktop.value;
+  }
+  if (stockDesktop) document.getElementById('mob-in-stock').checked = stockDesktop.checked;
+  if (rxDesktop) {
+    _mobTypeVal = rxDesktop.value;
+    document.querySelectorAll('.mob-type-btn').forEach(b => b.classList.toggle('active', b.dataset.val === _mobTypeVal));
+  }
+  document.getElementById('mob-filter-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobFilter() {
+  document.getElementById('mob-filter-sheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setMobType(btn) {
+  _mobTypeVal = btn.dataset.val;
+  document.querySelectorAll('.mob-type-btn').forEach(b => b.classList.toggle('active', b === btn));
+}
+function applyMobFilters() {
+  // Push mobile values to desktop inputs (filterAndRender reads desktop inputs)
+  const mobPrice = document.getElementById('mob-price-filter').value;
+  const mobStock = document.getElementById('mob-in-stock').checked;
+  const priceDesktop = document.getElementById('price-filter');
+  const stockDesktop = document.getElementById('in-stock-toggle');
+  const rxDesktop    = document.getElementById('rx-filter');
+  const priceLabel   = document.getElementById('price-label');
+
+  if (priceDesktop) priceDesktop.value = mobPrice;
+  if (priceLabel)   priceLabel.textContent = 'Under Rs.' + mobPrice;
+  if (stockDesktop) stockDesktop.checked = mobStock;
+  if (rxDesktop)    rxDesktop.value = _mobTypeVal;
+
+  // Count active filters
+  let count = 0;
+  if (parseInt(mobPrice) < 2000) count++;
+  if (mobStock) count++;
+  if (_mobTypeVal) count++;
+  const badge = document.getElementById('mob-filter-count');
+  if (badge) { badge.style.display = count ? 'inline-flex' : 'none'; badge.textContent = count; }
+  document.getElementById('mob-filter-btn').classList.toggle('mob-btn-active', count > 0);
+
+  closeMobFilter();
+  filterAndRender();
+}
+function resetMobFilters() {
+  document.getElementById('mob-price-filter').value = 2000;
+  document.getElementById('mob-price-label').textContent = 'Under Rs.2000';
+  document.getElementById('mob-in-stock').checked = false;
+  _mobTypeVal = '';
+  document.querySelectorAll('.mob-type-btn').forEach(b => b.classList.toggle('active', b.dataset.val === ''));
+}
+
+// ── Mobile category tabs (mirrors desktop) ─────────
+function buildMobCategoryTabs(categories) {
+  const wrap = document.getElementById('mob-category-tabs');
+  if (!wrap) return;
+  wrap.innerHTML = ['all', ...categories].map(cat => `
+    <button class="mob-cat-pill ${cat === 'all' ? 'active' : ''}"
+            data-cat="${cat}"
+            onclick="setMobCategory(this, '${cat}')">
+      ${cat === 'all' ? 'All' : cat}
+    </button>`).join('');
+}
+function setMobCategory(btn, cat) {
+  document.querySelectorAll('.mob-cat-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Sync to desktop active category
+  window.activeCategory = cat;
+  const desktopTabs = document.querySelectorAll('.cat-tab, .category-tab, [data-cat]');
+  desktopTabs.forEach(b => { if (b.dataset.cat) b.classList.toggle('active', b.dataset.cat === cat); });
+  filterAndRender();
+}
+
+// Also sync results count to mobile
+const _origFilterAndRender = window.filterAndRender;
+window.filterAndRender = function() {
+  if (_origFilterAndRender) _origFilterAndRender();
+  // Sync mob search bar
+  const desktop = document.getElementById('search-bar');
+  const mob = document.getElementById('mob-search-bar');
+  if (desktop && mob && document.activeElement !== mob) mob.value = desktop.value;
+  // Sync result count
+  const desktopCount = document.getElementById('results-count');
+  const mobCount = document.getElementById('results-count-mob');
+  if (desktopCount && mobCount) mobCount.textContent = desktopCount.textContent;
+};
+</script>
 </body>
 </html>
