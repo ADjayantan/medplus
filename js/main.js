@@ -21,6 +21,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadProducts();
   renderCart();
 
+  // Pre-fill search from URL ?q= param (e.g. from homepage search)
+  const _urlQ = new URLSearchParams(window.location.search).get('q');
+  if (_urlQ && _urlQ.trim()) {
+    const desktopBar = document.getElementById('search-bar');
+    const mobBar     = document.getElementById('mob-search-bar');
+    if (desktopBar) desktopBar.value = _urlQ.trim();
+    if (mobBar)     mobBar.value     = _urlQ.trim();
+    filterAndRender();
+    // Scroll to products grid
+    const grid = document.getElementById('products-section');
+    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   // Create toast container once on page load
   if (!document.getElementById('toast-container')) {
     const tc = document.createElement('div');
