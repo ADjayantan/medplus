@@ -17,6 +17,7 @@ function sanitize(str) {
 document.addEventListener('DOMContentLoaded', async () => {
   updateNavAuth();
   initSearchAutocomplete('search-bar', 'autocomplete-list');
+  initSearchAutocomplete('mob-search-bar', 'mob-autocomplete-list');
   await loadCategories();
   await loadProducts();
   renderCart();
@@ -87,6 +88,9 @@ async function loadCategories() {
 }
 
 function renderCategoryTabs(cats) {
+  // Build mobile category pill tabs too
+  if (typeof buildMobCategoryTabs === 'function') buildMobCategoryTabs(cats);
+
   const container = document.getElementById('category-tabs');
   if (!container) return;
   container.innerHTML = `
