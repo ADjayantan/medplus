@@ -389,3 +389,199 @@
   .cat-card-icon { width: 40px; height: 40px; font-size: 1.1rem; }
   .cat-card-name { font-size: .75rem; }
 }
+
+/* ════════ MOBILE FILTERS ════════ */
+.desktop-filters { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1rem; }
+.mobile-filters  { display: none; }
+.desktop-only    { display: block; }
+
+@media (max-width: 767px) {
+  .desktop-filters { display: none !important; }
+  .mobile-filters  { display: block; }
+  .desktop-only    { display: none !important; }
+}
+
+/* ── Mobile action buttons (Sort / Filter) ── */
+.mob-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .5rem .95rem;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.mob-action-btn.mob-btn-active {
+  background: #f0fdfa;
+  border-color: var(--teal-500, #0d9488);
+  color: var(--teal-600, #0f766e);
+}
+.mob-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--teal-500, #0d9488);
+  color: #fff;
+  border-radius: 50%;
+  font-size: .7rem;
+  font-weight: 700;
+}
+
+/* ── Category pills (mobile) ── */
+.mob-cat-pill {
+  flex-shrink: 0;
+  padding: .4rem .85rem;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.mob-cat-pill.active {
+  background: var(--teal-500, #0d9488);
+  border-color: var(--teal-500, #0d9488);
+  color: #fff;
+}
+
+/* ── Bottom sheet overlay ── */
+.mob-sheet-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 1000;
+  align-items: flex-end;
+}
+.mob-sheet-overlay.open {
+  display: flex;
+}
+
+/* ── Bottom sheet panel ── */
+.mob-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 1.25rem 1.25rem 2rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.12);
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.mob-sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: #cbd5e1;
+  border-radius: 4px;
+  margin: 0 auto .75rem;
+}
+.mob-sheet-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* ── Sort options ── */
+.mob-sort-opt {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  width: 100%;
+  padding: .85rem 1rem;
+  border: none;
+  background: none;
+  font-size: .92rem;
+  color: #374151;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .12s;
+  text-align: left;
+}
+.mob-sort-opt:hover  { background: #f8fafc; }
+.mob-sort-opt.active {
+  background: #f0fdfa;
+  color: var(--teal-600, #0f766e);
+  font-weight: 700;
+}
+.mob-sort-opt.active::after {
+  content: '✓';
+  margin-left: auto;
+  color: var(--teal-500, #0d9488);
+  font-weight: 700;
+}
+
+/* ── Filter sections ── */
+.mob-filter-section {
+  padding: .75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.mob-filter-label {
+  font-size: .8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: .5rem;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+/* ── Type buttons inside filter sheet ── */
+.mob-type-btn {
+  padding: .5rem 1.1rem;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  font-size: .85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all .15s;
+}
+.mob-type-btn.active {
+  background: var(--teal-500, #0d9488);
+  border-color: var(--teal-500, #0d9488);
+  color: #fff;
+}
+
+/* ── Apply / Reset buttons ── */
+.mob-apply-btn {
+  flex: 1;
+  padding: .75rem;
+  background: var(--teal-500, #0d9488);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: .95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.mob-reset-btn {
+  padding: .75rem 1.25rem;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 12px;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
