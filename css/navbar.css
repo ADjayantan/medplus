@@ -333,7 +333,8 @@ body.dark .navbar-top { background: var(--teal-900); }
 }
 
 @media (max-width: 480px) {
-  .nav-logo-text { display: none; }
+  .nav-logo-text { display: block; font-size: .85rem; }
+  .nav-logo-text span { display: none; }
   .navbar-cats   { display: none; }
 }
 
