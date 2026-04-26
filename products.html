@@ -76,12 +76,12 @@
       <div style="position:relative;margin-bottom:.75rem">
         <input id="mob-search-bar" type="search" class="form-input"
                placeholder="Search medicines..."
+               autocomplete="off"
                style="padding-left:2.5rem;padding-right:2.5rem;width:100%;box-sizing:border-box;font-size:15px"
-               oninput="syncMobSearch(this.value)"
-               onkeydown="if(event.key==='Enter'){syncMobSearch(this.value);filterAndRender();}">
+               oninput="syncMobSearch(this.value)">
         <i class="fas fa-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--text-secondary);pointer-events:none"></i>
         <button id="mob-search-clear" onclick="clearMobSearch()" style="display:none;position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:4px"><i class="fas fa-times"></i></button>
-        <div id="mob-autocomplete-list" style="position:absolute;top:100%;left:0;right:0;z-index:9999"></div>
+        <div id="mob-autocomplete-list"></div>
       </div>
       <!-- Mobile Category scroll -->
       <div id="mob-category-tabs" style="display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:.75rem"></div>
@@ -194,16 +194,24 @@ function syncMobSearch(val) {
   const clearBtn = document.getElementById('mob-search-clear');
   if (desktop) desktop.value = val;
   if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
-  filterAndRender();
+  // filterAndRender is called by selectSuggestion or Enter key via autocomplete
 }
 function clearMobSearch() {
   const mob = document.getElementById('mob-search-bar');
   const desktop = document.getElementById('search-bar');
   if (mob) mob.value = '';
   if (desktop) desktop.value = '';
-  document.getElementById('mob-search-clear').style.display = 'none';
+  const clearBtn = document.getElementById('mob-search-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
   filterAndRender();
 }
+
+// ── Init mobile autocomplete after page loads ───────
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof initSearchAutocomplete === 'function') {
+    initSearchAutocomplete('mob-search-bar', 'mob-autocomplete-list');
+  }
+});
 
 // ── Sort sheet ─────────────────────────────────────
 function openMobSort() {
