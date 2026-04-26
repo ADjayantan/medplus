@@ -54,8 +54,8 @@
         <div class="hero-mobile-search anim-in anim-delay-2" role="search">
           <input type="text" id="hero-search-mobile"
             placeholder="Search medicines, vitamins…"
-            onkeydown="if(event.key==='Enter'){window.location.href='products.html?q='+encodeURIComponent(this.value.trim())}">
-          <button onclick="window.location.href='products.html?q='+encodeURIComponent(document.getElementById('hero-search-mobile').value.trim())">
+            onkeydown="if(event.key==='Enter'){var v=this.value.trim();if(v)window.location.href='products.html?q='+encodeURIComponent(v);}">
+          <button onclick="var v=document.getElementById('hero-search-mobile').value.trim();if(v)window.location.href='products.html?q='+encodeURIComponent(v);">
             <i class="fas fa-search"></i> Search
           </button>
         </div>
