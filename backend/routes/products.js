@@ -1,10 +1,51 @@
 /* =====================================================
    routes/products.js — Browse & Manage Products
 ===================================================== */
-const express = require('express');
-const Product = require('../models/Product');
+const express    = require('express');
+const Product    = require('../models/Product');
 const { adminMiddleware } = require('../middleware/auth');
-const router  = express.Router();
+const router     = express.Router();
+const multer     = require('multer');
+const cloudinary = require('cloudinary').v2;
+
+/* ── Cloudinary config (reads from .env / Render env vars) ── */
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+/* ── Multer: store file in memory before sending to Cloudinary ── */
+const storage = multer.memoryStorage();
+const upload  = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files are allowed'));
+  },
+});
+
+/* POST /api/products/upload-image — Admin: upload product thumbnail */
+router.post('/upload-image', adminMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No image file provided' });
+
+    /* Upload buffer to Cloudinary */
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'genezenz/products', resource_type: 'image' },
+        (err, result) => { if (err) reject(err); else resolve(result); }
+      );
+      stream.end(req.file.buffer);
+    });
+
+    res.json({ imageUrl: result.secure_url });
+  } catch (err) {
+    console.error('[upload-image]', err.message);
+    res.status(500).json({ message: err.message || 'Image upload failed' });
+  }
+});
 
 /* GET /api/products — List / search products */
 router.get('/', async (req, res) => {
