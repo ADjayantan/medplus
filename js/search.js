@@ -158,10 +158,14 @@ function closeList(list) {
 }
 
 function selectSuggestion(name, id) {
-  const input = document.getElementById('search-bar');
-  const list  = document.getElementById('autocomplete-list');
-  if (input) input.value = name;
+  const input    = document.getElementById('search-bar');
+  const mobInput = document.getElementById('mob-search-bar');
+  const list     = document.getElementById('autocomplete-list');
+  const mobList  = document.getElementById('mob-autocomplete-list');
+  if (input)    input.value    = name;
+  if (mobInput) mobInput.value = name;
   closeList(list);
+  closeList(mobList);
   if (typeof filterAndRender === 'function') filterAndRender();
   else if (typeof applyFilters === 'function') applyFilters();
 }
