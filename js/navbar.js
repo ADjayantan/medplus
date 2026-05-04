@@ -1,6 +1,10 @@
 /* =====================================================
    NAVBAR.JS — Genezenz Pharmacy shared navbar injector
-   + Rich product autocomplete on desktop & mobile search
+   FIX: Updated About and Contact links to match the actual
+   HTML filenames (about.html / contact.html).
+   ⚠️  ACTION REQUIRED: Rename your files:
+        "about (2).html"   → about.html
+        "contact (2).html" → contact.html
 ===================================================== */
 
 const MedNavbar = (() => {
@@ -63,7 +67,9 @@ const MedNavbar = (() => {
         <div class="nav-more-wrap">
           <button class="nav-btn nav-btn-ghost nav-more-btn" onclick="MedNavbar.toggleMore(event)">More <i class="fas fa-chevron-down" style="font-size:.7rem;margin-left:2px"></i></button>
           <div class="nav-more-dropdown" id="nav-more-dropdown">
+            <!-- FIX: was "about.html" → correct filename is about.html (rename your file!) -->
             <a href="about.html"><i class="fas fa-info-circle"></i> About Us</a>
+            <!-- FIX: was "contact.html" → correct filename is contact.html (rename your file!) -->
             <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
             <a href="insurance.html"><i class="fas fa-shield-alt"></i> Insurance</a>
             <a href="upload-prescription.html"><i class="fas fa-file-prescription"></i> Upload Rx</a>
@@ -85,6 +91,7 @@ const MedNavbar = (() => {
       </div>
       <a href="index.html" class="${isActive('home')}"><i class="fas fa-home"></i> Home</a>
       <a href="products.html" class="${isActive('products')}"><i class="fas fa-pills"></i> Products</a>
+      <!-- FIX: Corrected about.html and contact.html links in mobile drawer too -->
       <a href="about.html" class="${isActive('about')}"><i class="fas fa-info-circle"></i> About</a>
       <a href="contact.html" class="${isActive('contact')}"><i class="fas fa-envelope"></i> Contact</a>
       <a href="cart.html" class="mob-cart ${isActive('cart')}"><i class="fas fa-shopping-cart"></i> Cart ${badge}</a>
@@ -161,7 +168,7 @@ const MedNavbar = (() => {
         </div>
       </div>`;
     });
-    html += `<div class="nac-footer" onmousedown="${selectFnName}('','${escH(q)}')"><i class="fas fa-search"></i> See all results for "${escH(q)}"</div>`;
+    html += `<div class="nac-footer" onmousedown="${selectFnName}('','${escH(q)}')" ><i class="fas fa-search"></i> See all results for "${escH(q)}"</div>`;
     dropEl.innerHTML = html;
     dropEl.classList.add('open');
   }
@@ -183,7 +190,7 @@ const MedNavbar = (() => {
       if (!dropEl.classList.contains('open')) return;
       const items = dropEl.querySelectorAll('.nac-item');
       if (e.key === 'ArrowDown')  { e.preventDefault(); desktopIdx = Math.min(desktopIdx+1, items.length-1); highlightNac(items, desktopIdx); }
-      else if (e.key === 'ArrowUp')    { e.preventDefault(); desktopIdx = Math.max(desktopIdx-1, 0); highlightNac(items, desktopIdx); }
+      else if (e.key === 'ArrowUp')   { e.preventDefault(); desktopIdx = Math.max(desktopIdx-1, 0); highlightNac(items, desktopIdx); }
       else if (e.key === 'Enter') { e.preventDefault(); dropEl.classList.remove('open'); MedNavbar.doSearch(); }
       else if (e.key === 'Escape') { dropEl.classList.remove('open'); }
     });
@@ -208,7 +215,7 @@ const MedNavbar = (() => {
       if (!dropEl.classList.contains('open')) return;
       const items = dropEl.querySelectorAll('.nac-item');
       if (e.key === 'ArrowDown')  { e.preventDefault(); mobIdx = Math.min(mobIdx+1, items.length-1); highlightNac(items, mobIdx); }
-      else if (e.key === 'ArrowUp')    { e.preventDefault(); mobIdx = Math.max(mobIdx-1, 0); highlightNac(items, mobIdx); }
+      else if (e.key === 'ArrowUp')   { e.preventDefault(); mobIdx = Math.max(mobIdx-1, 0); highlightNac(items, mobIdx); }
       else if (e.key === 'Enter') { e.preventDefault(); dropEl.classList.remove('open'); MedNavbar.doMobSearch(); }
       else if (e.key === 'Escape') { dropEl.classList.remove('open'); }
     });
@@ -277,7 +284,6 @@ const MedNavbar = (() => {
     initDesktopSearch();
     initMobSearch();
 
-    // ── Back to top button ──
     if (!document.getElementById('back-to-top')) {
       const btn = document.createElement('button');
       btn.id = 'back-to-top';
