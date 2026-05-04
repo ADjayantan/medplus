@@ -1,31 +1,60 @@
 /* =====================================================
    routes/auth.js — Register / Login / Profile
+   FIXES:
+   - Removed manual bcrypt.hash() — User model pre-save hook handles it
+   - Added rate limiting on login & register
 ===================================================== */
-const express  = require('express');
-const bcrypt   = require('bcryptjs');
-const jwt      = require('jsonwebtoken');
-const User     = require('../models/User');
+const express    = require('express');
+const bcrypt     = require('bcryptjs');
+const jwt        = require('jsonwebtoken');
+const rateLimit  = require('express-rate-limit');
+const User       = require('../models/User');
 const { authMiddleware } = require('../middleware/auth');
-const router   = express.Router();
+const router     = express.Router();
 
 const SECRET = process.env.JWT_SECRET || 'genezenz-pharmacy_INSECURE_fallback_set_JWT_SECRET_in_env';
 
+/* ── Rate limiter: 5 attempts per 15 minutes per IP ── */
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: req => req.ip,
+  message: { message: 'Too many attempts. Please wait 15 minutes and try again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/* ── Register limiter: 3 accounts per hour per IP ── */
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  keyGenerator: req => req.ip,
+  message: { message: 'Too many registrations from this IP. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 /* POST /api/register */
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
     if (!name || !email || !password)
       return res.status(400).json({ message: 'Name, email and password are required' });
 
+    if (password.length < 6)
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing)
       return res.status(409).json({ message: 'Email already registered' });
 
-    const hashed = await bcrypt.hash(password, 12);
-    const user   = await User.create({
-      name: name.trim(),
+    /* FIX: Pass plain password — the User model pre('save') hook hashes it.
+       Previously this was bcrypt.hash(password, 12) here AND hashed again
+       in the model, causing double-hashing and permanent login failure. */
+    const user = await User.create({
+      name:  name.trim(),
       email: email.toLowerCase().trim(),
-      password: hashed,
+      password,          // plain — model hook hashes it once
       phone: phone || '',
     });
 
@@ -40,7 +69,7 @@ router.post('/register', async (req, res) => {
 });
 
 /* POST /api/login */
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
@@ -78,12 +107,18 @@ router.get('/profile', authMiddleware, async (req, res) => {
 /* PUT /api/profile */
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
+    /* FIX: Only allow safe fields — never expose isAdmin via profile update */
     const { name, phone, address } = req.body;
+
+    if (name !== undefined && !name.trim())
+      return res.status(400).json({ message: 'Name cannot be empty' });
+
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { name, phone, address },
-      { new: true, select: '-password' }
-    );
+      { name: name?.trim(), phone, address },
+      { new: true, runValidators: true }   // FIX: runValidators ensures schema rules run
+    ).select('-password');
+
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
