@@ -1,8 +1,21 @@
 /* =====================================================
    CHATBOT.JS — Genezenz Pharmacy AI chat widget
+   FIXES:
+   - Sends { messages: [...] } array instead of { message: text }
+     (backend was returning 400 on every single message)
+   - Maintains conversation history so context is preserved
+   - addMsg() now returns the element so typing indicator works
 ===================================================== */
 (function () {
   const BASE = window.API_BASE || 'https://medplus-lkr7.onrender.com';
+
+  /* ── Conversation history (kept in memory per session) ── */
+  const history = [];
+
+  const SYSTEM_PROMPT = `You are a helpful assistant for Genezenz Pharmacy, an online pharmacy in India.
+Help users with medicine information, product queries, order status, and general health questions.
+Keep answers concise and friendly. Always recommend consulting a doctor for medical advice.
+Do not provide specific dosage instructions — direct users to the product label or their doctor.`;
 
   /* ── Build widget HTML ── */
   const widget = document.createElement('div');
@@ -28,10 +41,16 @@
         background: var(--teal-700, #1a5454); color: #fff; padding: .75rem 1rem;
         display: flex; align-items: center; gap: .6rem; font-weight: 700; font-size: .9rem;
       }
-      #chatbot-header button {
-        margin-left: auto; background: none; border: none; color: #fff; font-size: 1rem; cursor: pointer; opacity: .7;
+      #chatbot-header .cb-clear {
+        margin-left: auto; background: none; border: none; color: #fff;
+        font-size: .75rem; cursor: pointer; opacity: .6; padding: 2px 6px;
+        border-radius: 4px; transition: opacity .15s;
       }
-      #chatbot-header button:hover { opacity: 1; }
+      #chatbot-header .cb-clear:hover { opacity: 1; }
+      #chatbot-close-btn {
+        background: none; border: none; color: #fff; font-size: 1rem; cursor: pointer; opacity: .7;
+      }
+      #chatbot-close-btn:hover { opacity: 1; }
       #chatbot-messages {
         flex: 1; overflow-y: auto; padding: .75rem 1rem; display: flex; flex-direction: column; gap: .6rem;
         font-size: .875rem; background: #f8fafc;
@@ -39,23 +58,26 @@
       .cb-msg { max-width: 85%; padding: .55rem .85rem; border-radius: 12px; line-height: 1.5; }
       .cb-msg.bot { background: #fff; border: 1px solid #e2e8f0; color: #1e293b; align-self: flex-start; }
       .cb-msg.user { background: var(--teal-600, #1e6b6b); color: #fff; align-self: flex-end; }
+      .cb-msg.typing { opacity: .6; font-style: italic; }
       #chatbot-input-row {
         display: flex; border-top: 1px solid #e2e8f0; background: #fff;
       }
       #chatbot-input {
-        flex: 1; padding: .7rem 1rem; border: none; outline: none; font-size: .875rem; resize: none;
+        flex: 1; padding: .7rem 1rem; border: none; outline: none; font-size: .875rem;
       }
       #chatbot-send {
         padding: .7rem 1rem; background: var(--teal-600, #1e6b6b); color: #fff;
         border: none; cursor: pointer; font-size: 1rem; transition: background .18s;
       }
       #chatbot-send:hover { background: var(--teal-500, #228080); }
+      #chatbot-send:disabled { opacity: .5; cursor: not-allowed; }
     </style>
 
     <div id="chatbot-box" role="dialog" aria-label="Genezenz Pharmacy chat assistant">
       <div id="chatbot-header">
         <i class="fas fa-comment-medical"></i> Genezenz Pharmacy Assistant
-        <button id="chatbot-close" aria-label="Close chat"><i class="fas fa-times"></i></button>
+        <button class="cb-clear" id="chatbot-clear-btn" title="Clear chat">Clear</button>
+        <button id="chatbot-close-btn" aria-label="Close chat"><i class="fas fa-times"></i></button>
       </div>
       <div id="chatbot-messages">
         <div class="cb-msg bot">👋 Hi! I'm the Genezenz Pharmacy assistant. Ask me about medicines, products, or your order.</div>
@@ -72,43 +94,76 @@
   `;
   document.body.appendChild(widget);
 
-  const fab   = document.getElementById('chatbot-fab');
-  const box   = document.getElementById('chatbot-box');
-  const close = document.getElementById('chatbot-close');
-  const input = document.getElementById('chatbot-input');
-  const send  = document.getElementById('chatbot-send');
-  const msgs  = document.getElementById('chatbot-messages');
+  const fab      = document.getElementById('chatbot-fab');
+  const box      = document.getElementById('chatbot-box');
+  const closeBtn = document.getElementById('chatbot-close-btn');
+  const clearBtn = document.getElementById('chatbot-clear-btn');
+  const input    = document.getElementById('chatbot-input');
+  const sendBtn  = document.getElementById('chatbot-send');
+  const msgs     = document.getElementById('chatbot-messages');
 
-  fab.addEventListener('click',   () => box.classList.toggle('open'));
-  close.addEventListener('click', () => box.classList.remove('open'));
-  send.addEventListener('click',  sendMsg);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+  fab.addEventListener('click',   () => { box.classList.toggle('open'); if (box.classList.contains('open')) input.focus(); });
+  closeBtn.addEventListener('click', () => box.classList.remove('open'));
+  clearBtn.addEventListener('click', () => {
+    history.length = 0;
+    msgs.innerHTML = '<div class="cb-msg bot">Chat cleared. How can I help you?</div>';
+  });
+  sendBtn.addEventListener('click', sendMsg);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } });
 
-  function addMsg(text, who) {
+  /* Returns the created element so the caller can update it (e.g. typing → reply) */
+  function addMsg(text, who, extraClass = '') {
     const el = document.createElement('div');
-    el.className = 'cb-msg ' + who;
+    el.className = `cb-msg ${who}${extraClass ? ' ' + extraClass : ''}`;
     el.textContent = text;
     msgs.appendChild(el);
     msgs.scrollTop = msgs.scrollHeight;
+    return el;
   }
 
   async function sendMsg() {
     const text = input.value.trim();
-    if (!text) return;
+    if (!text || sendBtn.disabled) return;
+
     addMsg(text, 'user');
     input.value = '';
-    addMsg('…', 'bot');
+    sendBtn.disabled = true;
+
+    /* FIX: Push to history BEFORE the request so context is always sent */
+    history.push({ role: 'user', content: text });
+
+    /* Show typing indicator */
+    const typingEl = addMsg('Typing…', 'bot', 'typing');
+
     try {
-      const res  = await fetch(`${BASE}/api/chat`, {
-        method: 'POST',
+      /* FIX: Send { messages: [...] } array — backend was returning 400 when
+         we sent { message: text } (a single string) instead of an array. */
+      const res = await fetch(`${BASE}/api/chat`, {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({
+          messages:     history.slice(-20), // last 20 turns for token efficiency
+          systemPrompt: SYSTEM_PROMPT,
+        }),
       });
-      const data = await res.json();
-      msgs.lastChild.textContent = data.reply || data.message || "Sorry, I couldn't get a response.";
+
+      const data  = await res.json();
+      const reply = data.reply || data.message || "Sorry, I couldn't get a response.";
+
+      typingEl.textContent  = reply;
+      typingEl.classList.remove('typing');
+
+      /* Add assistant reply to history for next turn */
+      history.push({ role: 'assistant', content: reply });
     } catch {
-      msgs.lastChild.textContent = 'Unable to reach the assistant. Please try again.';
+      typingEl.textContent = 'Unable to reach the assistant. Please try again.';
+      typingEl.classList.remove('typing');
+      /* Remove the failed user message from history so it isn't re-sent */
+      history.pop();
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+      msgs.scrollTop = msgs.scrollHeight;
     }
-    msgs.scrollTop = msgs.scrollHeight;
   }
 })();
