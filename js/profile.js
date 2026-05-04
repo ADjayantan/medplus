@@ -1,9 +1,20 @@
-/* profile.js — user profile: orders + prescriptions */
+/* =====================================================
+   profile.js — user profile: orders + prescriptions
+   FIX: Replaced calls to showPage() and openAuthModal()
+   which don't exist in profile.html — caused ReferenceError
+   for any logged-out user landing on the page.
+===================================================== */
 
 function initProfile() {
   const user  = currentUser();
   const token = localStorage.getItem('genezenz-pharmacy_token');
-  if (!user || !token) { showPage('home'); openAuthModal('login'); return; }
+
+  /* FIX: Was showPage('home') + openAuthModal('login') — both undefined.
+     Now redirects to login with a return URL so user lands back here. */
+  if (!user || !token) {
+    window.location.href = 'login.html?redirect=profile.html';
+    return;
+  }
 
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
   setEl('profile-name',  user.name);
@@ -33,9 +44,9 @@ async function loadOrderHistory() {
           <i class="fas fa-box-open" style="font-size:48px;margin-bottom:16px;display:block"></i>
           <div style="font-size:18px;font-weight:600;color:#475569;margin-bottom:8px">No orders yet</div>
           <p style="font-size:14px">Your order history will appear here</p>
-          <button onclick="showPage('home')" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">
+          <a href="products.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;text-decoration:none">
             <i class="fas fa-store"></i> Shop Now
-          </button>
+          </a>
         </div>`;
       return;
     }
@@ -151,6 +162,7 @@ async function loadPrescriptionHistory() {
             <span style="background:${bg};color:${col};padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;text-transform:capitalize;display:inline-flex;align-items:center;gap:6px">
               <i class="fas ${ico}"></i> ${rx.status}
             </span>
+            ${rx.url ? `<br><a href="${rx.url}" target="_blank" rel="noopener" style="font-size:11px;color:#2563eb;margin-top:4px;display:inline-block">View file</a>` : ''}
           </div>
         </div>`;
     }).join('');
