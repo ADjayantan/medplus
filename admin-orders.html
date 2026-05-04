@@ -255,7 +255,7 @@ function closeModal(){document.getElementById('order-modal').classList.remove('o
 document.getElementById('order-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
 if(sessionStorage.getItem('adminGateway')!=='genezenz-pharmacy-admin-2025'){document.body.innerHTML='';window.location.replace('admin-login.html');}
-else{const u=currentUser();if(!u||!u.isAdmin){document.body.innerHTML='';window.location.replace('admin-login.html');}else{document.getElementById('admin-name').textContent=u.name||'Admin';document.getElementById('admin-avatar').textContent=(u.name||'A')[0].toUpperCase();loadOrders();}}
+else{const u=currentUser();if(!u||!u.isAdmin){document.body.innerHTML='';window.location.replace('admin-login.html');}else{const dn=(u.name||'Genezenz Admin').replace(/MedPlus Admin/gi,'Genezenz Admin').replace(/MedPlus/gi,'Genezenz Pharmacy');document.getElementById('admin-name').textContent=dn;document.getElementById('admin-avatar').textContent=(u.name||'A')[0].toUpperCase();loadOrders();}}
 </script>
 <script src="js/chatbot.js"></script>
 </body>
